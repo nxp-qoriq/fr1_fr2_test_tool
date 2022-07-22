@@ -1,0 +1,393 @@
+#!/bin/bash
+# Copyright 2022-2024 NXP
+#
+# NXP Confidential. This software is owned or controlled by NXP and may only
+# be used strictly in accordance with the applicable license terms. By expressly accepting
+# such terms or by downloading, installing, activating and/or otherwise using
+# the software, you are agreeing that you have read, and that you agree to
+# comply with and are bound by, such license terms. If you do not agree to
+# be bound by the applicable license terms, then you may not retain,
+# install, activate or otherwise use the software.
+
+
+#This file contain default configurations of the test tool
+#Users can change the configuration before starting to test
+
+############ CONFIGURATION 0: MODEM_PCI_ADDR
+#use export MODEM_PCI_ADDR=  do define the specific modem pci addr
+pci_addr_id=$MODEM_PCI_ADDR
+							
+############# CONFIGURATION 1: TDD FDD.
+tx_fdd=1				#0-TX in TDD mode, 1-TX in FDD mode
+rx_fdd=1				#0-RX in TDD mode, 1-RX in FDD mode
+rx_allowed_ext=0		#extension period of RX allowed in TDD mode, 0:standard TDD mode with no extension. 1-14:extend rx_allowed_ext*8192 samples. 15:TDD listening mode
+
+############# CONFIGURATION 2: DCS channels to test
+#from left to right mapping to LSDCS0-0,LSDCS0-1,LSDCS1-0,LSDCS1-1, HSDCS0, HSDCS1
+#value 0 means the channel will be disabled and will not be tested. Disabling unwanted channels can reduce data throughput on PCI and make system more stable
+#value 1 means the channel will be enabled for TX and RX
+#value 2 means the channel will be enabled for TX only.
+#value 3 means the channel will be enabled for RX only.
+DCSchan=(1 1 1 1   1 1)
+
+############# CONFIGURATION 3: DCS channel remapping
+#By default ant ID 0-5 are mapped to 0:LSDCS0-0,1:LSDCS0-1,2:LSDCS1-0,3:LSDCS1-1,4:HSDCS0,5:HSDCS1
+#In case users want to map in different way, change ant_remap to 1, and re-map the ant logic ID
+#One example case is that when VSPA images only support 1T1R (ant_id is 0), by default it is mapped to LSDCS0-0, users can re-map 
+#it to DCS channel LSDCS1-0 by setting ant_remap=1 and ant_map_tx/rx=(2,x,x,x,x,x). In this case values for ant ID 1-5 are don't-care
+ant_remap=0
+ant_map_tx=(2 3 0 1 5 4)    #valid only when ant_remap=1, TX ant0,1 mapping to LSDCS1-0,1-1, ant4 mapping to HSDCS1
+ant_map_rx=(2 3 0 1 5 4)    #valid only when ant_remap=1, RX ant0,1 mapping to LSDCS1-0,1-1, ant4 mapping to HSDCS1
+#           | | | | | |
+#   ant_id  0 1 2 3 4 5     #above new DCS channels re-mapped to ant id 0-5.
+
+############# CONFIGURATION 4: TDD pattern
+#A pattern is defined by 6 numbers: DL slots, DL symbols, UL slots, UL symbols, GP slots after UL, GP slots after UL
+#Example: (7 6 2 4 0 0) stands for DDDDD DDSUU, in which S is (6 DL symbols + 4 GP symbols + 4 UL symbols)
+#use channels_start.sh patternX   X=0-5 to select one of patterns to use.
+pattern0=(7 6 2 4 0 0)                #DDDDD DDSUU
+pattern1=(3 10 1 2 0 0)               #DDDSU
+pattern2=(3 6 1 4 0 0   2 10 2 2 0 0) #for redcap scs30: DDDSU DDSUU
+pattern3=(2 0 1 0 1 1   1 0 2 0 1 1)  #for redcap scs15: DDGUG DGUUG
+pattern4=(1 0 0 12 0 0)
+pattern5=(0 6 0 6 0 0)
+pattern6=(3 1 3 0)                    #mini slot is represented by 4 numbers, which represents: DL symbols, GP symbols, UL symbols, GP symbols.
+pattern7=(3 10 1 2 0 0   2 10 2 2 0 0)
+
+############# CONFIGURATION 5: eCPRI compresssion decompresssion enable/disable
+ecpri_comp_decomp_enable=0
+
+############# CONFIGURATION 6: waveform len, dump bounday and len configurations
+input_waveform_len=(20 10)   #default waveform length, 20ms for TDD, 10ms for FDD. valid range 1-40ms. must no larger than 80ms.
+sys_period=40                #system period in ms, must match the setting in VSPA image.
+dump_time_len=20             #default dump len in ms, 1-40 ms. must not be bigger than sys_period.
+
+############# CONFIGURATION 7: option8 or ecpri,
+option8=0                    #set to 0 for eCPRI, 1 for option8
+
+############# CONFIGURATION 8: IQ SWAP configurations
+#The 6 values in each parentheses are for the 6 DCS channels, from left to right mapping to LSDCS0-0,LSDCS0-1,LSDCS1-0,LSDCS1-1, HSDCS0, HSDCS1
+#To enable IQSWAP, change the value to 1
+#example: iqswap_tx=(0 0 1 0 0 0) will enable IQ SWAP on TX of LSDCS1-0
+iqswap_tx=(0 0 0 0 0 0)
+iqswap_rx=(0 0 0 0 1 0)  #HS ADC0 RX should be swapped in revB device.
+known_iqswap_list=(
+"NXP Layerscape LA1224-RDB RevC"	0 0 0 0 0 1		0 0 0 0 1 0  #each entry has 3 parts: board name from /proc/device-tree/model,iqswap tx,iqswap rx
+"RFNM imx8mp"	0 0 0 0 0 0		0 1 0 0 1 0  #each entry has 3 parts: board name from /proc/device-tree/model,iqswap tx,iqswap rx
+)
+
+############# CONFIGURATION 9: Cell Tracking configurations. Only for UE
+SSB_PERIOD=3					#SSB repeating period, 0:5ms, 1:10ms, 2:20ms, 3:40ms.
+SSB_SYM_ID=4					#SSB location, symbol Index insdie SSB PERIOD. For 20Mhz SCS30 10ms, valid range is from 0-279
+SSB_RE_OFFSET=186				#SSB starting RE Index, offset from the first RE of actual num of REs of current Bandwidth.
+NID2=1							#valid range 0,1,2
+NID1=1							#valid range 0-335
+
+############# CONFIGURATION 10: CFR configuration.   NOT SUPPORTED
+
+
+############# CONFIGURATION 11: DCS enabling config 
+#use NXP L1C to enable DCS tx_allowed/rx_allowed automatically. If users want to use their own software to enable DCS, change this configuration to 0
+#when this configuration is set to 0, users can still use NXP L1C tool to enable DCS manually.
+#if users see error response in L1C commands, they should set this configuration to 0 and use any workable way they know to enable DCS.
+use_nxp_l1c=1
+                                #the following configuration only valid when use_nxp_l1c=1
+ul_dl_gap=2000                  #gap between UL and DL switching. in nanosecond.
+
+############# CONFIGURATION 12: DDR buffer manual configuration and reservation
+#set use_manual_ddr_buffer to 1 if users want to use manually specified DDR region for Test Tool
+#reserved_size is a size for other purpose. test tool will not use this size. 
+#If users have other software that needs DDR, 
+#they can set this reserved_size and use this size from beginning of the DDR region, test tool will use DDR space after the reserved_size.
+use_manual_ddr_buffer=1
+mddr_vir=0x96400000
+mddr_phy=0xb0001000
+mddr_size=0xd000000
+reserved_size=0x400000
+
+############# CONFIGURATION 14: DPD model customization (Only valid when T4x VSPA image is used)
+#user can customize DPD model by setting use_custom_dpd_model=1, and change the DPD model defined in dpd_model_para_custom.
+#Only p(max), the 3rd column can be changed, and it can only be changed to a value equal to or smaller then MAX value specified.
+#if a row is not needed, set p(max) to -.
+use_custom_dpd_model=1  #valid only for T4x image
+
+#This model is used by ADvspa_images_LS.2T2R.T4x_100M_30K_491_245_HS.2R_400M_120K_983_983_TDDFDD
+dpd_model_para_custom_01=(
+#r q P  ID 01
+ 0 0 6  #max 6				
+ 1 0 3  #max 5				
+ 2 0 -  #max 5				
+ 0 1 5  #max 5				
+ 1 1 5  #max 6				
+ 2 1 -  #max 5				
+ 0 2 -  #max 5				
+ 1 2 -  #max 5				
+ 2 2 -  #max 6				
+)
+
+#This model is used by ADvspa_images_LS.2T2R.T4x_100M_30K_491_245_HS.2R_400M_120K_1966_1966_TDDFDD
+dpd_model_para_custom_19=(
+#r q P  ID 19     example: 73   522  R&D1 R&D2 R&D2M
+ 0 0 6  #max 6                 6     4    6    5    5   
+ 1 0 3  #max 5                 -     4    3    2    2   
+ 2 0 -  #max 3                 -     -    -    -    -   
+ 3 0 -  #max 3                 -     -    -    -    -   
+ 4 0 -  #max 3                 -     -    -    -    -   
+ 5 0 -  #max 3                 -     -    -    -    -   
+ 0 1 5  #max 5                 -     4    5    4    4   
+ 1 1 5  #max 6                 6     4    5    3    4   
+ 2 1 -  #max 5                 -     -    -    -    -   
+ 3 1 -  #max 5                 -     -    -    -    -
+ 4 1 -  #max 5                 -     -    -    -    -
+ 5 1 -  #max 5                 -     -    -    -    -
+ 0 2 -  #max 5                 -     -    -    3    4
+ 2 2 -  #max 6                 6     -    -    3    3
+ 0 3 -  #max 5                 -     -    -    -    -
+ 3 3 -  #max 5                 -     -    -    -    -
+ 0 4 -  #max 5                 -     -    -    -    -
+ 4 4 -  #max 5                 -     -    -    -    -
+ 0 5 -  #max 5                 -     -    -    -    -
+ 5 5 -  #max 5                 -     -    -    -    -
+)
+
+
+#dpd_model_para_custom=(
+##r q P  ID 10     example: 73   522  R&D1 R&D2 R&D2M
+# 0 0 6  #max 6                 6     4    6    5    5   
+# 1 0 3  #max 5                 -     4    3    2    2   
+# 2 0 -  #max 5                 -     -    -    -    -   
+# 3 0 -  #max 5                 -     -    -    -    -   
+# 4 0 -  #max 5                 -     -    -    -    -   
+# 5 0 -  #max 5                 -     -    -    -    -   
+# 0 1 5  #max 5                 -     4    5    4    4   
+# 1 1 5  #max 6                 6     4    5    3    4   
+# 2 1 -  #max 5                 -     -    -    -    -   
+# 3 1 -  #max 5                 -     -    -    -    -
+# 4 1 -  #max 5                 -     -    -    -    -
+# 5 1 -  #max 5                 -     -    -    -    -
+# 0 2 -  #max 5                 -     -    -    3    4
+# 1 2 -  #max 5                 -     -    -    -    -
+# 2 2 -  #max 6                 6     -    -    3    3
+# 3 2 -  #max 5                 -     -    -    -    -
+# 4 2 -  #max 5                 -     -    -    -    -
+# 5 2 -  #max 5                 -     -    -    -    -
+#)
+
+#include custom config file.  If users have their own config other than above, they can put in config_custom.dat
+#the custom config will overwrite the default config above.
+#this is useful when users upgrade fr1 fr2 test tool versions, config.dat will be replaced, but users own config_custom.dat will remain unchanged.
+[ -f ./config_custom.dat ] && source ./config_custom.dat
+
+
+
+# END OF CONFIGURATIONS
+#**************************************************************************************************
+# USERS SHOULD NOT CHANGE THE FOLLOWING CODE.
+
+#DDR phy and vir address mapping, HRAM address mapping
+#the test tool will automatically use the DDR memory defined as scratch by yami, 
+
+modem_info_app=modem_info
+if [ ! -f /usr/bin/modem_info ];then
+	modem_info_app=la9310_modem_info
+	[ ! -f /usr/bin/la9310_modem_info ] && { echo -e "***ERROR: modem_info unavailable, can not obtain system memory mapping.\n"; exit 1; }
+fi
+
+out=$($modem_info_app $pci_addr_id)
+if [ "$out" = "" ];then
+	echo -e "***ERROR: No info in $modem_info_app, can not get modem address.\n"
+	exit 1
+else
+	vspa_dev_type=$(echo $out | grep LA12xx)
+	[ "$vspa_dev_type" = "" ] && vspa_dev_type=LA9310 || vspa_dev_type=LA12xx    #LA12xx or LA9310
+
+	if [ $vspa_dev_type = LA12xx ];then
+		var=$(printf "$out" |grep -A3 "Scrach Buf Regions" |grep "^    0"|cut -d"|" -f3|tr -d ' '|head -1)
+		ddr_phy=$var
+		var=$(printf "$out" |grep -A3 "Scrach Buf Regions" |grep "^    0"|cut -d"|" -f2|tr -d ' '|head -1)
+		ddr_vir=$var
+		var=$(printf "$out" |grep -A3 "Scrach Buf Regions" |grep "^    0"|cut -d"|" -f4|tr -d ' '|head -1)
+		ddr_size=$var
+		var=$(printf "$out" |grep "^PEB"| cut -d" " -f3 | head -1)
+		PEBaddr_vir=$(printf "0x%x" $var)
+		var=$(printf "$out" |grep "^CCSR"| cut -d" " -f3 | head -1)
+		modembase_phy=$var
+		
+		PEBaddr_phy=0xe0200000
+		HRAMaddr_phy=0xe5000000
+		FRAMaddr_phy=0xe6000000
+		VDRAMaddr_phy=0xe1000000
+		HRAMaddr_vir=$(printf "0x%x" $((PEBaddr_vir-0x200000+0x5000000)))
+		FRAMaddr_vir=$(printf "0x%x" $((HRAMaddr_vir+0x01000000)))    
+		VDRAMaddr_vir=$(printf "0x%x" $((HRAMaddr_vir-0x04000000)))
+		HRAM_size=$((0x600000))
+		FRAM_size=$((768*1024))
+		VCPUDMEM_SIZE=0x20000
+		IPPUDMEM_SIZE=0x30000
+		ONCHIP_mem_phy=$PEBaddr_phy
+		ONCHIP_mem_vir=$PEBaddr_vir
+		ONCHIP_mem_size=$((FRAMaddr_phy+FRAM_size-PEBaddr_phy))
+
+	else
+		var=$(printf "$out" |grep "PCI WIN start" |tr -d ' ')
+		ddr_phy=${var:11:10}
+		var=$(printf "$out" |grep "Scratch buf phys" |tr -d ' ')
+		ddr_vir=${var:14:10}
+		ddr_size=${var:29:10}
+
+		var=$(printf "$out" |grep "HIF start" |tr -d ' ')
+		hif_vir=${var:8:10}
+		
+		var=$(printf "$out" |grep "IQ FLOOD phys" |tr -d ' ')
+		if [ "$var" != "" ];then
+		ddr_vir=${var:11:10}
+		ddr_phy=${var:32:10}
+		ddr_size=${var:47}
+		reserved_size=0
+		fi
+		
+		var=$(printf "$out" |grep "TCMU phys" |tr -d ' ')
+		PEBaddr_vir=${var:8:10}   #TCM
+		var=$(printf "$out" |grep "CCSR phys" |tr -d ' ')
+		modembase_phy=${var:8:10}
+		
+		TCM_START_PHY=0x20000000
+		TCM_AVAILABLE_OFFSET=0 #0xd000
+		TCM_AVAILABLE_SIZE=0x10000 #0x2000
+		PEBaddr_phy=$((TCM_START_PHY+TCM_AVAILABLE_OFFSET))
+		HRAMaddr_phy=$PEBaddr_phy
+		FRAMaddr_phy=$PEBaddr_phy
+		VDRAMaddr_phy=0x20400000
+		HRAMaddr_vir=$(printf "0x%x" $((PEBaddr_vir+TCM_AVAILABLE_OFFSET)))  #TCM 2nd half
+		FRAMaddr_vir=$(printf "0x%x" $((PEBaddr_vir+TCM_AVAILABLE_OFFSET)))  #TCM
+		VDRAMaddr_vir=$(printf "0x%x" $((PEBaddr_vir+0x400000)))
+		HRAM_size=$TCM_AVAILABLE_SIZE
+		FRAM_size=0
+		VCPUDMEM_SIZE=0x4000
+		IPPUDMEM_SIZE=0x4000
+		ONCHIP_mem_phy=$HRAMaddr_phy
+		ONCHIP_mem_vir=$HRAMaddr_vir
+		ONCHIP_mem_size=$HRAM_size
+
+	fi
+	
+	[ "$modembase_phy" = "" ]&& { echo -e "\n" "$out" "\n\n***ERROR: Wrong address info from modem_info, CCSR can not be retrieved.\n"; exit 1; }
+fi
+
+if [ $vspa_dev_type = LA9310 ];then
+if [ $((use_manual_ddr_buffer)) -ne 0 ];then
+	ddr_vir=$mddr_vir
+	ddr_phy=$mddr_phy
+	ddr_size=$mddr_size
+fi
+fi
+
+if [ $((reserved_size)) -ne 0 ];then
+	ddr_vir=$(printf "0x%x" $((ddr_vir+reserved_size)))
+	ddr_phy=$(printf "0x%x" $((ddr_phy+reserved_size)))
+	ddr_size=$(printf "0x%x" $((ddr_size-reserved_size)))
+fi
+	
+
+#echo ddr_vir=$ddr_vir, ddr_phy=$ddr_phy, ddr_size=$ddr_size, HRAMaddr_phy=$HRAMaddr_phy, HRAMaddr_vir=$HRAMaddr_vir
+#echo FRAMaddr_phy=$FRAMaddr_phy, FRAMaddr_vir=$FRAMaddr_vir, VDRAMaddr_phy=$VDRAMaddr_phy, VDRAMaddr_vir=$VDRAMaddr_vir
+
+#modembase_phy=`dmesg -S | grep "BAR:0" | tail -1 | cut -d ":" -f6 | cut -d " " -f1`   #BAR 0 for CCSR
+#modem_mem_phy=`dmesg -S | grep "BAR:2" | tail -1 | cut -d ":" -f6 | cut -d " " -f1`   #BAR 2 for LA device memory, PEB for LA12xx, TCM for LA9310
+
+DDR_host_vspa_view_offset=$((ddr_vir-ddr_phy))
+HRAM_host_vspa_view_offset=$((HRAMaddr_vir-HRAMaddr_phy))
+if ([ $((dump_time_len)) -eq 0 ] || [ $((dump_time_len)) -gt 40 ]);then
+	echo 
+	echo Wrong dump time len. only 1-40 ms supported.
+	echo
+	exit
+fi
+
+BITMASK_DIS_CFR0=1
+BITMASK_DIS_CFR1=2
+BITMASK_DIS_CFR2=0X4
+BITMASK_DIS_CFR3=0X200
+BITMASK_DIS_DPD=0X8
+BITMASK_DIS_TXQEC=0X10
+BITMASK_DIS_2XUP1=0X20
+BITMASK_DIS_2XUP2=0X40
+BITMASK_DIS_IFFT=0X100
+BITMASK_DIS_CPWIN=0X400
+BITMASK_DIS_RXQEC=0X10000
+BITMASK_DIS_2XDOWN=0X20000
+BITMASK_DIS_FFT=0X40000
+
+BITMASK_ANT_ENABLE_TX=2 
+BITMASK_ANT_ENABLE_RX=1 
+BITMASK_ANT_ENABLE_TRX=$((BITMASK_ANT_ENABLE_TX+BITMASK_ANT_ENABLE_RX))
+
+TAG_DCSID=("LSDCS0-0  " "LSDCS0-1  " "LSDCS1-0  " "LSDCS1-1  " "HSDCS0    " "HSDCS1    " "Illegal   " "Illegal   ")
+
+if [ $vspa_dev_type = LA12xx ];then
+	NUM_ANTS=6;  NUM_CORES=8; 
+	NUM_ANTS_LS=4; NUM_ANTS_HS=2;
+	vspa_core_clock=614400;  #Khz
+	TAG_TXDCSID=("LSDAC0-0  " "LSDAC0-1  " "LSDAC1-0  " "LSDAC1-1  " "HSDAC0    " "HSDAC1    " "Illegal   " "Illegal   ")
+	TAG_RXDCSID=("LSADC0-0  " "LSADC0-1  " "LSADC1-0  " "LSADC1-1  " "HSADC0    " "HSADC1    " "Illegal   " "Illegal   ")
+elif [ $vspa_dev_type = LA9310 ];then 
+	NUM_ANTS=4;  NUM_CORES=1; 
+	NUM_ANTS_LS=4; NUM_ANTS_HS=0;
+	vspa_core_clock=491520;  #Khz
+	TAG_TXDCSID=("DAC0      " "DAC0      " "DAC0      " "DAC0      " "Illegal   " "Illegal   " "Illegal   " "Illegal   ")
+	TAG_RXDCSID=("ADC0      " "ADC1      " "ADC2      " "ADC3      " "Illegal   " "Illegal   " "Illegal   " "Illegal   ")
+else
+	echo ***ERROR: Wrong vspa_dev_type; exit 1;
+fi
+
+VDRAM_size=$((0x400000*NUM_CORES))
+ANTS_ARR_INIT=(0 0 0 0 0 0); INVALID_ANT=15
+CORES_ARR_INIT=(0 0 0 0 0 0 0 0); INVALID_CORE=15
+dcs_enable=(${ANTS_ARR_INIT[@]}); ant_enable=(${ANTS_ARR_INIT[@]});
+num_errors=0; first_error=0; total_error_print_msg=""
+hiphy_txcore=$INVALID_CORE; hiphy_rxcore=$INVALID_CORE
+buffer_mode=0
+buffer_mode_addr40_tx=(${ANTS_ARR_INIT[@]}); buffer_mode_size_tx=(${ANTS_ARR_INIT[@]})
+buffer_mode_addr40_rx=(${ANTS_ARR_INIT[@]}); buffer_mode_size_rx=(${ANTS_ARR_INIT[@]})
+
+#internal testing for OBS dedicated channel
+#the following example configuraions matches the configuraitons in VSPA as 1.9Gsps, 2G_mode=1, dump size 8192 samples.
+#when OBS chan is enabled in any of CAP msg, test tool will enable dedicated OBS chan HSADC4 and 5 with the following settings.
+OBS_DEDICATE_ENABLE=1              #enable this for DPD training on HS channels. when enalbed and VSPA image also enables OBS, HS ADC will be enabled.
+OBS_DAC_SPS=1966080000             #Observation channel ADC sampling rate
+OBS_SIZE_BUFFER=$((64*1024-128))   #OBS buffer size in bytes,  must match VSPA code setting, can not be changed.
+OBS_HW_DECIMATION_RATIO=2          #1:hardware decimation not used. 2:hardware decimation used.  must match VSPA code setting, can not be changed.
+OBS_PULSE_LEN=$((OBS_SIZE_BUFFER/4*OBS_HW_DECIMATION_RATIO))	#len of pulse, nunmber of samples
+OBS_PULSE_PERIOD=$((sys_period))  #period of pulse in ms. must match VSPA sysmtem period
+
+test_tool_env_base_phy=$ddr_phy  #buffer used by test tool environment.
+test_tool_env_base_vir=$ddr_vir
+test_tool_env_size=4096
+
+CELL_STATE_STOPPED=0
+CELL_STATE_SEARCH=1
+CELL_STATE_ATTACH=2
+CELL_STATE_NORMAL=3
+
+#test tool env struct
+test_tool_env_boot_vspa_ind=$((test_tool_env_base_vir))
+test_tool_env_lsdiv2=$((test_tool_env_boot_vspa_ind+4))
+test_tool_env_hsdiv2=$((test_tool_env_lsdiv2+4))
+test_tool_env_bwdiv=$((test_tool_env_hsdiv2+4))
+test_tool_env_fdd_mode_pre=$((test_tool_env_bwdiv+4))
+test_tool_env_cell_state=$((test_tool_env_fdd_mode_pre+4))
+test_tool_env_dfe_mode_msg=$((test_tool_env_cell_state+4))  #size NUM_CORES*2*4
+test_tool_env_buf_struct_msg=$((test_tool_env_dfe_mode_msg+NUM_CORES*2*4))  #size NUM_CORES*2*4
+test_tool_env_bw_ls=$((test_tool_env_buf_struct_msg+NUM_CORES*2*4))
+test_tool_env_scs_ls=$((test_tool_env_bw_ls+4))
+test_tool_env_txdcs_sps_ls=$((test_tool_env_scs_ls+4))
+test_tool_env_rxdcs_sps_ls=$((test_tool_env_txdcs_sps_ls+4))
+test_tool_env_bw_hs=$((test_tool_env_rxdcs_sps_ls+4))
+test_tool_env_scs_hs=$((test_tool_env_bw_hs+4))
+test_tool_env_txdcs_sps_hs=$((test_tool_env_scs_hs+4))
+test_tool_env_rxdcs_sps_hs=$((test_tool_env_txdcs_sps_hs+4))
+
+ddr_malloc_cur=$((ddr_phy+test_tool_env_size))
+
+flag_runtime_config=0
+[ -f runtime_config.txt ] && { source ./runtime_config.txt; flag_runtime_config=1; }
