@@ -56,7 +56,8 @@ echo Apply QEC Rx passthrough mode on DC offset values...
 echo ./update_qec_coeff_rx.sh $rx_ant_id dc=0:0 inc
 ./update_qec_coeff_rx.sh $rx_ant_id dc=0:0 inc > /dev/null 2>&1
 
-tx_file=$invecfile_cur
+#tx_file=$invecfile_cur
+tx_file=${invecfile_cur[$tx_ant_id]}
 rx_file=rx_timedomain_$rx_dump_file_size\KB_$feedback_sps\ksps_dump_ant$rx_ant_id.bin
 
 echo Starting Rx IQ correction...
