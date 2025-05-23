@@ -237,8 +237,11 @@ do
 done
 
 source ./boot_vspa_log.txt
-echo "$vspa_image_folder_name" | grep ADvspa_images_LS.4T4R_100M_30K_491_245_TDD_ISC
-[ $? = 0 ] && { echo Current VSPA image supports TDD only, set TDD mode.; tx_fdd=0; rx_fdd=0; }
+echo "$vspa_image_folder_name" | grep ADvspa_images_LS.4T4R_100M_30K_491_245_TDDFDD_ISC
+if [ $? = 0 ];then
+	sym_buf_onchip=1  #for ISC, rx sym buffers are on onchip memory
+	[ $((txonly|rxonly)) -eq 0 ] && { echo Current VSPA image supports TDD only, set TDD mode.; tx_fdd=0; rx_fdd=0; }
+fi
 echo "$vspa_image_folder_name" | grep MEvspa_images_LS.1T1R.T4x_25M_60K_122_122_TDDFDD_LA93
 [ $? = 0 ] && { echo Current VSPA image supports DFE only, set DFE mode.; dfe_only=1; sym_buf_onchip=1; }
 
@@ -486,6 +489,26 @@ else
 	log=`check_error`
 	echo "num_errors=0; first_error=0" >> runtime_config.txt
 	rxrestart=0; txrestart=0
+	
+	if [ $fr1_used = 1 ];then  #restart HighPHY TX/RX cores in case of ISC
+	txcore=6
+	rxcore=4
+	else
+	txcore=2
+	rxcore=0
+	fi
+	
+	((dfe_mode_msb=0x0E30001C|(tx_fdd<<12)|(rx_fdd<<13)))
+	dfe_mode_lsb=0
+	dfe_mode_msb=`printf "0x%08x" $dfe_mode_msb`
+	
+	echo
+	echo Restart HighPHY TX RX cores:
+
+	echo "vspa_mbox send $txcore $host_vspa_mbox_id $dfe_mode_msb $dfe_mode_lsb "
+	vspa_mbox_ifsend $txcore $host_vspa_mbox_id $dfe_mode_msb $dfe_mode_lsb
+	echo "vspa_mbox send $rxcore $host_vspa_mbox_id $dfe_mode_msb $dfe_mode_lsb "
+	vspa_mbox_ifsend $rxcore $host_vspa_mbox_id $dfe_mode_msb $dfe_mode_lsb
 fi
 
 #the following is a workaround to set up IQFLOOD PCI window for the BSP bug in old BSP version

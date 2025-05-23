@@ -194,6 +194,8 @@ typedef struct tdd_pattern_entry_s
 #define celltrack_config_hi       ((ant_core_map_lo+4))
 #define celltrack_config_lo       ((celltrack_config_hi+4))
 
+#define tx_circ_base			0x160
+#define rx_circ_base			0x170
 #define addr_antman_tx			0x16c
 #define addr_antman_rx			0x17c
 #define addr_phcom_coeff_tx		0x180
@@ -653,16 +655,28 @@ void dmac_abort(unsigned int mask)
 	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_STAT_ABORT) = mask;
 }
 
-void Ant_buffer_tx_axiq_reset(struct_antman_ctrl_tx* antman_ctrl_tx)
+void Ant_buffer_tx_axiq_reset(unsigned int dcs_id, uint64_t vspa_dmem_base_vir)
 {
 	unsigned int core = 0;
-	unsigned int axiq_dma_chan = antman_ctrl_tx->axiq_dma_chan;
+	struct_antman_ctrl_tx antman_ctrl_tx;
+	antman_ctrl_tx.axiq_dma_chan = AXIQDMA_ID_TX0;
+	antman_ctrl_tx.axiq_fifo_addr = AXIQFIFO_ADDR_TX0+AXIQFIFO_OFFSET_THRESHOLD_TX;
+	antman_ctrl_tx.axiq_control_gpo = GPO(AXIQ_GPO_TX0);
+	antman_ctrl_tx.axiq_status_gpi = GPI(AXIQ_GPI_TX0);
+	antman_ctrl_tx.axiq_control_enable_bitfield = LS_AXIQ_CTL_TX0_CH_EN_MASK;
+	antman_ctrl_tx.axiq_status_enable_bitfield = AXIQ_STATUS_ENABLE_BITFIELD_TX0;
+	antman_ctrl_tx.axiq_underflow_overflow_bitfield = AXIQ_STATUS_UNDERF_BITFIELD_TX0;
+	antman_ctrl_tx.axiq_control_fifo_rst_clr_err_bitfield = LS_AXIQ_CTL_TX0_CLEAR_ERROR_MASK;		
+	antman_ctrl_tx.buf_stat_ant_tx[0].buf_addr[0] = 0;
+	unsigned int addr_temp = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_circ_base);  //used for temp addr for vspa DMA VCPU addr
+
+	unsigned int axiq_dma_chan = antman_ctrl_tx.axiq_dma_chan;
 
 	dmac_abort(1<<axiq_dma_chan);
 	
 	#ifdef LA9310
 	//configure a short DMA with PTR_RST to reset AXIQ, 9310 AXIQ can only reset by ptr_rst
-	dmac_enable(DMAC_PRST_REQ | DMA_TRIG | DMAC_WRC | DMAC_FIFO_HS | axiq_dma_chan, 64, antman_ctrl_tx->axiq_fifo_addr, UNIT2BYTE(antman_ctrl_tx->buf_stat_ant_tx[0].buf_addr[0]));
+	dmac_enable(DMAC_PRST_REQ | DMA_TRIG | DMAC_WRC | DMAC_FIFO_HS | axiq_dma_chan, 64, antman_ctrl_tx.axiq_fifo_addr, addr_temp);
 	delay_cycles(1000);
 	//if AXIQ is in normal state, this DMA will be pending there, then abort it.
 	//if AXIQ is in Flush mode, this DMA will be consumed and Flush mode will be ended, then this abort will take no effect.
@@ -671,24 +685,37 @@ void Ant_buffer_tx_axiq_reset(struct_antman_ctrl_tx* antman_ctrl_tx)
 
 	//disable AXIQ, reset AXIQ(LA12xx only), clr errors
 	//__ip_write(antman_ctrl_tx->axiq_control_gpo, antman_ctrl_tx->axiq_control_enable_bitfield|antman_ctrl_tx->axiq_control_fifo_rst_clr_err_bitfield, antman_ctrl_tx->axiq_control_fifo_rst_clr_err_bitfield);
-	unsigned int gpo = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_tx->axiq_control_gpo*4);
-	gpo &= ~(antman_ctrl_tx->axiq_control_enable_bitfield|antman_ctrl_tx->axiq_control_fifo_rst_clr_err_bitfield);
-	gpo |= antman_ctrl_tx->axiq_control_fifo_rst_clr_err_bitfield;
-	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_tx->axiq_control_gpo*4) = gpo;
+	unsigned int gpo = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_tx.axiq_control_gpo*4);
+	gpo &= ~(antman_ctrl_tx.axiq_control_enable_bitfield|antman_ctrl_tx.axiq_control_fifo_rst_clr_err_bitfield);
+	gpo |= antman_ctrl_tx.axiq_control_fifo_rst_clr_err_bitfield;
+	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_tx.axiq_control_gpo*4) = gpo;
 	delay_cycles(32); //wait at least 8 clocks for reset to complete
 	//__ip_write(antman_ctrl_tx->axiq_control_gpo, antman_ctrl_tx->axiq_control_fifo_rst_clr_err_bitfield, 0);
-	gpo &= ~antman_ctrl_tx->axiq_control_fifo_rst_clr_err_bitfield;
-	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_tx->axiq_control_gpo*4) = gpo;
+	gpo &= ~antman_ctrl_tx.axiq_control_fifo_rst_clr_err_bitfield;
+	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_tx.axiq_control_gpo*4) = gpo;
 }
-void Ant_buffer_rx_axiq_reset(struct_antman_ctrl_rx* antman_ctrl_rx)
+void Ant_buffer_rx_axiq_reset(unsigned int dcs_id, uint64_t vspa_dmem_base_vir)
 {
 	unsigned int core = 0;
-	unsigned int axiq_dma_chan = antman_ctrl_rx->axiq_dma_chan;
+	struct_antman_ctrl_rx antman_ctrl_rx;
+	antman_ctrl_rx.axiq_fifo_addr = AXIQFIFO_ADDR_RX0 + dcs_id * 0x1000 +AXIQFIFO_OFFSET_THRESHOLD_RX;
+	antman_ctrl_rx.axiq_dma_chan = (AXIQDMA_ID_RX0+dcs_id);		
+	antman_ctrl_rx.dcs_id = dcs_id;
+	antman_ctrl_rx.axiq_control_gpo = GPO(4);
+	antman_ctrl_rx.axiq_status_gpi = GPI(0);
+	antman_ctrl_rx.axiq_control_enable_bitfield = LS_AXIQ_CTL_RX0_CH_EN_MASK<<(dcs_id*8);
+	antman_ctrl_rx.axiq_control_fifo_rst_clr_err_bitfield = LS_AXIQ_CTL_RX0_CLEAR_ERROR_MASK<<(dcs_id*8);
+	antman_ctrl_rx.axiq_status_err_bitfield = 0xc<<(dcs_id*4);
+	antman_ctrl_rx.axiq_status_enable_bitfield = LS_AXIQ_STS_RX0_CH_EN_MASK<<(dcs_id*4);
+	antman_ctrl_rx.axiq_underflow_overflow_bitfield = 0xc<<(dcs_id*4);
+	unsigned int addr_temp = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_circ_base);  //used for temp addr for vspa DMA VCPU addr
+
+	unsigned int axiq_dma_chan = antman_ctrl_rx.axiq_dma_chan;
 	dmac_abort(1<<axiq_dma_chan);
 
 	#ifdef LA9310
 	//configure a short DMA with PTR_RST to reset AXIQ, 9310 AXIQ can only reset by ptr_rst
-	dmac_enable(DMAC_PRST_REQ | DMA_TRIG | DMAC_RDC | DMAC_FIFO_HS | axiq_dma_chan, 64, antman_ctrl_rx->axiq_fifo_addr, UNIT2BYTE(antman_ctrl_rx->buf_stat_ant_rx[0].buf_addr[0]));
+	dmac_enable(DMAC_PRST_REQ | DMA_TRIG | DMAC_RDC | DMAC_FIFO_HS | axiq_dma_chan, 64, antman_ctrl_rx.axiq_fifo_addr, addr_temp);
 	delay_cycles(1000);
 	//if AXIQ is in normal state, this DMA will be pending there, then abort it.
 	//if AXIQ is in Flush mode, this DMA will be consumed and Flush mode will be ended, then this abort will take no effect.
@@ -697,14 +724,14 @@ void Ant_buffer_rx_axiq_reset(struct_antman_ctrl_rx* antman_ctrl_rx)
 
 	//disable AXIQ, reset AXIQ(LA12xx only), clr errors
 	//__ip_write(antman_ctrl_rx->axiq_control_gpo, antman_ctrl_rx->axiq_control_enable_bitfield|antman_ctrl_rx->axiq_control_fifo_rst_clr_err_bitfield, antman_ctrl_rx->axiq_control_fifo_rst_clr_err_bitfield);
-	unsigned int gpo = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_rx->axiq_control_gpo*4);
-	gpo &= ~(antman_ctrl_rx->axiq_control_enable_bitfield|antman_ctrl_rx->axiq_control_fifo_rst_clr_err_bitfield);
-	gpo |= antman_ctrl_rx->axiq_control_fifo_rst_clr_err_bitfield;
-	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_rx->axiq_control_gpo*4) = gpo;
+	unsigned int gpo = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_rx.axiq_control_gpo*4);
+	gpo &= ~(antman_ctrl_rx.axiq_control_enable_bitfield|antman_ctrl_rx.axiq_control_fifo_rst_clr_err_bitfield);
+	gpo |= antman_ctrl_rx.axiq_control_fifo_rst_clr_err_bitfield;
+	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_rx.axiq_control_gpo*4) = gpo;
 	delay_cycles(32); //wait at least 8 clocks for reset to complete
 	//__ip_write(antman_ctrl_rx->axiq_control_gpo, antman_ctrl_rx->axiq_control_fifo_rst_clr_err_bitfield, 0);
-	gpo &= ~antman_ctrl_rx->axiq_control_fifo_rst_clr_err_bitfield;
-	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_rx->axiq_control_gpo*4) = gpo;
+	gpo &= ~antman_ctrl_rx.axiq_control_fifo_rst_clr_err_bitfield;
+	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_rx.axiq_control_gpo*4) = gpo;
 }
 int Ant_buffer_tx_init(unsigned int dcs_id, unsigned int iq_swap, uint64_t vspa_dmem_base_vir)
 {
@@ -904,8 +931,9 @@ int Ant_buffer_rx_init(unsigned int dcs_ids, unsigned int ctrl_iqswap, uint64_t 
 	{
 		reg_value |= (LS_AXIQ_CTL_RX0_CH_EN_MASK | (FIFO_THRESHOLD_CONFIG_RX<<LS_AXIQ_CTL_RX0_FIFO_THRESH_LSB) | (iq_swap2<<LS_AXIQ_CTL_RX0_SWAP_B))<<(dcs_id2*8);
 		reg_mask |= (LS_AXIQ_CTL_RX0_CH_EN_MASK | LS_AXIQ_CTL_RX0_FIFO_THRESH_MASK | LS_AXIQ_CTL_RX0_SWAP_MASK)<<(dcs_id2*8);
-		*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IP_IDX_FAST_FLAGS) = 1;
+		*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IP_IDX_FAST_FLAGS) |= 1;
 	}
+
 #else
 	antman_ctrl_rx->dcs_id = dcs_ids;
 	if(dcs_id == 0)
@@ -1153,15 +1181,14 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 	}
 	else if((msb&0xFF000000)==MSG_ID_DFE_MODE_CONFIG)   //DFE MODE msg
 	{
-		unsigned int dfe_mode_pre = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IP_DFE_MODE_HI);
-		if(dfe_mode_pre)  //update DFE mode bits only
+		unsigned int dfe_mode_hi_pre = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IP_DFE_MODE_HI);
+		if(dfe_mode_hi_pre)  //update DFE mode bits only
 		{
-			unsigned int v_addr_antman_tx = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+addr_antman_tx);
-			struct_antman_ctrl_tx antman_ctrl_tx = *(struct_antman_ctrl_tx*)(vspa_dmem_base_vir+core*0x400000+v_addr_antman_tx);
-			unsigned int v_addr_antman_rx = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+addr_antman_rx);
-			struct_antman_ctrl_rx antman_ctrl_rx = *(struct_antman_ctrl_rx*)(vspa_dmem_base_vir+core*0x400000+v_addr_antman_rx);
-
-
+			unsigned int dfe_mode_lo_pre = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IP_DFE_MODE_LO);
+			unsigned int ant_map_tx_pre = GET_DFE_MODE_ANT_MAP_TX(dfe_mode_lo_pre);
+			unsigned int ant_map_rx_pre = GET_DFE_MODE_ANT_MAP_RX(dfe_mode_lo_pre);
+			unsigned int ant_map_rx2_pre = GET_DFE_MODE_ANT_MAP_RX2(dfe_mode_lo_pre);
+			
 			*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IP_DFE_MODE_LO) = lsb;
 			*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IP_DFE_MODE_HI) = msb;
 			
@@ -1174,14 +1201,18 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 					dfe_mode_cur = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IP_DFE_MODE_HI);
 				}while(dfe_mode_cur & DFE_MODE_RESTART_TX);
 				
+				delay_cycles(1000000); //delay 1ms to make sure vspa has restarted
+				
 				//reset AXIQ only when FDD mode,  TDD mode doesn't need reset AXIQ for restart.
-				if( ((msb&DFE_MODE_TX_DIS)==0) && (dfe_mode_pre&DFE_MODE_TX_FDD) )
+				if( ((msb&DFE_MODE_TX_DIS)==0) && (dfe_mode_hi_pre&DFE_MODE_TX_FDD) )
 				{
-					Ant_buffer_tx_axiq_reset(&antman_ctrl_tx);
+					Ant_buffer_tx_axiq_reset(ant_map_tx_pre, vspa_dmem_base_vir);
 				}
-				if( ((msb&DFE_MODE_RX_DIS)==0) && (dfe_mode_pre&DFE_MODE_RX_FDD) )
+				if( ((msb&DFE_MODE_RX_DIS)==0) && (dfe_mode_hi_pre&DFE_MODE_RX_FDD) )
 				{
-					Ant_buffer_rx_axiq_reset(&antman_ctrl_rx);
+					Ant_buffer_rx_axiq_reset(ant_map_rx_pre, vspa_dmem_base_vir);
+					if(ant_map_rx2_pre != 0x7)
+						Ant_buffer_rx_axiq_reset(ant_map_rx2_pre, vspa_dmem_base_vir);
 				}
 			}
 			return ((uint64_t)MSG_ID_DFE_MODE_CONFIG_ACK)<<32;
@@ -1200,7 +1231,7 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 			Ant_buffer_rx_init(dcs_id, ctrl_iqswap, vspa_dmem_base_vir);
 
 //		iEdmaInit();
-//		iEdmaChanInit(14);
+//		iEdmaChanInit(VSPA_eDMA_CHANNEL);
 		
 		unsigned short num_rb_in_a_sym = ((lsb)>>24)&0xFF;
 		unsigned int num_sc_in_a_sym = num_rb_in_a_sym*12;
