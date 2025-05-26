@@ -36,7 +36,7 @@ yesno=0
 num_counter=0
 offset=0
 len=0
-
+txrx=0 #0=tx 1=rx
 arg_parse()
 {
 	arg=$1
@@ -47,6 +47,7 @@ arg_parse()
 	elif [ $1 = auto ]; then	auto=1
 	elif [ $1 = dis ]; then		dis=1
 	elif [ $1 = off ]; then		off=1
+	elif [ $1 = rx ]; then		txrx=1
 	elif [ ${arg:0:7} = offset= ]; then		offset=${arg:7}
 	elif [ ${arg:0:4} = len= ]; then		len=${arg:4}
 	else
@@ -67,8 +68,24 @@ do
 	arg_parse $i
 done
 
-check_ant_enable_tx $ant #[ $((ant_enable[ant]&BITMASK_ANT_ENABLE_TX)) = 0 ] && { echo ***ERROR: Current TX ant $ant is not enabled.; exit 1; }
-([ $factor -eq 0 ] && [ $((vspa_image_version)) -lt $((0x353)) ]) && { echo "***Error: Scaling factor can not be 0, please run ./send_single_tone.sh $ant 0 0 to disable output signal."; echo; exit 1; }
+if [ $txrx = 1 ];then
+	check_ant_enable_rx $ant
+	rxcore=${antrx[$ant]}
+	rid=${ridant[$ant]}
+	if [ $((factor)) -ne 0 ];then
+		factor=`percent_to_F16 $((factor))`
+	fi
+
+	msb=`printf "0x%08x" $((0x0a030000 | (1 << 14) | (rid<<15)))`
+	vspa_mbox send $rxcore $host_vspa_mbox_id $msb $factor;
+	echo vspa_mbox send $rxcore $host_vspa_mbox_id $msb $factor;
+	echo "RX ant $ant scaling done"
+	check_error $ant
+	exit 0
+fi
+
+
+check_ant_enable_tx $ant
 
 if ([ $((factor)) -ge 200 ] && [ $yesno = 0 ]);then
 	echo "***WARNING: High amplitude may damage PA. The scaling you set is $factor%."
@@ -80,15 +97,6 @@ fi
 txcore=${anttx[$ant]}
 tid=${tidant[$ant]}
 get_chan_para $ant $txcore
-
-if ([ $((single_tone_stat)) -eq 1 ] && [ $((vspa_image_version)) -lt $((0x353)) ]);then
-	echo Single tone can not be scaled by this script, please stop single tone or use ./send_single_tone.sh to set the freq and amplitude of single tone.
-	echo Command failed.
-	echo 
-	exit
-fi
-
-([ $((txdcs/baseband_txsps)) -lt 2 ] && [ $((vspa_image_version)) -lt $((0x353)) ]) && { input_scaling=1; echo WARNING: Output scaling is not supported when baseband SPS equals to DCS SPS, will use input scaling instead.; }
 
 if [ $dis = 1 ];then
 	input_scaling=1; input_scaling_factor=100
@@ -173,25 +181,12 @@ if [ $output_scaling = 1 ];then
 	fi
 
 	echo "Scaling output signal  amplitude for antenna $ant to $output_scaling_factor%..."
-	if [ $((vspa_image_version)) -ge $((0x312)) ];then
-		msb=0x0a030000 #msb=0x0a034000 #scale 2xup1 coeff which is always enabled, 2xup2 is disabled in case only 2x up sampling is needed
-	elif [ $((vspa_image_version)) -gt $((0x251)) ];then
-		msb=0x0a034000
-	else
-		[ $((txdcs/baseband_txsps)) -lt 4 ] && msb=0x0a030000 || msb=0x0a034000
-	fi
-
-	if [ $((vspa_image_version)) -lt $((0x353)) ];then
-		((output_scaling_factor=output_scaling_factor*100/factor_hist))
-	fi
-
-
 
 	if [ $((output_scaling_factor)) -ne 0 ];then
 		output_scaling_factor=`percent_to_F16 $output_scaling_factor`
 	fi
 
-	msb=`printf "0x%08x" $((msb + (tid<<15)))`
+	msb=`printf "0x%08x" $((0x0a030000 | (tid<<15)))`
 	vspa_mbox send $txcore $host_vspa_mbox_id $msb $output_scaling_factor;
 	echo vspa_mbox send $txcore $host_vspa_mbox_id $msb $output_scaling_factor;
 
