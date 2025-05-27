@@ -47,15 +47,16 @@ arg_parse()
 	elif [ $1 = auto ]; then	auto=1
 	elif [ $1 = dis ]; then		dis=1
 	elif [ $1 = off ]; then		off=1
+	elif [ $1 = tx ]; then		txrx=0
 	elif [ $1 = rx ]; then		txrx=1
 	elif [ ${arg:0:7} = offset= ]; then		offset=${arg:7}
 	elif [ ${arg:0:4} = len= ]; then		len=${arg:4}
 	else
 		if [ $num_counter = 0 ];then
-			ant=$(($1))
+			ant=$(($1)); [ $ant != $1 ] && { echo -e "***ERROR: Wrong Argument $1\n"; print_usage; exit 1; }
 			num_counter=$((num_counter+1))
 		elif [ $num_counter = 1 ];then
-			factor=$(($1))
+			factor=$(($1)); [ $factor != $1 ] && { echo -e "***ERROR: Wrong Argument $1\n"; print_usage; exit 1; }
 			num_counter=$((num_counter+1))
 		else
 			echo -e "***ERROR: Wrong Argument $1\n"; print_usage; exit 1
@@ -70,6 +71,8 @@ done
 
 if [ $txrx = 1 ];then
 	check_ant_enable_rx $ant
+	echo "Scaling digital signal amplitude at RX ADC output for antenna $ant to $factor%..."
+	./utils/memrw w 32 $((test_tool_env_rx_scaling+ant*4)) $factor
 	rxcore=${antrx[$ant]}
 	rid=${ridant[$ant]}
 	if [ $((factor)) -ne 0 ];then
@@ -79,7 +82,7 @@ if [ $txrx = 1 ];then
 	msb=`printf "0x%08x" $((0x0a030000 | (1 << 14) | (rid<<15)))`
 	vspa_mbox send $rxcore $host_vspa_mbox_id $msb $factor;
 	echo vspa_mbox send $rxcore $host_vspa_mbox_id $msb $factor;
-	echo "RX ant $ant scaling done"
+	echo -e "RX signal scaling done. Run ./check_all.sh to check scaling result\n"
 	check_error $ant
 	exit 0
 fi
@@ -150,10 +153,10 @@ fi
 
 
 if [ $input_scaling = 1 ];then
-	echo Scaling input waveform amplitude for antenna $ant to $input_scaling_factor%...
 	if ([ $phcom_disable = 1 ] || [ $((option8_tx[ant])) -eq 1 ]);then #when phcom is disabled or time domain, scale input waveform
 	filename=${invecfile_cur[$ant]}; [ $filename = 0 ] && { echo -e "Waveform file not loaded\n"; exit 1; }
-	log=`./update_test_vector.sh $ant $filename #restore test vector`
+	echo Scaling TX input waveform amplitude for antenna $ant to $input_scaling_factor%...
+	log=`./update_test_vector.sh $ant $filename`  #restore test vector
 	[ $((len)) -eq 0 ] && len=$((invecsize_exp[$ant]/4))
 	if [ $input_scaling_factor -ne 100 ];then
 		addr_phy=${addr_tx_wv[$ant]}
@@ -161,9 +164,9 @@ if [ $input_scaling = 1 ];then
 		./utils/scale $((addr_vir+offset*4)) $((addr_vir+offset*4)) $len $input_scaling_factor
 	fi
 	./utils/memrw w 32 $((test_tool_env_tx_scaling_input+ant*4)) $input_scaling_factor 
-	
 	else
-	log=`./update_phase_compensation_coeff.sh $ant scale=$input_scaling_factor`
+	echo Scaling TX input amplitudeat by scaling phase compensation coeff for antenna $ant to $input_scaling_factor%...
+	./update_phase_compensation_coeff.sh $ant scale=$input_scaling_factor
 	fi
 fi
 
@@ -180,7 +183,7 @@ if [ $output_scaling = 1 ];then
 		./utils/memrw w 32 $((test_tool_env_tx_scaling_output+ant*4)) $output_scaling_factor 
 	fi
 
-	echo "Scaling output signal  amplitude for antenna $ant to $output_scaling_factor%..."
+	echo "Scaling digital signal amplitude at TX DAC input for antenna $ant to $output_scaling_factor%..."
 
 	if [ $((output_scaling_factor)) -ne 0 ];then
 		output_scaling_factor=`percent_to_F16 $output_scaling_factor`
@@ -191,6 +194,6 @@ if [ $output_scaling = 1 ];then
 	echo vspa_mbox send $txcore $host_vspa_mbox_id $msb $output_scaling_factor;
 
 fi
-echo -e "Scaling done. Run ./check_all.sh to check scaling result\n"
+echo -e "TX signal scaling done. Run ./check_all.sh to check scaling result\n"
 check_error $ant
 exit 0

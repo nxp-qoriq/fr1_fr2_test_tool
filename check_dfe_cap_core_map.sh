@@ -19,6 +19,7 @@ MAX_NUM_1R_IN_CORE=2
 
 test_tool_env_tx_scaling_input=$((test_tool_env_rxdcs_sps_hs+4)) #size NUM_ANTS
 test_tool_env_tx_scaling_output=$((test_tool_env_tx_scaling_input+NUM_ANTS*4)) #size NUM_ANTS
+test_tool_env_rx_scaling=$((test_tool_env_tx_scaling_output+NUM_ANTS*4)) #size NUM_ANTS
 
 #VSPA IP reg 
 IP_DFE_MODE_HI=$((0x13C))

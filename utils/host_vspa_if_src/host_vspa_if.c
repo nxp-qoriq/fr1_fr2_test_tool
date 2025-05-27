@@ -34,15 +34,15 @@ install, activate or otherwise use the software.
 //#define DUMP_INJECT_MODE_COMPACT				0x0080
 #define DUMP_INJECT_MODE_SHIFT					4
 
-
-#define IP_IDX_FAST_FLAGS	0x714
-#define IP_IDX_NSC			0x138
-#define IP_DFE_MODE_HI 		0x13C
-#define IP_DFE_MODE_LO 		0x140
+#define SWVERSION           0x004
 #define VCPU_HOST_FLAGS0    0x014
 #define VCPU_HOST_FLAGS1    0x018
 #define HOST_VCPU_FLAGS0    0x01C
 #define HOST_VCPU_FLAGS1    0x020
+#define IP_IDX_FAST_FLAGS	0x714
+#define IP_IDX_NSC			0x138
+#define IP_DFE_MODE_HI 		0x13C
+#define IP_DFE_MODE_LO 		0x140
 
 
 // Trigger options:
@@ -419,6 +419,8 @@ uint64_t g_ddr_host_vspa_view_offset;  //DDR address host vspa view offset (DDR 
 #define GPI(x)      (GPIN0 + (x))
 
 #define TCM_BASE	0x20000000
+#define VCPU_DMEM_SIZE_LA12xx		0x20000
+#define VCPU_DMEM_SIZE_LA9310		0x4000
 
 #define NUM_ANT_BUFFERS	2
 
@@ -560,6 +562,20 @@ int float16_to_float32(short data16)
 	data32 = (sign << 16) | ((data << (16 - 3)) + (0x70 << 23));   //change from EXP from (EXP field-15) to (EXP field-127), need compensate 127-15 = 112 = 0x70,
 #endif
 	return (int)data32;
+}
+
+uint32_t get_vspa_dmem_addr_offset_host_view(uint32_t vspa_dmem_addr_vspa_view)
+{
+	uint32_t vcpu_dmem_size;
+	if(g_dfe_ref_la9310)
+		vcpu_dmem_size = VCPU_DMEM_SIZE_LA9310;
+	else
+		vcpu_dmem_size = VCPU_DMEM_SIZE_LA12xx;
+	
+	if(vspa_dmem_addr_vspa_view >= vcpu_dmem_size)
+		return vspa_dmem_addr_vspa_view - vcpu_dmem_size + 0x100000;
+	else
+		return vspa_dmem_addr_vspa_view;
 }
 
 void qec_para_convert(void* p_qec_para_converted, void* p_qec_para)
@@ -1137,11 +1153,68 @@ unsigned int get_min(unsigned int a, unsigned int b)
 
 #define DFE_INITIALIZED					(1<<12)
 
+//return value: 0-success,  -1 fail (the msg not sent)
+uint64_t la9310_la12xx_mbox_common(unsigned int core, unsigned int mbox_id, unsigned int msb, unsigned int lsb)
+{
+	if((msb&0xFF3F0000)==0x0A030000)   //signal scaling
+	{
+		uint64_t dest;
+		unsigned int trid = (msb>>15)&1;
+		uint64_t vspa_dmem_base_vir = (uint64_t)mmap(NULL, 0x2000000, PROT_READ | PROT_WRITE,	MAP_SHARED, g_devmem_fd, g_vspa_dmem_base_phy);
+		core = ((*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+SWVERSION))>>13) & 7;	//signal scaling is on core A.
+
+		if(msb & (1<<14))  //TXRX
+			dest = (*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+addr_DFE_qec_params_opt_rx))<<7;
+		else
+			dest = (*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+addr_DFE_qec_params_opt_tx))<<7;
+
+		dest = (vspa_dmem_base_vir+core*0x400000+get_vspa_dmem_addr_offset_host_view(dest)+trid*128);
+		
+		short temp=lsb&0xFFFF;
+		int temp1 = float16_to_float32(temp);
+		float output_scaling_factor = *(float*)&temp1;
+		
+		unsigned int cap_lo = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+STATUS_CAP_LO);
+		unsigned int timing_skew_flag = (cap_lo >> 22) & 0x1;
+
+		if(timing_skew_flag == 0)
+		{
+			float f1 = *(float*)(dest+4*6);
+			float f4 = *(float*)(dest+4*7);
+			float f2 = *(float*)(dest+4*9);
+			if((f1 == 0) && (f4 == 0) && (f2 == 0) )
+			{
+				f1 = 1; 
+				f4 = 1; 
+			}
+			f1 *= output_scaling_factor;
+			f2 *= output_scaling_factor;
+			f4 *= output_scaling_factor;
+			
+			*(float*)(dest+4*0) = f1;
+			*(float*)(dest+4*1) = f4;
+			*(float*)(dest+4*3) = f2;
+		}
+		else
+		{
+			float gain_I_ori = *(float*)(dest+128+4*9);
+			float gain_Q_ori = *(float*)(dest+128+4*10);
+			gain_I_ori *= output_scaling_factor;
+			gain_Q_ori *= output_scaling_factor;
+			*(float*)(dest+128+4*5) = gain_I_ori;
+			*(float*)(dest+128+4*6) = gain_Q_ori;
+		}
+		return 0;
+	}
+	return -1;
+}
+
+
 //due to LA9310 code size limitation, mailbox msg will be converted to direct memory access by this API.
 //return value: 0-success,  -1 fail (the msg not sent)
 uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, unsigned int msb, unsigned int lsb)
 {
-	uint64_t vspa_dmem_base_vir = (uint64_t)mmap(NULL, 0x100000, PROT_READ | PROT_WRITE,	MAP_SHARED, g_devmem_fd, g_vspa_dmem_base_phy);
+	uint64_t vspa_dmem_base_vir = (uint64_t)mmap(NULL, 0x2000000, PROT_READ | PROT_WRITE,	MAP_SHARED, g_devmem_fd, g_vspa_dmem_base_phy);
 	if( ((msb&0xFF000000)==MSG_ID_SYMBOL_BUFFER_STRUCT) || ((msb&0xFF000000)==MSG_ID_SYMBOL_BUFFER_STRUCT2) )   //buffer struct msg
 	{
 		unsigned int tx_sym_base, rx_sym_base, ack_msg;
@@ -1461,29 +1534,6 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 
 		return 0;
 	}
-	else if((msb&0xFF3F0000)==0x0A030000)   //output scaling
-	{
-		uint64_t dest;
-		dest = (*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+addr_DFE_qec_params_opt_tx))<<7;
-		dest = (vspa_dmem_base_vir+core*0x400000+dest);
-		
-		short temp=lsb&0xFFFF;
-		int temp1 = float16_to_float32(temp);
-		float output_scaling_factor = *(float*)&temp1;
-		
-		float f1 = *(float*)(dest+4*6);
-		float f4 = *(float*)(dest+4*7);
-		float f2 = *(float*)(dest+4*9);
-		f1 *= output_scaling_factor;
-		f2 *= output_scaling_factor;
-		f4 *= output_scaling_factor;
-		
-		*(float*)(dest+4*0) = f1;
-		*(float*)(dest+4*1) = f4;
-		*(float*)(dest+4*3) = f2;
-
-		return 0;
-	}
 	return -1;
 }
 
@@ -1561,26 +1611,31 @@ uint64_t hvif_mbox_send(uint32_t core_id, uint32_t mbox_id, uint32_t msb32, uint
 		return check_error_core(core_id);
 	
 	uint64_t addr = MAILBOX_ADDR(mbox_id, 0, core_id);
-	
-	if(g_dfe_ref_la9310)
+	uint64_t ret = la9310_la12xx_mbox_common(core_id, mbox_id, msb32, lsb32);
+	if(ret == -1) 
 	{
-		//la9310 fr1 fr2 test tool doesn't support some mbox msgs due to code size limitation, write to dmem
-		uint64_t ret = la9310_dmem_write_for_mbox(core_id, mbox_id, msb32, lsb32);
-		if(ret == -1) //for messages that are not written by direct mem access, send by mailbox
+		if(g_dfe_ref_la9310)
+		{
+			//la9310 fr1 fr2 test tool doesn't support some mbox msgs due to code size limitation, write to dmem
+			uint64_t ret = la9310_dmem_write_for_mbox(core_id, mbox_id, msb32, lsb32);
+			if(ret == -1) //for messages that are not written by direct mem access, send by mailbox
+			{
+				iowrite32(msb32, (void*)addr);
+				iowrite32(lsb32, (void*)(addr+4));
+				return 0;
+			}
+			else
+				return ret;
+		}
+		else
 		{
 			iowrite32(msb32, (void*)addr);
 			iowrite32(lsb32, (void*)(addr+4));
-			return 0;
+			return hvif_mbox_recv_1msg(core_id, mbox_id, 1);          //recv ack after a send
 		}
-		return ret;
 	}
 	else
-	{
-		iowrite32(msb32, (void*)addr);
-		iowrite32(lsb32, (void*)(addr+4));
-	}
-	
-	return hvif_mbox_recv_1msg(core_id, mbox_id, 1);          //recv ack after a send
+		return ret;
 }
 
 uint32_t hvif_tx_sym_buf_status(uint32_t core, uint32_t sym_idx)

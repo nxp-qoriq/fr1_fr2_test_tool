@@ -424,7 +424,7 @@ echo -e "fr1_used=$fr1_used; fr2_used=$fr2_used\nnum_T_LS=$num_T_LS; num_T_HS=$n
 if [ $flag_dfe_initialized = 0 ];then   #restart handling
 
 	./utils/memset $test_tool_env_tx_scaling_output $NUM_ANTS 100  #output scaling factor reset to 100 only when a first start, not restart as output scaling factor still kept in vspa.
-	
+	./utils/memset $test_tool_env_rx_scaling $NUM_ANTS 100
 	rxrestart=0; txrestart=0			#this is not a real restart, but just a first time start after boot.
 	boot_flag=`./utils/devmem $test_tool_env_boot_vspa_ind`
 	if [ $((boot_flag)) -ne $((0x1234abcd)) ];then
