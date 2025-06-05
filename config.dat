@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -18,17 +18,17 @@
 pci_addr_id=$MODEM_PCI_ADDR
 							
 ############# CONFIGURATION 1: TDD FDD.
-tx_fdd=1				#0-TX in TDD mode, 1-TX in FDD mode
-rx_fdd=1				#0-RX in TDD mode, 1-RX in FDD mode
+default_tx_fdd=1		#0-TX in TDD mode, 1-TX in FDD mode
+default_rx_fdd=1		#0-RX in TDD mode, 1-RX in FDD mode
 rx_allowed_ext=0		#extension period of RX allowed in TDD mode, 0:standard TDD mode with no extension. 1-14:extend rx_allowed_ext*8192 samples. 15:TDD listening mode
 
 ############# CONFIGURATION 2: DCS channels to test
 #from left to right mapping to LSDCS0-0,LSDCS0-1,LSDCS1-0,LSDCS1-1, HSDCS0, HSDCS1
 #value 0 means the channel will be disabled and will not be tested. Disabling unwanted channels can reduce data throughput on PCI and make system more stable
-#value 1 means the channel will be enabled for TX and RX
+#value 3 means the channel will be enabled for TX and RX
 #value 2 means the channel will be enabled for TX only.
-#value 3 means the channel will be enabled for RX only.
-DCSchan=(1 1 1 1   1 1)
+#value 1 means the channel will be enabled for RX only.
+DCSchan=(3 3 3 3   3 3)
 
 ############# CONFIGURATION 3: DCS channel remapping
 #By default ant ID 0-5 are mapped to 0:LSDCS0-0,1:LSDCS0-1,2:LSDCS1-0,3:LSDCS1-1,4:HSDCS0,5:HSDCS1
@@ -360,10 +360,10 @@ buffer_mode_addr40_rx=(${ANTS_ARR_INIT[@]}); buffer_mode_size_rx=(${ANTS_ARR_INI
 #when OBS chan is enabled in any of CAP msg, test tool will enable dedicated OBS chan HSADC4 and 5 with the following settings.
 OBS_DEDICATE_ENABLE=1              #enable this for DPD training on HS channels. when enalbed and VSPA image also enables OBS, HS ADC will be enabled.
 OBS_DAC_SPS=1966080000             #Observation channel ADC sampling rate
-OBS_SIZE_BUFFER=$((64*1024-128))   #OBS buffer size in bytes,  must match VSPA code setting, can not be changed.
-OBS_HW_DECIMATION_RATIO=2          #1:hardware decimation not used. 2:hardware decimation used.  must match VSPA code setting, can not be changed.
-OBS_PULSE_LEN=$((OBS_SIZE_BUFFER/4*OBS_HW_DECIMATION_RATIO))	#len of pulse, nunmber of samples
-OBS_PULSE_PERIOD=$((sys_period))  #period of pulse in ms. must match VSPA sysmtem period
+OBS_SIZE_BUFFER=$((40*1024))       #OBS buffer size in bytes,  must match VSPA code setting, can not be changed.
+OBS_HW_DECIMATION_ENABLE=1         #0:hardware decimation not used. 1:hardware decimation used.  must match VSPA code setting, can not be changed.
+OBS_PULSE_LEN=$((OBS_SIZE_BUFFER/4*(OBS_HW_DECIMATION_ENABLE+1)))	#len of pulse, number of samples
+OBS_PULSE_PERIOD=$((sys_period))   #period of pulse in ms. must match VSPA sysmtem period
 
 test_tool_env_base_phy=$ddr_phy  #buffer used by test tool environment.
 test_tool_env_base_vir=$ddr_vir

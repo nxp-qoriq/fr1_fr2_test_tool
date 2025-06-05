@@ -11,8 +11,8 @@
 
 source ./config.dat
 
-if [ $0 != ./measure_dma_latency.sh ];then
-[ $flag_runtime_config = 0 ] && { echo -e "***ERROR: Channels not started, run channels_start.sh\n"; exit 1; }
+if ([ $0 != ./measure_dma_latency.sh ] && [ $0 != ./channels_start.sh ]);then
+[ $flag_runtime_config = 0 ] && { echo -e "***ERROR: Channels not started, run ./channels_start.sh\n"; exit 1; }
 fi
 
 MAX_NUM_1R_IN_CORE=2
@@ -102,6 +102,7 @@ rx_inject_addr=$((COREB_STATUS_BASE+0x9c))
 rx_inject_size=$((COREB_STATUS_BASE+0xa0))
 peak_cycle_count=$((COREB_STATUS_BASE+0xb8))
 min_cycle_count=$((COREB_STATUS_BASE+0xba))
+obs_dump_addr=$((COREB_STATUS_BASE+0xd4))
 
 host_vspa_mbox_id=0
 tag_tddfdd=(TDD FDD)
@@ -150,13 +151,6 @@ get_flag_singletone() #$1=core id
 	local addr_vir=$(( $(get_vspa_dmem_base $1) + CONFIG_TX_SINGLE_TONE_AMP))
 	local flag=`./utils/memrw r 32 $addr_vir`
 	echo $((flag&1))
-}
-
-get_flag_obs() #$1=core id
-{
-	local addr_vir=$(( $(get_vspa_dmem_base $1) + RXPATH_STATUS_OFFSET_FLAG_AtoB))
-	local flag=`./utils/memrw r 32 $addr_vir`
-	echo $((flag&FLAG_AtoB_OBS_DUMP_ENABLE))   #0:8taps, non-zero:64taps
 }
 
 get_flag_downsampling_64taps() #$1=core id
@@ -427,21 +421,9 @@ else
 	fr1=0
 fi
 
-#echo read DFE capability info
-if [ $((vspa_image_version)) -lt $((0x422)) ];then
-	vspa_mbox ifsend $core $host_vspa_mbox_id 0x4C000000 0
-	if [ $msg_recv_flag = 0 ];then
-		echo -e "***ERROR: CAP msg no response on core $core\n"; return 1
-	elif [ $((msg_recv_msb32&0xFF000000)) -ne $((0x4d000000)) ];then
-		echo -e "***ERROR: CAP msg 0x4C000000 got unexpected response $msg_recv_msb32 on core $core, \n"; return 1
-	fi
-	cap_msb=$msg_recv_msb32; cap_lsb=$msg_recv_lsb32
-else
-	cap_msb=`get_wordvalue_from_vspa $((slave_core[core])) $STATUS_CAP_HI`
-	cap_lsb=`get_wordvalue_from_vspa $((slave_core[core])) $STATUS_CAP_LO`
-fi
-
 #parsing capability info
+cap_msb=`get_wordvalue_from_vspa $core $STATUS_CAP_HI`
+cap_lsb=`get_wordvalue_from_vspa $core $STATUS_CAP_LO`
 decom=$(($cap_lsb & 0x1))
 ifft=$((($cap_lsb >> 1) & 0x1))
 cfr_pass=$((($cap_lsb >> 2) & 0x3))
@@ -481,7 +463,7 @@ sym_queue_in_dfe=$((($cap_msb >> 4) & 0x1))
 #bandwidth_code=$((($cap_msb >> 17) & 0xF))
 dpd_enable=$(((cap_msb >> 8) & 0x1))
 num_downsampling_taps=$(((cap_msb >> 9) & 0x1)); [ $num_downsampling_taps = 0 ] && num_downsampling_taps=8 || num_downsampling_taps=64
-flag_obs=$(((cap_msb >> 10) & 0x1)); ((obs_chan_enable=obs_chan_enable|flag_obs))
+flag_obs=$(((cap_msb >> 10) & 0x1))
 option8=$((option8_cfg|((cap_msb>>11)&1)))
 dcsfdd=$(((cap_msb >> 12) & 0x1))
 rx_lpf_63taps_enable=$(((cap_msb >> 13) & 0x1))
@@ -598,7 +580,7 @@ elif [ $scs -eq 120 ];then
 fi
 
 POINTS_FFT=$((2<<`echo $max_sym_size | awk '{ printf("%d\n",log($1-1)/log(2)); }'`))
- 
+
 local cell_state=`./utils/devmem $test_tool_env_cell_state`
 [ $((cell_state)) = $CELL_STATE_SEARCH ] && pattern=(20 0 0 0 0 0)
 
@@ -831,9 +813,10 @@ echo "addr_test_tool_env           `phy2vir $test_tool_env_base_phy`, `printf "0
 echo "addr_trace_log               `phy2vir $trace_log_buf_base`, `printf "0x%x" $trace_log_buf_base`, size `printf "0x%x" $trace_log_buf_size`"
 echo "addr_tx_sym_queue            `phy2vir $tx_sym_queue_base`, `printf "0x%x" $tx_sym_queue_base`, size `printf "0x%x" $tx_sym_queue_size`"
 echo "addr_rx_sym_queue            `phy2vir $rx_sym_queue_base`, `printf "0x%x" $rx_sym_queue_base`, size `printf "0x%x" $rx_sym_queue_size`"
-#if [ $cpe = 1 ];then
 echo "addr_cell_tracking_extbuf    `phy2vir $celltrack_extbuf_base`, `printf "0x%x" $celltrack_extbuf_base`, size `printf "0x%x" $celltrack_extbuf_size`"
-#fi
+if [ $obs_buffer_phy != 0 ];then
+echo "addr_obs_buffer              `phy2vir $obs_buffer_phy`, `printf "0x%x" $obs_buffer_phy`, size `printf "0x%x" $obs_buffer_size`"
+fi
 echo "addr_tx_test_vector          `phy2vir $addr_tx_test_vector`, `printf "0x%x" $addr_tx_test_vector`, size `printf "0x%x" $size_tx_test_vector`"
 echo "addr_dump                    `phy2vir $addr_dump`, `printf "0x%x" $addr_dump`, size `printf "0x%x" $size_dump`"
 echo "addr_inject                  `phy2vir $addr_inject`, `printf "0x%x" $addr_inject`, size `printf "0x%x" $size_inject`"

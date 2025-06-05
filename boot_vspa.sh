@@ -46,7 +46,7 @@ arg_parse()
 	elif [ $1 = rudemo ];then									malt_firmware_name=geul_e200_rudemo.elf
 	else
 		if [ $num_counter = 0 ];then	((num_counter++));		arg=$1
-		elif [ $num_counter = 1 ];then	((num_counter++));		malt_firmware_name=$1; [ -f /lib/firmware/$malt_firmware_name ] || { echo Arguments wrong: $1; exit 1; }
+		elif [ $num_counter = 1 ];then	((num_counter++));		malt_firmware_name=$1
 		else	echo Wrong Argument: $1; print_usage; exit 1
 		fi
 	fi
@@ -99,6 +99,8 @@ else
 	[ -f $boot_tool ] || { echo -e "***ERROR: $boot_tool does not exist. OR wrong VSPA image used for current LA device, the images tagged with LA93 can only run on LA9310, ohters can only run on LA12xx.\n"; exit 1; }
 	[ "$malt_firmware_name" = "" ] && malt_firmware_name=geul_e200_rudemo.elf
 fi
+malt_firmware_pathname=/lib/firmware/$malt_firmware_name
+[ -f $malt_firmware_pathname ] || { echo File $malt_firmware_pathname does not exist; exit 1; }
 
 #Default value for Yami boot argument
 #modem_addr_array="0002:01:00.0"
@@ -228,7 +230,7 @@ else
 	obs_sps=0
 fi
 
-echo Booting VSPA images $arg ...
+echo Booting VSPA images $arg + $malt_firmware_pathname
 
 if [ $flag_la93 = 1 ];then
 	log=`lsmod | grep la9310shiva`
@@ -246,7 +248,6 @@ if [ $flag_la93 = 1 ];then
 	gpioset 0 1=1
 	mount -t hugetlbfs none /dev/hugepages
 	echo 24 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
-	[ -f /lib/firmware/la9310_dfe.bin ] || { echo "***ERROR: missing /lib/firmware/la9310_dfe.bin. You are using old BSP, upgrade to BSP 0.4 or above, or rename la9310.bin to la9310_dfe.bin. Boot failed"; exit 1; }
 
 	if [ $dac_sps = 61 ];then
 		dac_rate_tag="dac_rate_mask=0x1"

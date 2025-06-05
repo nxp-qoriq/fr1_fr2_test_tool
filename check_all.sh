@@ -532,10 +532,10 @@ echo -e "\nAnt Mapping RX:\nant_id  dcsid     dcs         status            scal
 for((i=0;i<$NUM_ANTS;i++))
 do
 	if [ $((ant_enable[$i]&BITMASK_ANT_ENABLE_RX)) != 0 ];then
-		test_tool_env_rx_scaling=$((`./utils/memrw r 32 $((test_tool_env_rx_scaling+i*4))`))
+		scaling_factor=$((`./utils/memrw r 32 $((test_tool_env_rx_scaling+i*4))`))
 		tag0="${ant_map_rx[$i]}     "
 		tag1=${TAG_RXDCSID[${ant_map_rx[$i]}]}
-		echo "$i       $tag0    $tag1  ${tag_running[ant_running_rx[i]]}      $test_tool_env_rx_scaling"
+		echo "$i       $tag0    $tag1  ${tag_running[ant_running_rx[i]]}      $scaling_factor"
 	fi
 done
 fi

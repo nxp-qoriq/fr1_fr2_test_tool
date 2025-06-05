@@ -1154,7 +1154,7 @@ unsigned int get_min(unsigned int a, unsigned int b)
 #define DFE_INITIALIZED					(1<<12)
 
 //return value: 0-success,  -1 fail (the msg not sent)
-uint64_t la9310_la12xx_mbox_common(unsigned int core, unsigned int mbox_id, unsigned int msb, unsigned int lsb)
+uint64_t la9310_la12xx_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, unsigned int msb, unsigned int lsb)
 {
 	if((msb&0xFF3F0000)==0x0A030000)   //signal scaling
 	{
@@ -1611,29 +1611,25 @@ uint64_t hvif_mbox_send(uint32_t core_id, uint32_t mbox_id, uint32_t msb32, uint
 		return check_error_core(core_id);
 	
 	uint64_t addr = MAILBOX_ADDR(mbox_id, 0, core_id);
-	uint64_t ret = la9310_la12xx_mbox_common(core_id, mbox_id, msb32, lsb32);
+	
+	//for specific messages, use direct mem write instead of mbox due to vspa code size limitation or mbox msg not implemeted in vspa
+	uint64_t ret = la9310_la12xx_dmem_write_for_mbox(core_id, mbox_id, msb32, lsb32);
 	if(ret == -1) 
 	{
 		if(g_dfe_ref_la9310)
 		{
 			//la9310 fr1 fr2 test tool doesn't support some mbox msgs due to code size limitation, write to dmem
-			uint64_t ret = la9310_dmem_write_for_mbox(core_id, mbox_id, msb32, lsb32);
-			if(ret == -1) //for messages that are not written by direct mem access, send by mailbox
-			{
-				iowrite32(msb32, (void*)addr);
-				iowrite32(lsb32, (void*)(addr+4));
-				return 0;
-			}
-			else
-				return ret;
-		}
-		else
-		{
-			iowrite32(msb32, (void*)addr);
-			iowrite32(lsb32, (void*)(addr+4));
-			return hvif_mbox_recv_1msg(core_id, mbox_id, 1);          //recv ack after a send
+			ret = la9310_dmem_write_for_mbox(core_id, mbox_id, msb32, lsb32);
 		}
 	}
+
+	//send all mbox messages.
+	iowrite32(msb32, (void*)addr);
+	iowrite32(lsb32, (void*)(addr+4));
+	uint64_t ret1 = hvif_mbox_recv_1msg(core_id, mbox_id, 1);          //recv ack after a send
+	
+	if(ret == -1) 
+		return ret1;
 	else
 		return ret;
 }
