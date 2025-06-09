@@ -28,16 +28,16 @@ rx_allowed_ext=0		#extension period of RX allowed in TDD mode, 0:standard TDD mo
 #value 3 means the channel will be enabled for TX and RX
 #value 2 means the channel will be enabled for TX only.
 #value 1 means the channel will be enabled for RX only.
-DCSchan=(3 3 3 3   3 3)
+default_DCSchan=(3 3 3 3   3 3)
 
 ############# CONFIGURATION 3: DCS channel remapping
 #By default ant ID 0-5 are mapped to 0:LSDCS0-0,1:LSDCS0-1,2:LSDCS1-0,3:LSDCS1-1,4:HSDCS0,5:HSDCS1
 #In case users want to map in different way, change ant_remap to 1, and re-map the ant logic ID
 #One example case is that when VSPA images only support 1T1R (ant_id is 0), by default it is mapped to LSDCS0-0, users can re-map 
 #it to DCS channel LSDCS1-0 by setting ant_remap=1 and ant_map_tx/rx=(2,x,x,x,x,x). In this case values for ant ID 1-5 are don't-care
-ant_remap=0
-ant_map_tx=(2 3 0 1 5 4)    #valid only when ant_remap=1, TX ant0,1 mapping to LSDCS1-0,1-1, ant4 mapping to HSDCS1
-ant_map_rx=(2 3 0 1 5 4)    #valid only when ant_remap=1, RX ant0,1 mapping to LSDCS1-0,1-1, ant4 mapping to HSDCS1
+default_ant_remap=0
+default_ant_map_tx=(2 3 0 1 5 4)    #valid only when ant_remap=1, TX ant0,1 mapping to LSDCS1-0,1-1, ant4 mapping to HSDCS1
+default_ant_map_rx=(2 3 0 1 5 4)    #valid only when ant_remap=1, RX ant0,1 mapping to LSDCS1-0,1-1, ant4 mapping to HSDCS1
 #           | | | | | |
 #   ant_id  0 1 2 3 4 5     #above new DCS channels re-mapped to ant id 0-5.
 
@@ -58,12 +58,12 @@ pattern7=(3 10 1 2 0 0   2 10 2 2 0 0)
 ecpri_comp_decomp_enable=0
 
 ############# CONFIGURATION 6: waveform len, dump bounday and len configurations
-input_waveform_len=(20 10)   #default waveform length, 20ms for TDD, 10ms for FDD. valid range 1-40ms. must no larger than 80ms.
+default_waveform_len=(20 10) #default waveform length, 20ms for TDD, 10ms for FDD. valid range 1-40ms. must no larger than 80ms.
 sys_period=40                #system period in ms, must match the setting in VSPA image.
 dump_time_len=20             #default dump len in ms, 1-40 ms. must not be bigger than sys_period.
 
 ############# CONFIGURATION 7: option8 or ecpri,
-option8=0                    #set to 0 for eCPRI, 1 for option8
+default_option8=0            #set to 0 for eCPRI, 1 for option8
 
 ############# CONFIGURATION 8: IQ SWAP and PN SWAP configurations
 #The 6 values in each parentheses are for the 6 DCS channels, from left to right mapping to LSDCS0-0,LSDCS0-1,LSDCS1-0,LSDCS1-1, HSDCS0, HSDCS1

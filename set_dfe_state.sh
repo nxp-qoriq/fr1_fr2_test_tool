@@ -84,11 +84,7 @@ sign_convert()
     echo $var
 }
 
-[ $vspa_dev_type = LA12xx ] && [ $state != track ] && { echo DFE state change is only supported on LA93xx device; exit 1; }
-([ $((tx_fdd|rx_fdd)) -ne 0 ] && [ $state != track ]) && { echo DFE state change is only supported in TDD mode, current mode is FDD; exit 1; }
-#[ $cpe = 0 ] && { echo DFE state change is only supported in UE/CPE mode, current mode is base station; exit 1; }
-
-[ $state != track ] && [ $state != $CELL_STATE_SEARCH ] && check_ant_enable_tx $ant
+[ $state != track ] && [ $state != $CELL_STATE_SEARCH ] && [ $((tx_fdd|rx_fdd)) -eq 0 ] && check_ant_enable_tx $ant
 check_ant_enable_rx $ant
 cell_state_pre=`./utils/devmem $test_tool_env_cell_state`
 if [ $state != track ];then
@@ -106,11 +102,15 @@ rid=${ridant[$ant]}
 get_chan_para $ant $txcore
 
 if [ $state = $CELL_STATE_STOPPED ];then
+	if [ $((tx_fdd|rx_fdd)) -eq 0 ];then
 	echo dpdk-dfe_app -c "tdd stop"
 	dpdk-dfe_app -c "tdd stop"
 	echo -e "\n\nDFE state has changed to $tag_state state. Run ./check_all.sh to see current status.\n"
-
+	else
+	echo -e "FDD STOP MODE not supported.\n"
+	fi
 elif [ $state = $CELL_STATE_SEARCH ];then
+	if [ $((tx_fdd|rx_fdd)) -eq 0 ];then
 	[ $((cell_state_pre)) -ne $CELL_STATE_STOPPED ] && { echo dpdk-dfe_app -c "tdd stop"; dpdk-dfe_app -c "tdd stop"; }
 
 	pattern_digits=${pattern[0]}
@@ -125,9 +125,13 @@ elif [ $state = $CELL_STATE_SEARCH ];then
 	echo dpdk-dfe_app -c "tdd start"
 	dpdk-dfe_app -c "tdd start"
 
+	else
+	./channels_start.sh search restart
+	fi
 	echo -e "\n ${GREEN} DFE state has changed to $tag_state state. Run ./check_all.sh to see current status.${NC} \n"
 
 elif [ $state = $CELL_STATE_ATTACH ];then
+	if [ $((tx_fdd|rx_fdd)) -eq 0 ];then
 	[ $((cell_state_pre)) -ne $CELL_STATE_STOPPED ] && { echo dpdk-dfe_app -c "tdd stop"; dpdk-dfe_app -c "tdd stop"; }
 
 	echo Clearing TX symbols buffer to avoid sending unwanted signal during mode change from SEARCH to ATTACH.
@@ -137,7 +141,7 @@ elif [ $state = $CELL_STATE_ATTACH ];then
 	msb=`devmem $((test_tool_env_dfe_mode_msg+txcore*8+0))`
 	lsb=`devmem $((test_tool_env_dfe_mode_msg+txcore*8+4))`
 	msb=$((msb|DFE_MODE_OPTION8))
-	vspa_mbox_mpsend $txcore $host_vspa_mbox_id $msb $lsb
+	vspa_mbox_ifsend $txcore $host_vspa_mbox_id $msb $lsb
 	
 	log=`./inject_freq_domain_tx.sh $ant stop`  #make sure to use symbol buffers interface
 	
@@ -152,6 +156,11 @@ elif [ $state = $CELL_STATE_ATTACH ];then
 
 	echo dpdk-dfe_app -c "tdd start"
 	dpdk-dfe_app -c "tdd start"
+	
+	else
+	./channels_start.sh restart option8 rt
+	./utils/devmem $test_tool_env_cell_state w $state
+	fi
 
 	echo -e "\n ${GREEN} DFE state has changed to $tag_state state. Run ./check_all.sh to see current status."
 	echo -e "\n ${GREEN} Currently DFE is sending time domain symbols from TX symbol buffers which are cleared to all 0."
@@ -159,13 +168,14 @@ elif [ $state = $CELL_STATE_ATTACH ];then
 
 elif [ $state = $CELL_STATE_NORMAL ];then
 	
+	if [ $((tx_fdd|rx_fdd)) -eq 0 ];then
 	echo Clearing TX symbols buffer to avoid sending unwanted signal during mode change from ATTACH to NORMAL.
 	./utils/memset `phy2vir $tx_sym_queue_base` $((tx_sym_queue_size/4)) 0
 	
 	echo Restoring DFE MODE to original state.
 	msb=`devmem $((test_tool_env_dfe_mode_msg+txcore*8+0))`
 	lsb=`devmem $((test_tool_env_dfe_mode_msg+txcore*8+4))`
-	vspa_mbox_mpsend $txcore $host_vspa_mbox_id $msb $lsb
+	vspa_mbox_ifsend $txcore $host_vspa_mbox_id $msb $lsb
 	echo Starting to play waveform
 	log=`./inject_freq_domain_tx.sh $ant` #to start playing default waveform
 	
@@ -181,6 +191,11 @@ elif [ $state = $CELL_STATE_NORMAL ];then
 
 	echo dpdk-dfe_app -c "tdd start"
 	dpdk-dfe_app -c "tdd start"
+	fi
+	
+	else
+	./channels_start.sh restart
+	./utils/devmem $test_tool_env_cell_state w $state
 	fi
 
 	echo -e "\n${GREEN}DFE state has changed to $tag_state state. Run ./check_all.sh to see current status.${NC} \n"

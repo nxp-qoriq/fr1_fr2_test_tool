@@ -28,7 +28,7 @@ channels_start_fail()
 print_usage()
 {
 echo
-echo "usage ./channels_start.sh [ant_id] [txonly|rxonly] [sinad] [option8] [comp] [nl1c] [dcsx] [txdcsx] [rxdcsx] [0.5ms|1ms|2ms|5ms|10ms|20ms|40ms] [HRAM] [cpe|gnb] [mimo] [file] [nre=M|nrb=N] [search] [norx2host] [lphy|dfe] [hshake|txhshake|rxhshake] [nextlog] [pattern=X] [hwdcm|nhwdcm]"
+echo "usage ./channels_start.sh [ant_id] [txonly|rxonly] [sinad] [option8] [comp] [nl1c] [dcsx] [txdcsx] [rxdcsx] [0.5ms|1ms|2ms|5ms|10ms|20ms|40ms] [HRAM] [cpe|gnb] [mimo] [file] [nre=M|nrb=N] [search] [norx2host] [lphy|dfe] [hshake|txhshake|rxhshake] [nextlog] [pattern=X] [hwdcm|nhwdcm] [rt]"
 echo "  ant_id: start specified antenna. If ant_id not specified, start all antennas/channels defined in config.dat"
 echo "  txonly: start antennas with TX only, RX will be disabled."
 echo "  rxonly: start antennas with RX only, TX will be disabled."
@@ -47,6 +47,7 @@ echo "  file:   input waveform filename, the file size should match the configur
 echo "  nre=M|nrb=N:  specify num of RE or RB, one RB is 12 REs. Specify this option to use reduced bandwidth, such as nrb=24 will reduce bandwidth from 20Mhz to 10Mhz in scs30 use case."
 echo "  search:   start with cell search mode. used only in UE/CPE"
 echo "  hwdcm|nhwdcm:   enable or disable hardware decimation by 2 for HSADC"
+echo "  rt:     Send real time symbol data from HighPHY. test tool will not load static waveform from file."
 echo "          example:  ./channels_start.sh dcs2 dcs3                                  will test DCS channel 2 and 3 (DCS1-0,DCS1-1)."
 echo "          example:  ./channels_start.sh txdcs2 rxdcs3                              will test TX on DCS channel 2 (DCS1-0) and RX on DCS channel 3 (DCS1-1)."
 echo "          example:  ./channels_start.sh dcs4 option8 1ms HRAM waveform_file.bin    will test HSDCS0 with option8 1ms waveform length from HRAM and use specified waveform file"
@@ -141,7 +142,7 @@ force_ru=0
 idle=0             #used to not route TX/RX host symbols to FRAM and not injecting TX test vector, in order to see ISC is working stably without DDR access
 sinad=0
 fast=0
-option8_cfg=$option8
+option8_cfg=$default_option8
 warning_list=""
 test_vector_on_hram=0
 invecfile_arg=0
@@ -158,6 +159,10 @@ dbg=0
 wvpd=0; sym_buf_onchip=0
 rxinj_file=""
 size_dump=0; size_inject=0
+rt=0;
+input_waveform_len=(${default_waveform_len[@]})
+ant_remap=$default_ant_remap; ant_map_tx=(${default_ant_map_tx[@]}); ant_map_rx=(${default_ant_map_rx[@]})
+DCSchan=(${default_DCSchan[@]})
 
 arg_parse()
 {
@@ -184,6 +189,7 @@ arg_parse()
 	elif [ $arg = rxfdd ]; then							rx_fdd=1
 	elif [ $arg = txtdd ]; then							tx_fdd=0
 	elif [ $arg = rxtdd ]; then							rx_fdd=0
+	elif [ $arg = rt ]; then							rt=1
 	elif [ $arg = fast ]; then							fast=1
 	elif [ $arg = hwdcm ]; then							hwdcm=1; arg_hwdcm=1
 	elif [ $arg = nhwdcm ]; then						hwdcm=0; arg_nhwdcm=1
@@ -273,7 +279,7 @@ fi
 
 if [ $cell_state = $CELL_STATE_SEARCH ];then
 	[ $cpe = 0 ] && { echo ***ERROR: Basestation mode does not support cell search; channels_start_fail; }
-	tx_fdd=0; rx_fdd=0
+	rxonly=1
 fi
 
 [ $((ant_sel_ls+ant_sel_hs+arg_dcsen)) -eq 0 ] && ant_selected=($BITMASK_ANT_ENABLE_TRX $BITMASK_ANT_ENABLE_TRX $BITMASK_ANT_ENABLE_TRX $BITMASK_ANT_ENABLE_TRX $BITMASK_ANT_ENABLE_TRX $BITMASK_ANT_ENABLE_TRX)
@@ -662,7 +668,7 @@ addr_tx_wv=(${ANTS_ARR_INIT[@]})
 invec_addr_cur_backup=0; invecsize_backup=0; invecfile_backup=0
 print_msg=""
 one_enabled_dfe_core=0
-[ $((sinad+dfe_only)) -ne 0 ] && no_wv_load=1 || no_wv_load=0
+[ $((sinad+dfe_only+rt)) -ne 0 ] && no_wv_load=1 || no_wv_load=0
 
 	for ((core=0;core<NUM_CORES;core++))
 	do
@@ -980,7 +986,7 @@ one_enabled_dfe_core=0
 			echo ./utils/vspa_mbox send $txcore $host_vspa_mbox_id 0x0a0e0000 0x40000000 >> ./command_init.sh
 			vspa_mbox_ifsend $txcore $host_vspa_mbox_id 0x0a0e0000 0x40000000
 		fi
-		if ([ $((type_ru | force_ru)) -eq $((1)) ] && [ $cell_state != $CELL_STATE_SEARCH ] && [ $sinad = 0 ] && [ $((dfe_mode_msb&(1<<22))) -eq 0 ]); then
+		if ([ $((type_ru | force_ru)) -eq $((1)) ] && [ $cell_state != $CELL_STATE_SEARCH ] && [ $sinad = 0 ] && [ $((dfe_mode_msb&(1<<22))) -eq 0 ] && [ $rt = 0 ]); then
 			print_msg="${print_msg}Sending INJECT DL TEST VECTOR msg to core $txcore   : vspa_mbox send $txcore $host_vspa_mbox_id $inject_msb $inject_lsb\n"
 			echo ./utils/vspa_mbox send $txcore $host_vspa_mbox_id $inject_msb $inject_lsb >> ./command_init.sh
 			inject_freq_domain_tx $txcore $host_vspa_mbox_id $inject_msb $inject_lsb
