@@ -454,7 +454,7 @@ else
 	if [ $vspa_dev_type = LA9310 ];then
 	[ $((tx_fdd_pre)) = 1 ] && dpdk-dfe_app -c "fdd stop"
 	else
-	[ $((tx_fdd_pre)) = 0 ] && { echo gul_refapp -c "l1c stop"; gul_refapp -c "l1c stop"; }
+	[ $((tx_fdd_pre)) = 0 ] && { echo gul_cli -c "l1c stop"; gul_cli -c "l1c stop"; }
 	sleep 0.5
 	echo stop_dcs_fdd; stop_dcs_fdd #in case LS is TDD and HS is FDD this is needed.
 	fi
@@ -1315,13 +1315,13 @@ else #LA12xx
 		do
 			trx_enable=${dcs_enable[$dcsid]}
 			if [ $trx_enable -eq 0 ];then
-			gul_refapp -c "l1c config ${tagintf[dcsid]}"
-			echo gul_refapp -c "l1c config ${tagintf[dcsid]}"
+			gul_cli -c "l1c config ${tagintf[dcsid]}"
+			echo gul_cli -c "l1c config ${tagintf[dcsid]}"
 			else
 			echo Enabling LSDCS$dcsid in TDD mode
 			dcsid1=$((dcsid/2)); dcsid2=$((dcsid%2))
-			gul_refapp -c "l1c config ${tagintf[dcsid]} ls$dcsid1 $dcsid2"
-			echo gul_refapp -c "l1c config ${tagintf[dcsid]} ls$dcsid1 $dcsid2"
+			gul_cli -c "l1c config ${tagintf[dcsid]} ls$dcsid1 $dcsid2"
+			echo gul_cli -c "l1c config ${tagintf[dcsid]} ls$dcsid1 $dcsid2"
 			l1c=1; one_enabled_dcsid_by_l1c=$dcsid
 			fi
 			sleep $l1c_sleep_time
@@ -1329,11 +1329,11 @@ else #LA12xx
 		fi
 		
 		if [ $OBS_DEDICATE_ENABLE = 1 ];then
-			echo gul_refapp -c "l1c config obs_if hs 0 $OBS_PULSE_LEN $((OBS_PULSE_PERIOD*1966080))", OBS_PULSE_PERIOD=$OBS_PULSE_PERIOD
-			gul_refapp -c "l1c config obs_if hs 0 $OBS_PULSE_LEN $((OBS_PULSE_PERIOD*1966080))"
+			echo gul_cli -c "l1c config obs_if hs 0 $OBS_PULSE_LEN $((OBS_PULSE_PERIOD*1966080))", OBS_PULSE_PERIOD=$OBS_PULSE_PERIOD
+			gul_cli -c "l1c config obs_if hs 0 $OBS_PULSE_LEN $((OBS_PULSE_PERIOD*1966080))"
 			sleep $l1c_sleep_time
-			echo gul_refapp -c "l1c config obs_if1 hs 1 $OBS_PULSE_LEN $((OBS_PULSE_PERIOD*1966080))", OBS_PULSE_PERIOD=$OBS_PULSE_PERIOD
-			gul_refapp -c "l1c config obs_if1 hs 1 $OBS_PULSE_LEN $((OBS_PULSE_PERIOD*1966080))" 
+			echo gul_cli -c "l1c config obs_if1 hs 1 $OBS_PULSE_LEN $((OBS_PULSE_PERIOD*1966080))", OBS_PULSE_PERIOD=$OBS_PULSE_PERIOD
+			gul_cli -c "l1c config obs_if1 hs 1 $OBS_PULSE_LEN $((OBS_PULSE_PERIOD*1966080))" 
 			sleep $l1c_sleep_time
 		fi
 
@@ -1345,54 +1345,54 @@ else #LA12xx
 		do
 			trx_enable=${dcs_enable[$dcsid]}
 			if [ $trx_enable -eq 0 ];then
-			gul_refapp -c "l1c config ${tagintf[dcsid-4]}"
-			echo gul_refapp -c "l1c config ${tagintf[dcsid-4]}"
+			gul_cli -c "l1c config ${tagintf[dcsid-4]}"
+			echo gul_cli -c "l1c config ${tagintf[dcsid-4]}"
 			else
 			echo Enabling HSDCS$((dcsid-4)) in TDD mode
-			gul_refapp -c "l1c config ${tagintf[dcsid-4]} hs $((dcsid-4))"
-			echo gul_refapp -c "l1c config ${tagintf[dcsid-4]} hs $((dcsid-4))"
+			gul_cli -c "l1c config ${tagintf[dcsid-4]} hs $((dcsid-4))"
+			echo gul_cli -c "l1c config ${tagintf[dcsid-4]} hs $((dcsid-4))"
 			l1c_hs=1; one_enabled_dcsid_by_l1c=$dcsid
 			fi
 			sleep $l1c_sleep_time
 		done
-		gul_refapp -c "l1c config ${tagintf[2]}"
-		echo gul_refapp -c "l1c config ${tagintf[2]}"
+		gul_cli -c "l1c config ${tagintf[2]}"
+		echo gul_cli -c "l1c config ${tagintf[2]}"
 		sleep $l1c_sleep_time
-		gul_refapp -c "l1c config ${tagintf[3]}"
-		echo gul_refapp -c "l1c config ${tagintf[3]}"
+		gul_cli -c "l1c config ${tagintf[3]}"
+		echo gul_cli -c "l1c config ${tagintf[3]}"
 		sleep $l1c_sleep_time
 		fi
 	
 		if [ $l1c_hs = 1 ];then
-			gul_refapp -c "l1c config scs $scs_hs"
-			echo gul_refapp -c "l1c config scs $scs_hs"
+			gul_cli -c "l1c config scs $scs_hs"
+			echo gul_cli -c "l1c config scs $scs_hs"
 			sleep $l1c_sleep_time
 		fi
 	fi
 	
 	if [ $((l1c|l1c_hs)) = 1 ];then
 		str_pattern="${pattern[@]}"
-		gul_refapp -c "l1c config pattern $str_pattern"
-		echo gul_refapp -c "l1c config pattern $str_pattern"
+		gul_cli -c "l1c config pattern $str_pattern"
+		echo gul_cli -c "l1c config pattern $str_pattern"
 		sleep $l1c_sleep_time
 		
-		gul_refapp -c "l1c config ul_dl_gap $ul_dl_gap"
-		echo gul_refapp -c "l1c config ul_dl_gap $ul_dl_gap"
+		gul_cli -c "l1c config ul_dl_gap $ul_dl_gap"
+		echo gul_cli -c "l1c config ul_dl_gap $ul_dl_gap"
 		sleep $l1c_sleep_time
 
-		gul_refapp -c "l1c config pps_offset 0"
-		echo gul_refapp -c "l1c config pps_offset 0"
+		gul_cli -c "l1c config pps_offset 0"
+		echo gul_cli -c "l1c config pps_offset 0"
 		sleep $l1c_sleep_time
 	
 		if ([ $rx_fdd = 1 ] || [ $((rx_allowed_ext)) -eq 15 ]);then                              #enable RX FDD in LS or HS
-			gul_refapp -c "l1c config listen yes"
-			echo gul_refapp -c "l1c config listen yes"
+			gul_cli -c "l1c config listen yes"
+			echo gul_cli -c "l1c config listen yes"
 			sleep $l1c_sleep_time
 		fi
 
 		tag_l1c_start_cpe=(no_vspa_start start_cpe)
-		gul_refapp -c "l1c ${tag_l1c_start_cpe[cpe]}"
-		echo gul_refapp -c "l1c ${tag_l1c_start_cpe[cpe]}"
+		gul_cli -c "l1c ${tag_l1c_start_cpe[cpe]}"
+		echo gul_cli -c "l1c ${tag_l1c_start_cpe[cpe]}"
 		echo "L1C start command sent to e200 at VSPA core timestamp $(printf 0x%012x `get_counter vspa $one_dfe_core`)"
 
 		if [ $((l1c)) = 1 ];then  #if LS is TDD, HS will be configured as FDD.
@@ -1417,9 +1417,12 @@ else #LA12xx
 		
 		one_enabled_dcsid_ctrl_reg=$(get_tdd_ctrl ${TAG_LSHS[$one_enabled_dcsid_by_l1c]} $((one_enabled_dcsid_by_l1c%4)) )
 		one_enabled_dcsid_ctrl_reg_v=`./utils/devmem $one_enabled_dcsid_ctrl_reg`
-		while [ $((one_enabled_dcsid_ctrl_reg_v&1)) -eq 0 ]
+		wait_count=1000
+		while ([ $((one_enabled_dcsid_ctrl_reg_v&1)) -eq 0 ] && [ $wait_count -ne 0 ])
 		do
 			one_enabled_dcsid_ctrl_reg_v=`./utils/devmem $one_enabled_dcsid_ctrl_reg`
+			wait_count=$((wait_count-1))
+			[ $wait_count -eq 0 ] && { echo Timeout waiting e200 L1C TDD logic to enable DCS.; channels_start_fail; }
 		done
 		l1c_startoffset=$(( (`./utils/devmem $((one_enabled_dcsid_ctrl_reg+4))`<<32) | `./utils/devmem $((one_enabled_dcsid_ctrl_reg+8))`))
 		echo "l1c will start from TBGEN master counter offset $(printf 0x%x $l1c_startoffset)"
