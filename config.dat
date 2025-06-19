@@ -14,30 +14,30 @@
 #Users can change the configuration before starting to test
 
 ############ CONFIGURATION 0: MODEM_PCI_ADDR
-#use export MODEM_PCI_ADDR=  do define the specific modem pci addr
+#use export MODEM_PCI_ADDR=  to define the specific modem pci addr
 pci_addr_id=$MODEM_PCI_ADDR
 							
 ############# CONFIGURATION 1: TDD FDD.
-default_tx_fdd=1		#0-TX in TDD mode, 1-TX in FDD mode
-default_rx_fdd=1		#0-RX in TDD mode, 1-RX in FDD mode
+tx_fdd=1		        #0-TX in TDD mode, 1-TX in FDD mode
+rx_fdd=1		        #0-RX in TDD mode, 1-RX in FDD mode
 rx_allowed_ext=0		#extension period of RX allowed in TDD mode, 0:standard TDD mode with no extension. 1-14:extend rx_allowed_ext*8192 samples. 15:TDD listening mode
 
 ############# CONFIGURATION 2: DCS channels to test
 #from left to right mapping to LSDCS0-0,LSDCS0-1,LSDCS1-0,LSDCS1-1, HSDCS0, HSDCS1
 #value 0 means the channel will be disabled and will not be tested. Disabling unwanted channels can reduce data throughput on PCI and make system more stable
-#value 3 means the channel will be enabled for TX and RX
+#value 1 means the channel will be enabled for TX and RX
 #value 2 means the channel will be enabled for TX only.
-#value 1 means the channel will be enabled for RX only.
-default_DCSchan=(3 3 3 3   3 3)
+#value 3 means the channel will be enabled for RX only.
+DCSchan=(1 1 1 1   1 1)
 
 ############# CONFIGURATION 3: DCS channel remapping
 #By default ant ID 0-5 are mapped to 0:LSDCS0-0,1:LSDCS0-1,2:LSDCS1-0,3:LSDCS1-1,4:HSDCS0,5:HSDCS1
 #In case users want to map in different way, change ant_remap to 1, and re-map the ant logic ID
 #One example case is that when VSPA images only support 1T1R (ant_id is 0), by default it is mapped to LSDCS0-0, users can re-map 
 #it to DCS channel LSDCS1-0 by setting ant_remap=1 and ant_map_tx/rx=(2,x,x,x,x,x). In this case values for ant ID 1-5 are don't-care
-default_ant_remap=0
-default_ant_map_tx=(2 3 0 1 5 4)    #valid only when ant_remap=1, TX ant0,1 mapping to LSDCS1-0,1-1, ant4 mapping to HSDCS1
-default_ant_map_rx=(2 3 0 1 5 4)    #valid only when ant_remap=1, RX ant0,1 mapping to LSDCS1-0,1-1, ant4 mapping to HSDCS1
+ant_remap=0
+ant_map_tx=(2 3 0 1 5 4)    #valid only when ant_remap=1, TX ant0,1 mapping to LSDCS1-0,1-1, ant4 mapping to HSDCS1
+ant_map_rx=(2 3 0 1 5 4)    #valid only when ant_remap=1, RX ant0,1 mapping to LSDCS1-0,1-1, ant4 mapping to HSDCS1
 #           | | | | | |
 #   ant_id  0 1 2 3 4 5     #above new DCS channels re-mapped to ant id 0-5.
 
@@ -58,12 +58,12 @@ pattern7=(3 10 1 2 0 0   2 10 2 2 0 0)
 ecpri_comp_decomp_enable=0
 
 ############# CONFIGURATION 6: waveform len, dump bounday and len configurations
-default_waveform_len=(20 10) #default waveform length, 20ms for TDD, 10ms for FDD. valid range 1-40ms. must no larger than 80ms.
+input_waveform_len=(20 10)   #default waveform length, 20ms for TDD, 10ms for FDD. valid range 1-40ms. must no larger than 80ms.
 sys_period=40                #system period in ms, must match the setting in VSPA image.
 dump_time_len=20             #default dump len in ms, 1-40 ms. must not be bigger than sys_period.
 
 ############# CONFIGURATION 7: option8 or ecpri,
-default_option8=0            #set to 0 for eCPRI, 1 for option8
+option8=0                    #set to 0 for eCPRI, 1 for option8
 
 ############# CONFIGURATION 8: IQ SWAP and PN SWAP configurations
 #The 6 values in each parentheses are for the 6 DCS channels, from left to right mapping to LSDCS0-0,LSDCS0-1,LSDCS1-0,LSDCS1-1, HSDCS0, HSDCS1
@@ -74,6 +74,7 @@ iqswap_rx=(0 0 0 0 1 0)  #HS ADC0 RX should be swapped in revB device.
 known_iqswap_list=(
 "NXP Layerscape LA1224-RDB RevC"	0 0 0 0 0 1		0 0 0 0 1 0  #each entry has 3 parts: board name from /proc/device-tree/model,iqswap tx,iqswap rx
 "RFNM imx8mp"	0 0 0 0 0 0		0 1 0 0 1 0  #each entry has 3 parts: board name from /proc/device-tree/model,iqswap tx,iqswap rx
+"SDR imx8mp"	0 0 0 0 0 0		0 1 0 0 1 0  #each entry has 3 parts: board name from /proc/device-tree/model,iqswap tx,iqswap rx
 )
 
 pnswap_tx_I=(0 0 0 0 0 0)
@@ -333,14 +334,14 @@ if [ $vspa_dev_type = LA12xx ];then
 	NUM_ANTS=6;  NUM_CORES=8; 
 	NUM_ANTS_LS=4; NUM_ANTS_HS=2;
 	vspa_core_clock=614400;  #Khz
-	TAG_TXDCSID=("LSDAC0-0  " "LSDAC0-1  " "LSDAC1-0  " "LSDAC1-1  " "HSDAC0    " "HSDAC1    " "Illegal   " "Illegal   ")
-	TAG_RXDCSID=("LSADC0-0  " "LSADC0-1  " "LSADC1-0  " "LSADC1-1  " "HSADC0    " "HSADC1    " "Illegal   " "Illegal   ")
+	TAG_TXDCSID=("LSDAC0-0" "LSDAC0-1" "LSDAC1-0" "LSDAC1-1" "HSDAC0  " "HSDAC1  " "Illegal " "Illegal ")
+	TAG_RXDCSID=("LSADC0-0" "LSADC0-1" "LSADC1-0" "LSADC1-1" "HSADC0  " "HSADC1  " "Illegal " "Illegal ")
 elif [ $vspa_dev_type = LA9310 ];then 
 	NUM_ANTS=4;  NUM_CORES=1; 
 	NUM_ANTS_LS=4; NUM_ANTS_HS=0;
 	vspa_core_clock=491520;  #Khz
-	TAG_TXDCSID=("DAC0      " "DAC0      " "DAC0      " "DAC0      " "Illegal   " "Illegal   " "Illegal   " "Illegal   ")
-	TAG_RXDCSID=("ADC0      " "ADC1      " "ADC2      " "ADC3      " "Illegal   " "Illegal   " "Illegal   " "Illegal   ")
+	TAG_TXDCSID=("DAC0    " "DAC0    " "DAC0    " "DAC0    " "Illegal " "Illegal " "Illegal " "Illegal ")
+	TAG_RXDCSID=("ADC0    " "ADC1    " "ADC2    " "ADC3    " "Illegal " "Illegal " "Illegal " "Illegal ")
 else
 	echo ***ERROR: Wrong vspa_dev_type; exit 1;
 fi

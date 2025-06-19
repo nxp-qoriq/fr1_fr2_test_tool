@@ -609,6 +609,8 @@ void qec_para_convert(void* p_qec_para_converted, void* p_qec_para)
 	*(float*)(addr_qec_para_converted+4*7) = f4;
 	*(float*)(addr_qec_para_converted+4*8) = 0;
 	*(float*)(addr_qec_para_converted+4*9) = f2;
+	*(float*)(addr_qec_para_converted+4*10) = dcre;
+	*(float*)(addr_qec_para_converted+4*11) = dcim;
 }
 
 
@@ -1160,10 +1162,11 @@ uint64_t la9310_la12xx_dmem_write_for_mbox(unsigned int core, unsigned int mbox_
 	{
 		uint64_t dest;
 		unsigned int trid = (msb>>15)&1;
+		unsigned int rx = msb & (1<<14);
 		uint64_t vspa_dmem_base_vir = (uint64_t)mmap(NULL, 0x2000000, PROT_READ | PROT_WRITE,	MAP_SHARED, g_devmem_fd, g_vspa_dmem_base_phy);
 		core = ((*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+SWVERSION))>>13) & 7;	//signal scaling is on core A.
 
-		if(msb & (1<<14))  //TXRX
+		if(rx)
 			dest = (*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+addr_DFE_qec_params_opt_rx))<<7;
 		else
 			dest = (*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+addr_DFE_qec_params_opt_tx))<<7;
@@ -1172,7 +1175,7 @@ uint64_t la9310_la12xx_dmem_write_for_mbox(unsigned int core, unsigned int mbox_
 		
 		short temp=lsb&0xFFFF;
 		int temp1 = float16_to_float32(temp);
-		float output_scaling_factor = *(float*)&temp1;
+		float scaling_factor = *(float*)&temp1;
 		
 		unsigned int cap_lo = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+STATUS_CAP_LO);
 		unsigned int timing_skew_flag = (cap_lo >> 22) & 0x1;
@@ -1187,22 +1190,52 @@ uint64_t la9310_la12xx_dmem_write_for_mbox(unsigned int core, unsigned int mbox_
 				f1 = 1; 
 				f4 = 1; 
 			}
-			f1 *= output_scaling_factor;
-			f2 *= output_scaling_factor;
-			f4 *= output_scaling_factor;
+			f1 *= scaling_factor;
+			f2 *= scaling_factor;
+			f4 *= scaling_factor;
 			
 			*(float*)(dest+4*0) = f1;
 			*(float*)(dest+4*1) = f4;
 			*(float*)(dest+4*3) = f2;
+			
+			if(rx)
+			{
+				float dc_I_ori = *(float*)(dest+4*10);
+				float dc_Q_ori = *(float*)(dest+4*11);
+				if(dc_I_ori==0 && dc_Q_ori==0)
+				{
+					dc_I_ori = *(float*)(dest+4*4);
+					dc_Q_ori = *(float*)(dest+4*5);
+					*(float*)(dest+4*10) = dc_I_ori;
+					*(float*)(dest+4*11) = dc_Q_ori;
+				}
+				*(float*)(dest+4*4) = dc_I_ori * scaling_factor;
+				*(float*)(dest+4*5) = dc_Q_ori * scaling_factor;
+			}
 		}
 		else
 		{
 			float gain_I_ori = *(float*)(dest+128+4*9);
 			float gain_Q_ori = *(float*)(dest+128+4*10);
-			gain_I_ori *= output_scaling_factor;
-			gain_Q_ori *= output_scaling_factor;
+			gain_I_ori *= scaling_factor;
+			gain_Q_ori *= scaling_factor;
 			*(float*)(dest+128+4*5) = gain_I_ori;
 			*(float*)(dest+128+4*6) = gain_Q_ori;
+			
+			if(rx)
+			{
+				float dc_I_ori = *(float*)(dest+128+4*11);
+				float dc_Q_ori = *(float*)(dest+128+4*12);
+				if(dc_I_ori==0 && dc_Q_ori==0)
+				{
+					dc_I_ori = *(float*)(dest+128+4*7);
+					dc_Q_ori = *(float*)(dest+128+4*8);
+					*(float*)(dest+128+4*11) = dc_I_ori;
+					*(float*)(dest+128+4*12) = dc_Q_ori;
+				}
+				*(float*)(dest+128+4*7) = dc_I_ori * scaling_factor;
+				*(float*)(dest+128+4*8) = dc_Q_ori * scaling_factor;
+			}
 		}
 		return 0;
 	}

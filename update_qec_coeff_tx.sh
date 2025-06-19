@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -45,7 +45,8 @@ echo "example: ./update_qec_coeff_tx.sh 0 0xABCDEFGH              will use the c
 
 source ./check_dfe_cap_core_map.sh
 
-[ $# = 0 ] && print_usage
+[ $# = 0 ] && { print_usage; exit 1; }
+[ $# = 1 ] && [ $1 = rx ] && { print_usage; exit 1; }
 ant=0; dis=0; txrx=0; inc=0
 from_file=0
 flag_imb=0; flag_gain=0; flag_dc=0
@@ -173,6 +174,8 @@ if ([ $((vspa_image_version)) -ge $((0x500)) ] && [ $((gainQ)) -eq 0 ]);then
 fi
 devmem $((addr_vir+41*4)) w $gainI  #backup used for scaling for non-optimized QEC
 devmem $((addr_vir+42*4)) w $gainQ
+devmem $((addr_vir+43*4)) w $dcoffI
+devmem $((addr_vir+44*4)) w $dcoffQ
 
 if [ $txqec_timing_skew = 0 ];then #when optimized QEC is used
 if [ $((vspa_image_version)) -ge $((0x501)) ];then
@@ -231,6 +234,8 @@ devmem $((addr_vir+6*4)) w $f1          #backup used for scaling for optimized Q
 devmem $((addr_vir+7*4)) w $f4
 devmem $((addr_vir+8*4)) w 0
 devmem $((addr_vir+9*4)) w $f2
+devmem $((addr_vir+10*4)) w $dcoffI
+devmem $((addr_vir+11*4)) w $dcoffQ
 fi
 fi
 

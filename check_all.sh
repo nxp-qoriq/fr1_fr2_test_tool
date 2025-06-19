@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -189,8 +189,10 @@ echo "*** Samples sent/received:   RX: $num_sample_rx ~`rounding $num_sample_rx_
 fi
 fi
 
+dfe_mode_hi=`get_vspa_ip_reg_value $core $IP_DFE_MODE_HI`
+dfe_mode_hi_option8=$(((dfe_mode_hi>>DFE_MODE_OPTION8_IDX)&1))
 tagoption8=(OPTION7-2 OPTION8)
-show_status "***           Symbol Type:  " "${tagoption8[option8_tx[ant]]}" "${tagoption8[option8_rx[ant]]}"
+show_status "***           Symbol Type:  " "${tagoption8[dfe_mode_hi_option8]}" "${tagoption8[option8_rx[ant]]}"
 show_status "***        Running Status:  " "${tag_running[running_status_tx|running_status_sample_tx]}" "${tag_running[running_status_rx|running_status_sample_rx]}"
                     
 if [ ${tag:0:1} = T ]; then
@@ -509,33 +511,36 @@ if [ $((tx_fdd&rx_fdd)) = 0 ];then
 	echo
 fi
 
+TAG_IQSWAP=("         " "IQSWAPPED")
 if [ $((num_T_LS_enabled+num_T_HS_enabled)) -ne 0 ];then
-echo -e "\nAnt Mapping TX:\nant_id  dcsid     dcs         status            scaling_factor(input/ouput)"
+echo -e "\nAnt Mapping TX:\nant_id dcs_id                status            scaling_factor(input/ouput)"
 for((i=0;i<$NUM_ANTS;i++))
 do
 	if [ $((ant_enable[$i]&BITMASK_ANT_ENABLE_TX)) != 0 ];then
-		tag0="${ant_map_tx[$i]}     "
-		tag1=${TAG_TXDCSID[${ant_map_tx[$i]}]}
+		tag0="${ant_map_tx[$i]}"
+		dcsid=${ant_map_tx[$i]}
+		tag1=${TAG_TXDCSID[dcsid]}
 		scaling_factor_input=$((`./utils/memrw r 32 $((test_tool_env_tx_scaling_input+i*4))`))
 		scaling_factor_output=$((`./utils/memrw r 32 $((test_tool_env_tx_scaling_output+i*4))`))
 		scaling_off=$((scaling_factor_output>>31)); scaling_factor_output=$((scaling_factor_output&0x7FFFFFFF))
 		idle_flag=`get_wordvalue_from_vspa ${anttx[$i]} $CONFIG_TX_SINGLE_TONE_AMP`
 		[ $((idle_flag)) -eq 1 ] && ant_running_tx[i]=3 || idle_flag=0
 		[ $((scaling_off|idle_flag)) = 1 ] && tag_scaling=OFF || tag_scaling="$scaling_factor_input/$scaling_factor_output"
-		echo "$i       $tag0    $tag1  ${tag_running[ant_running_tx[i]]}      $tag_scaling"
+		echo "$i      $tag0 $tag1 ${TAG_IQSWAP[iqswap_tx[dcsid]]}  ${tag_running[ant_running_tx[i]]}      $tag_scaling"
 	fi
 done
 fi
 
 if [ $((num_R_LS_enabled+num_R_HS_enabled)) -ne 0 ];then
-echo -e "\nAnt Mapping RX:\nant_id  dcsid     dcs         status            scaling_factor"
+echo -e "\nAnt Mapping RX:\nant_id dcs_id                status            scaling_factor"
 for((i=0;i<$NUM_ANTS;i++))
 do
 	if [ $((ant_enable[$i]&BITMASK_ANT_ENABLE_RX)) != 0 ];then
 		scaling_factor=$((`./utils/memrw r 32 $((test_tool_env_rx_scaling+i*4))`))
-		tag0="${ant_map_rx[$i]}     "
-		tag1=${TAG_RXDCSID[${ant_map_rx[$i]}]}
-		echo "$i       $tag0    $tag1  ${tag_running[ant_running_rx[i]]}      $scaling_factor"
+		tag0="${ant_map_rx[$i]}"
+		dcsid=${ant_map_rx[$i]}
+		tag1=${TAG_RXDCSID[dcsid]}
+		echo "$i      $tag0 $tag1 ${TAG_IQSWAP[iqswap_rx[dcsid]]}  ${tag_running[ant_running_rx[i]]}      $scaling_factor"
 	fi
 done
 fi
