@@ -44,7 +44,7 @@ do
 	arg_parse $i
 done
 
-[ $cfo_disable = 1 ] && { echo -e "***ERROR: CFO compensation feature is not enabled in current VSPA image, command failed\n"; exit 1; }
+[ $cfo_disable = 1 ] && { echo -e "***ERROR: CFO feature is not enabled in current VSPA image, command failed\n"; exit 1; }
 
 if [ $txrx = TX ];then	
 	check_ant_enable_tx $ant; cmd=0x14000000; core=${anttx[$ant]}; trid=${tidant[$ant]}; sps=${axiqsps_tx[ant]}

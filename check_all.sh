@@ -102,7 +102,6 @@ echo "***                   FFT:   ${supported[$fft]}, ${POINTS_FFT}-point"
 echo "***          eCPRI Decomp:   ${supported[$decom]}"
 echo "***            eCPRI Comp:   ${supported[$comp]}"
 
-if [ $ant -lt $NUM_ANTS_LS ];then  
 if [ $phcom_disable = 0 ];then
 echo "***    Phase Compensation:   TX: SUPPORTED, RX: SUPPORTED. Num of Coeff: $((sym_num_1m/2)). Frequency Domain"
 else
@@ -113,7 +112,8 @@ echo "***                   CFO:   TX: SUPPORTED, RX: SUPPORTED. Between QEC and
 else
 echo "***                   CFO:   TX: NOT-SUPPORTED, RX: NOT-SUPPORTED."
 fi
-fi
+
+echo "***         CELL TRACKING:   ${supported[$celltrack_enable]}"
 echo "***     SINAD measurement:   ${supported[${sinad_enable_arr[ant]}]}"
 done
 
@@ -144,13 +144,21 @@ check_running_status $core $trid
 local score=${slave_core[core]}
 local tag_score="&$score"
 [ $score = $core ] && tag_score=""
+dfe_mode_hi=`get_vspa_ip_reg_value $core $IP_DFE_MODE_HI`
+dfe_mode_hi_option8=$(((dfe_mode_hi>>DFE_MODE_OPTION8_IDX)&1))
+tagoption8=(OPTION7-2 OPTION8)
 
 echo "***************  ANT ID $ant: $tag on CORE$core$tag_score  ***********************************************"
 
 local dcs_id_tx=${ant_map_tx[$ant]}; 
 local dcs_id_rx=${ant_map_rx[$ant]};
 bw_curr=`size_align $((sym_size*scs/1000)) 5`
+
+if [ $dfe_mode_hi_option8 -ne 0 ];then
+echo "***             Bandwidth:   Max $((bandwidth_tx/baseband_upsampling_rate)) Mhz"
+else
 echo "***             Bandwidth:   Max $((bandwidth_tx/baseband_upsampling_rate)) Mhz, Current $bw_curr Mhz, num RE $((sym_size)), SCS $scs Khz"
+fi
 
 tag_iqswap=("" "IQSWAPPED")
 [ $((vspa_image_version)) -ge $((0x500)) ] && { tag_pnswap_I=("" "PNSWAPPED_on_I");tag_pnswap_Q=("" "PNSWAPPED_on_Q"); } || { tag_pnswap_I=("" "");tag_pnswap_Q=("" ""); }
@@ -189,9 +197,6 @@ echo "*** Samples sent/received:   RX: $num_sample_rx ~`rounding $num_sample_rx_
 fi
 fi
 
-dfe_mode_hi=`get_vspa_ip_reg_value $core $IP_DFE_MODE_HI`
-dfe_mode_hi_option8=$(((dfe_mode_hi>>DFE_MODE_OPTION8_IDX)&1))
-tagoption8=(OPTION7-2 OPTION8)
 show_status "***           Symbol Type:  " "${tagoption8[dfe_mode_hi_option8]}" "${tagoption8[option8_rx[ant]]}"
 show_status "***        Running Status:  " "${tag_running[running_status_tx|running_status_sample_tx]}" "${tag_running[running_status_rx|running_status_sample_rx]}"
                     

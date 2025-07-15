@@ -440,14 +440,6 @@ fi
 
 dpd_model_id=$((($cap_lsb >> 8) & 0x1F))
 block_size=$(((($cap_lsb >> 13) & 0x7F)*512))
-up2=$((($cap_lsb >> 16) & 0xF))
-if [ $up2 -eq $((0xF)) ]; then		up2=64
-elif [ $up2 -eq $((0xE)) ]; then	up2=32
-elif [ $up2 -eq $((0xD)) ]; then	up2=48
-elif [ $up2 -le $((0x5)) ]; then	up2=0
-else								up2=$((($up2 + 2) * 2))
-fi
-
 txqec_timing_skew=$((($cap_lsb >> 22) & 0x1))
 txqec_en=$((($cap_lsb >> 23) & 0x1))
 rxqec_timing_skew=$((($cap_lsb >> 26) & 0x1))
@@ -458,9 +450,9 @@ cfo_disable=$(((cap_lsb >> 30) & 0x1))
 phcom_disable=$(((cap_lsb >> 31) & 0x1))
 
 sinad_enable=$((($cap_msb >> 0) & 0x1))
+celltrack_enable=$((($cap_msb >> 1) & 0x1))
 dpd_sps_ratio=$((($cap_msb >> 2) & 0x3)); ((dpd_sps_ratio=dpd_sps_ratio+1))
-sym_queue_in_dfe=$((($cap_msb >> 4) & 0x1))
-#bandwidth_code=$((($cap_msb >> 17) & 0xF))
+hwdcm_enable=$(((cap_msb >> 7) & 0x1))
 dpd_enable=$(((cap_msb >> 8) & 0x1))
 num_downsampling_taps=$(((cap_msb >> 9) & 0x1)); [ $num_downsampling_taps = 0 ] && num_downsampling_taps=8 || num_downsampling_taps=64
 flag_obs=$(((cap_msb >> 10) & 0x1))
