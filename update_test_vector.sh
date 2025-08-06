@@ -12,12 +12,15 @@
 print_usage()
 {
 	echo
-	echo "Usage: ./update_test_vector.sh [ant_id] [user_vec_filename|sample] [-lh|-rh]"
+	echo "Usage: ./update_test_vector.sh [ant_id] [user_vec_filename|sample] [-lh|-rh] [idx=a:b]"
 	echo "  ant_id:            0-5, test vector only updated on specified antenna. If ant_id not specified, update on all antennas"
 	echo "  user_vec_filename: User vector file to be loaded, user_vec_filename is the filename. If filename is not specified, default frequency domain input vector file will be loaded"
 	echo "  sample:            A sample is a HEX format 32-bit IQ value with leading 0x. If sample is specified, the value of all the waveform will be set to this sample value"
-	echo "  -lh only send left half of the total bandwidth."
-	echo "  -rh only send right half of the total bandwidth."
+	echo "  -lh:               only send left half of the total bandwidth."
+	echo "  -rh:               only send right half of the total bandwidth."
+	echo "  idx=a:b:           only keep specified range of REs, other REs cleared to 0"
+	echo "example:  ./update_test_vector.sh 0 a.bin                will update test vector to a.bin on ant 0"
+	echo "example:  ./update_test_vector.sh 0 a.bin idx=-120:119   will update test vector to a.bin on ant 0 and only keep 240 REs"
 	echo
 }
 
@@ -104,19 +107,10 @@ fi
 filesize=$(stat --format=%s $vec_file)
 filesize_exp=${invecsize_exp[$ant]}
 
-if [ $ant -ge 4 ];then
-	addr_phy=${addr_tx_wv[$ant]}
-	addr_vir=`phy2vir $addr_phy`
-	((num_sym=560*4))
-	sym_size=3168
-	sym_buf_size=3168
-else
-	addr_phy=${addr_tx_wv[$ant]}
-	addr_vir=`phy2vir $addr_phy`
-	((num_sym=560*1))
-	sym_size=3276
-	sym_buf_size=3296
-fi
+addr_phy=${addr_tx_wv[$ant]}
+addr_vir=`phy2vir $addr_phy`
+((sym_buf_size=(sym_size+31)/32*32))   #aligned to 32 sample 128B.
+
 invecfile_cur[$ant]=$vec_file
 
 if [ $send_fixed_sample_flag = 0 ];then
@@ -158,7 +152,7 @@ elif [ $flag_idx = 1 ];then
 fi
 
 if [ $((lh+rh)) -eq 1 ];then
-for ((i=0;i<num_sym;i++))
+for ((i=0;i<sym_num;i++))
 do
 	((addr=addr_vir+(i*sym_buf_size+clr_start)*4))
 	clear_mem $addr $((sym_size/2*4))
@@ -166,14 +160,14 @@ done
 
 elif [ $flag_idx = 1 ];then
 	if [ $((keep_start)) -gt 0 ];then
-		for ((i=0;i<num_sym;i++))
+		for ((i=0;i<sym_num;i++))
 		do
 			((addr=addr_vir+(i*sym_buf_size+0)*4))
 			clear_mem $addr $((keep_start*4))
 		done
 	fi
 	if [ $((keep_end)) -lt $((sym_size-1)) ];then
-		for ((i=0;i<num_sym;i++))
+		for ((i=0;i<sym_num;i++))
 		do
 			((addr=addr_vir+(i*sym_buf_size+keep_end+1)*4))
 			clear_mem $addr $(((sym_size-1-keep_end)*4))

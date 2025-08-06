@@ -165,7 +165,7 @@ if [ $input_scaling = 1 ];then
 	fi
 	./utils/memrw w 32 $((test_tool_env_tx_scaling_input+ant*4)) $input_scaling_factor 
 	else
-	echo Scaling TX input amplitudeat by scaling phase compensation coeff for antenna $ant to $input_scaling_factor%...
+	echo Scaling TX input RE amplitude by scaling phase compensation coeff for antenna $ant to $input_scaling_factor%...
 	./update_phase_compensation_coeff.sh $ant scale=$input_scaling_factor
 	fi
 fi

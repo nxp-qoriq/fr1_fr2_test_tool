@@ -85,7 +85,7 @@ pnswap_rx_Q=(0 0 0 0 0 0)
 ############# CONFIGURATION 9: Cell Tracking configurations. Only for UE
 SSB_PERIOD=3					#SSB repeating period, 0:5ms, 1:10ms, 2:20ms, 3:40ms.
 SSB_SYM_ID=4					#SSB location, symbol Index insdie SSB PERIOD. For 20Mhz SCS30 10ms, valid range is from 0-279
-SSB_RE_OFFSET=186				#SSB starting RE Index, offset from the first RE of actual num of REs of current Bandwidth.
+SSB_RE_OFFSET=186				#PSS starting RE Index, offset from the first RE of actual num of REs of current Bandwidth.
 NID2=1							#valid range 0,1,2
 NID1=1							#valid range 0-335
 
