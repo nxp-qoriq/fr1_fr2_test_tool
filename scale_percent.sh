@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -195,5 +195,5 @@ if [ $output_scaling = 1 ];then
 
 fi
 echo -e "TX signal scaling done. Run ./check_all.sh to check scaling result\n"
-check_error $ant
+check_error_ant $ant
 exit 0

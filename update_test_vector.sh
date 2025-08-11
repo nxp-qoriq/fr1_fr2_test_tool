@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -15,7 +15,7 @@ print_usage()
 	echo "Usage: ./update_test_vector.sh [ant_id] [user_vec_filename|sample] [-lh|-rh] [idx=a:b]"
 	echo "  ant_id:            0-5, test vector only updated on specified antenna. If ant_id not specified, update on all antennas"
 	echo "  user_vec_filename: User vector file to be loaded, user_vec_filename is the filename. If filename is not specified, default frequency domain input vector file will be loaded"
-	echo "  sample:            A sample is a HEX format 32-bit IQ value with leading 0x. If sample is specified, the value of all the waveform will be set to this sample value"
+	echo "  sample:            A sample is a HEX format 32-bit IQ value with leading 0x. If sample is specified, the value of all the REs will be set to this sample value"
 	echo "  -lh:               only send left half of the total bandwidth."
 	echo "  -rh:               only send right half of the total bandwidth."
 	echo "  idx=a:b:           only keep specified range of REs, other REs cleared to 0"
@@ -152,30 +152,14 @@ elif [ $flag_idx = 1 ];then
 fi
 
 if [ $((lh+rh)) -eq 1 ];then
-for ((i=0;i<sym_num;i++))
-do
-	((addr=addr_vir+(i*sym_buf_size+clr_start)*4))
-	clear_mem $addr $((sym_size/2*4))
-done
-
+	./utils/memset $((addr_vir+clr_start*4)) $((sym_size/2)) 0 $((sym_buf_size-(sym_size/2))) $sym_num
 elif [ $flag_idx = 1 ];then
-	if [ $((keep_start)) -gt 0 ];then
-		for ((i=0;i<sym_num;i++))
-		do
-			((addr=addr_vir+(i*sym_buf_size+0)*4))
-			clear_mem $addr $((keep_start*4))
-		done
-	fi
-	if [ $((keep_end)) -lt $((sym_size-1)) ];then
-		for ((i=0;i<sym_num;i++))
-		do
-			((addr=addr_vir+(i*sym_buf_size+keep_end+1)*4))
-			clear_mem $addr $(((sym_size-1-keep_end)*4))
-		done
-	fi
+	./utils/memset $addr_vir $keep_start 0 $((sym_buf_size-keep_start)) $sym_num
+	./utils/memset $((addr_vir+(keep_end+1)*4)) $((sym_size-1-keep_end)) 0 $((sym_buf_size-(sym_size-1-keep_end))) $sym_num
 fi
 
 done
 [ $prach = 0 ] && echo "invecfile_cur=(${invecfile_cur[@]}); " >> ./runtime_config.txt
 echo Num of antennas updated: $num_ant_updated
 echo
+check_error

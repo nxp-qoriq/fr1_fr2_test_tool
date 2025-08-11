@@ -258,25 +258,25 @@ do
 		
 		if [ $SYNC == NULL ];then
 			echo "$dpdpath/dpdt -c $dpdpath/dpd_spec.cfg -b $training_len $option_r_s -x $srx_resampling_arg -d 0.00001"
-			log=$($dpdpath/dpdt -c $dpdpath/dpd_spec.cfg -b $training_len $option_r_s -x $srx_resampling_arg -d 0.00001)
+			log_dpdt=$($dpdpath/dpdt -c $dpdpath/dpd_spec.cfg -b $training_len $option_r_s -x $srx_resampling_arg -d 0.00001)
 			ret=$?; echo dpdt return value: $ret
-			echo "$log"
+			echo "$log_dpdt"
 			#[ $ret -ne 0 ] && { echo DPD training error: error code $ret; read -t 10 -p "Press CTRL+C to abort. ENTER to continue: " yesno; }
-			SYNC=$(echo "$log" | tail -n 1)
+			SYNC=$(echo "$log_dpdt" | tail -n 1)
 		else
 			echo "$dpdpath/dpdt -c $dpdpath/dpd_spec.cfg -b $training_len $option_r_s -x $srx_resampling_arg -t $SYNC -d 0.00001"
-			log=$($dpdpath/dpdt -c $dpdpath/dpd_spec.cfg -b $training_len $option_r_s -x $srx_resampling_arg -t $SYNC -d 0.00001)
+			log_dpdt=$($dpdpath/dpdt -c $dpdpath/dpd_spec.cfg -b $training_len $option_r_s -x $srx_resampling_arg -t $SYNC -d 0.00001)
 			ret=$?; echo dpdt return value: $ret
-			echo "$log"
+			echo "$log_dpdt"
 			#[ $ret -ne 0 ] && { echo DPD training error: error code $ret; read -t 10 -p "Press CTRL+C to abort. ENTER to continue: " yesno; }
 		fi
-		nmse=$(echo "$log" | grep "NMSE" | tr ' ' '\n' | grep -E '^[+-]?[0-9]*\.?([0-9]+)$')
+		if [ $fstop = 1 ];then log=`vspa_mbox send $txcore $host_vspa_mbox_id 0x0a0e21ff 0x00040000`; echo Ant $ant is set active after training.
+		fi
+		nmse=$(echo "$log_dpdt" | grep "NMSE" | tr ' ' '\n' | grep -E '^[+-]?[0-9]*\.?([0-9]+)$')
 		[ "$nmse" = "" ] && { nmse=0; read -p "***ERROR NMSE, press ENTER to continue, CTRL+C to quit: " choice1; }
 	
 	log=`check_error_ant $ant`; echo -e "$log"; [ "$log" != "" ] && exit 1
 	[ $ant -ne $ant_feedback ] && { log=`check_error_ant $ant_feedback`; echo -e "$log"; [ "$log" != "" ] && exit 1; }
-	if [ $fstop = 1 ];then log=`vspa_mbox send $txcore $host_vspa_mbox_id 0x0a0e21ff 0x00040000`; echo Ant $ant is set active after training.
-	fi
 	
 	if [ -f dpd_coeff_vspa.flp ];then
 	mv ./dpd_coeff_vspa.flp $dpdpath/dpd_coeff_vspa_ant$ant.flp 

@@ -616,6 +616,8 @@ option8_tx=(${ANTS_ARR_INIT[@]});    option8_rx=(${ANTS_ARR_INIT[@]})
 bbsps_tx=(${ANTS_ARR_INIT[@]});      bbsps_rx=(${ANTS_ARR_INIT[@]})
 axiqsps_tx=(${ANTS_ARR_INIT[@]});    axiqsps_rx=(${ANTS_ARR_INIT[@]})
 pci_bw_req=(${ANTS_ARR_INIT[@]})
+sym_size_per_ant=(${ANTS_ARR_INIT[@]}); max_sym_size_per_ant=(${ANTS_ARR_INIT[@]})
+upsampling_ratio_per_ant=(${ANTS_ARR_INIT[@]});
 
 trace_log_buf_base=`HEX $ddr_malloc_cur`
 trace_log_buf_size_per_core=$((128*1024))
@@ -715,6 +717,9 @@ one_enabled_dfe_core=0
 			option8_tx[$txant]=$option8
 			bbsps_tx[txant]=$baseband_txsps
 			axiqsps_tx[txant]=$txaxiq
+			sym_size_per_ant[txant]=$sym_size
+			max_sym_size_per_ant[txant]=$max_sym_size
+			upsampling_ratio_per_ant[txant]=$upsampling_ratio
 			if [ $((txant2)) -ne $((0xF)) ];then
 			option8_tx[$txant2]=$option8
 			bbsps_tx[txant2]=$baseband_txsps
@@ -1086,7 +1091,7 @@ one_enabled_dfe_core=0
 	echo "trace_log_buf_base=$trace_log_buf_base; trace_log_buf_size_per_core=$trace_log_buf_size_per_core; trace_log_buf_size=$trace_log_buf_size; test_tool_env_base_phy=$test_tool_env_base_phy; test_tool_env_size=$test_tool_env_size; tx_sym_queue_base=$tx_sym_queue_base; tx_sym_queue_size=$tx_sym_queue_size; rx_sym_queue_base=$rx_sym_queue_base; rx_sym_queue_size=$rx_sym_queue_size" >> ./runtime_config.txt
 	echo "celltrack_extbuf_base=$celltrack_extbuf_base; celltrack_extbuf_size=$celltrack_extbuf_size; obs_buffer_phy=$obs_buffer_phy; obs_buffer_size=$obs_buffer_size" >> ./runtime_config.txt
 	echo -e "dcsfdd=$dcsfdd; hwdcm=$hwdcm; lsdiv2=$lsdiv2; hsdiv2=$hsdiv2; bwdiv=$bwdiv; pci_bw_req_total=$pci_bw_req_total; pci_bw_req=(${pci_bw_req[@]})\nnum_T_LS_enabled=$num_T_LS_enabled; num_R_LS_enabled=$num_R_LS_enabled; num_T_HS_enabled=$num_T_HS_enabled; num_R_HS_enabled=$num_R_HS_enabled" >> ./runtime_config.txt
-	echo -e "one_enabled_dfe_core=$one_enabled_dfe_core; option8_tx=(${option8_tx[@]}); option8_rx=(${option8_rx[@]})\nbbsps_tx=(${bbsps_tx[@]}); bbsps_rx=(${bbsps_rx[@]}); axiqsps_tx=(${axiqsps_tx[@]}); axiqsps_rx=(${axiqsps_rx[@]}); sinad_enable_arr=(${sinad_enable_arr[@]})" >> ./runtime_config.txt
+	echo -e "one_enabled_dfe_core=$one_enabled_dfe_core; option8_tx=(${option8_tx[@]}); option8_rx=(${option8_rx[@]})\nsym_size_per_ant=(${sym_size_per_ant[@]}); max_sym_size_per_ant=(${max_sym_size_per_ant[@]}); upsampling_ratio_per_ant=(${upsampling_ratio_per_ant[@]}); bbsps_tx=(${bbsps_tx[@]}); bbsps_rx=(${bbsps_rx[@]}); axiqsps_tx=(${axiqsps_tx[@]}); axiqsps_rx=(${axiqsps_rx[@]}); sinad_enable_arr=(${sinad_enable_arr[@]})" >> ./runtime_config.txt
 	echo -e "invecfile_ori=(${invecfile_ori[@]}); invecfile_cur=(${invecfile_cur[@]}); invecsize_exp=(${invecsize_exp[@]})\ndcs_enable=(${dcs_enable[@]}); ant_enable=(${ant_enable[@]})" >> ./runtime_config.txt
 	echo -e "test_vector_on_hram=$test_vector_on_hram; next_HRAMaddr_phy=$next_HRAMaddr_phy\naddr_tx_test_vector=$addr_tx_test_vector; size_tx_test_vector=$size_tx_test_vector; addr_tx_wv=(${addr_tx_wv[@]})\naddr_inject=$addr_inject; size_inject=$size_inject; addr_dump=$addr_dump; addr_dump_vir=$addr_dump_vir; size_dump=$size_dump; end_ddr=$end_ddr " >> ./runtime_config.txt
 
@@ -1095,6 +1100,7 @@ one_enabled_dfe_core=0
 	for((ant=0;ant<NUM_ANTS;ant++))
 	do
 		if [ $((ant_enable[ant]&BITMASK_ANT_ENABLE_TX)) -ne 0 ];then
+			[ $((sym_size_per_ant[ant])) -le $((max_sym_size_per_ant[ant]/2)) ] && [ $((upsampling_ratio_per_ant[ant])) -eq 4 ] && ./update_filter_coeff.sh 4xup ./test_vectors/h_4x_64tap_gain4p8_BW8x.bin
 			[ $((pnswap_tx_I[ant_map_tx[ant]] | pnswap_tx_Q[ant_map_tx[ant]])) = 1 ] && ./update_qec_coeff_tx.sh $ant dis
 			tx_scaling_output=`./utils/memrw r 32 $((test_tool_env_tx_scaling_output+ant*4))`
 			[ $((tx_scaling_output)) -ne 100 ] && log=`./scale_percent.sh $ant 100` #restore scaling to 100% in case that scaling is done in previous run

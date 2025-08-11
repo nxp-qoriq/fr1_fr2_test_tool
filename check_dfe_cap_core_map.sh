@@ -451,7 +451,6 @@ phcom_disable=$(((cap_lsb >> 31) & 0x1))
 
 sinad_enable=$((($cap_msb >> 0) & 0x1))
 celltrack_enable=$((($cap_msb >> 1) & 0x1))
-dpd_sps_ratio=$((($cap_msb >> 2) & 0x3)); ((dpd_sps_ratio=dpd_sps_ratio+1))
 hwdcm_enable=$(((cap_msb >> 7) & 0x1))
 dpd_enable=$(((cap_msb >> 8) & 0x1))
 num_downsampling_taps=$(((cap_msb >> 9) & 0x1)); [ $num_downsampling_taps = 0 ] && num_downsampling_taps=8 || num_downsampling_taps=64

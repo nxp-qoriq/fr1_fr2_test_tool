@@ -117,7 +117,7 @@ reserved_size=0x400000
 #if a row is not needed, set p(max) to -.
 use_custom_dpd_model=1  #valid only for T4x image
 
-#This model is used by ADvspa_images_LS.2T2R.T4x_100M_30K_491_245_HS.2R_400M_120K_983_983_TDDFDD
+#This model is used by ADvspa_images_LS.2T2R.T4x_100M_30K_491_245_HS.2R_400M_120K_1966_1966_TDDFDD
 dpd_model_para_custom_01=(
 #r q P  ID 01
  0 0 6  #max 6				
@@ -131,7 +131,7 @@ dpd_model_para_custom_01=(
  2 2 -  #max 6				
 )
 
-#This model is used by ADvspa_images_LS.2T2R.T4x_100M_30K_491_245_HS.2R_400M_120K_1966_1966_TDDFDD
+#This model is used by ADvspa_images_LS.2T2R.T4x_100M_30K_491_245_HS.2R_400M_120K_1966_1966_TDDFDD_DPD19
 dpd_model_para_custom_19=(
 #r q P  ID 19     example: 73   522  R&D1 R&D2 R&D2M srch MT
  0 0 5  #max 6             6     4    6    5    5    6    5
@@ -156,28 +156,6 @@ dpd_model_para_custom_19=(
  5 5 -  #max 5             -     -    -    -    -    -    -
 )
 
-
-#dpd_model_para_custom=(
-##r q P  ID 10     example: 73   522  R&D1 R&D2 R&D2M
-# 0 0 6  #max 6                 6     4    6    5    5   
-# 1 0 3  #max 5                 -     4    3    2    2   
-# 2 0 -  #max 5                 -     -    -    -    -   
-# 3 0 -  #max 5                 -     -    -    -    -   
-# 4 0 -  #max 5                 -     -    -    -    -   
-# 5 0 -  #max 5                 -     -    -    -    -   
-# 0 1 5  #max 5                 -     4    5    4    4   
-# 1 1 5  #max 6                 6     4    5    3    4   
-# 2 1 -  #max 5                 -     -    -    -    -   
-# 3 1 -  #max 5                 -     -    -    -    -
-# 4 1 -  #max 5                 -     -    -    -    -
-# 5 1 -  #max 5                 -     -    -    -    -
-# 0 2 -  #max 5                 -     -    -    3    4
-# 1 2 -  #max 5                 -     -    -    -    -
-# 2 2 -  #max 6                 6     -    -    3    3
-# 3 2 -  #max 5                 -     -    -    -    -
-# 4 2 -  #max 5                 -     -    -    -    -
-# 5 2 -  #max 5                 -     -    -    -    -
-#)
 
 #include custom config file.  If users have their own config other than above, they can put in config_custom.dat
 #the custom config will overwrite the default config above.
