@@ -11,16 +11,19 @@
 
 print_usage()
 {
-echo "usage: ./scale_percent.sh [ant_id] [per_cent] [-y] [input [auto] [dis] [offset=x len=y]]"
+echo "usage: ./scale_percent.sh [ant_id] [percent|+percent|-percent] [-y] [input [auto] [dis] [offset=x len=y]]"
 echo "  the arguments are optional, with no arguments the script will scale up antenna 0 by 10%."
 echo "  ant_id:   antenna ID, values could be 0,1,2,3,4,5 representing a logic channel."
-echo "  per_cent：percentage number without %. As too high amplitude may damage PA, when per_cent is 200 or higher, a warning will be prompted to ask users to confirm the scaling is safe to PA."
+echo " percent： percentage number without %. Scale the signal amplitude to this percent. As too high amplitude may damage PA, when per_cent is 200 or higher, a warning will be prompted to ask users to confirm the scaling is safe to PA."
+echo "+percent:  increase the signal amplitude by percent%"
+echo "-percent:  decrease the signal amplitude by percent%"
 echo "     -y：   confirm the scaling is safe to PA, and test tool will not prompt with a warning."
 echo "  input:    scaling the input data fetched from HighPHY/DU. if not specified, scaling the QEC output."
 echo "   auto:    auto scaling both input and output to fully utilize the DAC dynamic range"
 echo "    dis:    disable scaling on both input and output, restore to original state"
-echo "example:  ./scale_percent.sh 0 105                will scale antenna 0 signal amplitude up 5%"
-echo "example:  ./scale_percent.sh 0 90                 will scale antenna 0 signal amplitude down 10%"
+echo "example:  ./scale_percent.sh 0 105                will scale antenna 0 signal amplitude up 5% from orignal amplitude"
+echo "example:  ./scale_percent.sh 0 90                 will scale antenna 0 signal amplitude down 10% from orignal amplitude"
+echo "example:  ./scale_percent.sh 0 +15                will scale antenna 0 signal amplitude up 15% from current amplitude"
 echo "example:  ./scale_percent.sh 0 25 input           will scale input data down to 25% of original data"
 echo
 }
@@ -37,6 +40,7 @@ num_counter=0
 offset=0
 len=0
 txrx=0 #0=tx 1=rx
+inc=0;
 arg_parse()
 {
 	arg=$1
@@ -49,6 +53,7 @@ arg_parse()
 	elif [ $1 = off ]; then		off=1
 	elif [ $1 = tx ]; then		txrx=0
 	elif [ $1 = rx ]; then		txrx=1
+	elif ([ ${arg:0:1} = + ] || [ ${arg:0:1} = - ]); then	inc=$1; [ $((inc)) -lt -100 ] && inc=-100;
 	elif [ ${arg:0:7} = offset= ]; then		offset=${arg:7}
 	elif [ ${arg:0:4} = len= ]; then		len=${arg:4}
 	else
@@ -71,6 +76,10 @@ done
 
 if [ $txrx = 1 ];then
 	check_ant_enable_rx $ant
+	if [ $((inc)) -ne 0 ];then
+		factor=`./utils/memrw r 32 $((test_tool_env_rx_scaling+ant*4))`
+		factor=$((factor*(100+inc)/100))
+	fi
 	echo "Scaling digital signal amplitude at RX ADC output for antenna $ant to $factor%..."
 	./utils/memrw w 32 $((test_tool_env_rx_scaling+ant*4)) $factor
 	rxcore=${antrx[$ant]}
@@ -153,6 +162,10 @@ fi
 
 
 if [ $input_scaling = 1 ];then
+	if [ $((inc)) -ne 0 ];then
+		input_scaling_factor=`./utils/memrw r 32 $((test_tool_env_tx_scaling_input+ant*4))`
+		input_scaling_factor=$((input_scaling_factor*(100+inc)/100))
+	fi
 	if ([ $phcom_disable = 1 ] || [ $((option8_tx[ant])) -eq 1 ]);then #when phcom is disabled or time domain, scale input waveform
 	filename=${invecfile_cur[$ant]}; [ $filename = 0 ] && { echo -e "Waveform file not loaded\n"; exit 1; }
 	echo Scaling TX input waveform amplitude for antenna $ant to $input_scaling_factor%...
@@ -180,6 +193,9 @@ if [ $output_scaling = 1 ];then
 		((output_scaling_factor=factor_hist))
 		./utils/memrw w 32 $((test_tool_env_tx_scaling_output+ant*4)) $factor_hist  #clear OFF bit
 	else
+		if [ $((inc)) -ne 0 ];then
+			output_scaling_factor=$((factor_hist*(100+inc)/100))
+		fi
 		./utils/memrw w 32 $((test_tool_env_tx_scaling_output+ant*4)) $output_scaling_factor 
 	fi
 

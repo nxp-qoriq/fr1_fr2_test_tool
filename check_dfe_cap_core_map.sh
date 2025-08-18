@@ -431,7 +431,8 @@ if [ $cfr_pass -ne 0 ];then
 	((cfr_pass++))
 fi
 up1=$((($cap_lsb >> 4) & 0xF))
-if [ $up1 -eq $((0xF)) ]; then		up1=64
+if [ $up1 -eq 0 ]; then				up1=128
+elif [ $up1 -eq $((0xF)) ]; then	up1=64
 elif [ $up1 -eq $((0xE)) ]; then	up1=32
 elif [ $up1 -eq $((0xD)) ]; then	up1=48
 elif [ $up1 -le $((0x5)) ]; then	up1=0
