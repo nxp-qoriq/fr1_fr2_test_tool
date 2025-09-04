@@ -164,36 +164,58 @@ tag_iqswap=("" "IQSWAPPED")
 [ $((vspa_image_version)) -ge $((0x500)) ] && { tag_pnswap_I=("" "PNSWAPPED_on_I");tag_pnswap_Q=("" "PNSWAPPED_on_Q"); } || { tag_pnswap_I=("" "");tag_pnswap_Q=("" ""); }
 
 if [ $tag = TX+RX ]; then
+tx_sym_base=`get_wordvalue_from_vspa $core $tx_sym_buf_base_inject`; tx_sym_base_vir=`phy2vir $tx_sym_base`
+tx_num_sym=`get_wordvalue_from_vspa $core $tx_num_sym_in_buf_inject`
+tx_sym_buf_size=`get_wordvalue_from_vspa $core $tx_sym_buff_size_inject`
+end_tx_sym_buf=`align $((tx_sym_base+tx_num_sym*tx_sym_buf_size)) 4096`
+[ $((end_tx_sym_buf)) -gt $((next_HRAMaddr_phy)) ] && [ $((end_tx_sym_buf)) -lt $((HRAMaddr_phy+HRAM_size)) ] && { next_HRAMaddr_phy=$end_tx_sym_buf; echo "next_HRAMaddr_phy=$end_tx_sym_buf" >> ./runtime_config.txt; }
+rx_sym_base=`get_wordvalue_from_vspa $core $((rx_sym_buf_base_dump+trid*4))`; rx_sym_base_vir=`phy2vir $tx_sym_base`
+rx_num_sym=`get_wordvalue_from_vspa $core $((rx_num_sym_in_buff_dump+trid*4))`
+rx_sym_buf_size=`get_wordvalue_from_vspa $core $rx_sym_buff_size_dump`
+end_rx_sym_buf=`align $((rx_sym_base+rx_num_sym*rx_sym_buf_size)) 4096`
+[ $((end_rx_sym_buf)) -gt $((next_HRAMaddr_phy)) ] && [ $((end_rx_sym_buf)) -lt $((HRAMaddr_phy+HRAM_size)) ] && { next_HRAMaddr_phy=$end_rx_sym_buf; echo "next_HRAMaddr_phy=$end_rx_sym_buf" >> ./runtime_config.txt; }
 ((dcs_used_tx[$dcs_id_tx]++))
 ((dcs_used_rx[$dcs_id_rx]++))
 echo "***      DCS channel used:   TX: "${tag_tddfdd[$tx_fdd]} ${TAG_TXDCSID[$dcs_id_tx]} $txdcs KSPS ${tag_iqswap[iqswap_tx[dcs_id_tx]]} ${tag_pnswap_I[pnswap_tx_I[dcs_id_tx]]} ${tag_pnswap_Q[pnswap_tx_Q[dcs_id_tx]]},   RX: ${tag_tddfdd[$rx_fdd]} ${TAG_RXDCSID[$dcs_id_rx]} $rxdcs KSPS ${tag_iqswap[iqswap_rx[dcs_id_rx]]} ${tag_pnswap_I[pnswap_rx_I[dcs_id_rx]]} ${tag_pnswap_Q[pnswap_rx_Q[dcs_id_rx]]}, HW_2x_Decimation ${onoff[axiq_2G_mode]}
 
 if [ $dfe_only = 0 ];then
-echo "*** Symbols sent/received:   TX: $num_sym_tx ~$num_sym_tx_1ms/ms,   RX: $num_sym_rx ~$num_sym_rx_1ms/ms"
+echo "***      Symbols sent    :   TX: $num_sym_tx ~$num_sym_tx_1ms/ms from addr $tx_sym_base num_symbols $((tx_num_sym))"
+echo "***      Symbols received:   RX: $num_sym_rx ~$num_sym_rx_1ms/ms from addr $rx_sym_base num_symbols $((rx_num_sym))"
 [ $((num_sym_tx_1ms)) -gt $((sym_num_1m*12/10)) ] && { str="***WARNING: TX sent more symbols than expected on ant $ant, sent $num_sym_tx_1ms/ms, expected $sym_num_1m/ms. Check TX DAC sampling rate\n"; error_list="$error_list$str"; }
 [ $((num_sym_rx_1ms)) -gt $((sym_num_1m*12/10)) ] && { str="***WARNING: RX received more symbols than expected on ant $ant, received $num_sym_rx_1ms/ms, expected $sym_num_1m/ms. Check RX ADC sampling rate\n"; error_list="$error_list$str"; }
 else
-echo "*** Samples sent/received:   TX: $num_sample_tx ~`rounding $num_sample_tx_1ms 15360` KSPS,   RX: $num_sample_rx ~`rounding $num_sample_rx_1ms 15360` KSPS"
+echo "***      Samples sent    :   TX: $num_sample_tx ~`rounding $num_sample_tx_1ms 15360` KSPS from addr $tx_sym_base num_symbols $((tx_num_sym))"
+echo "***      Samples received:   RX: $num_sample_rx ~`rounding $num_sample_rx_1ms 15360` KSPS from addr $rx_sym_base num_symbols $((rx_num_sym))"
 fi
 
 elif [ $tag = TX ]; then
+tx_sym_base=`get_wordvalue_from_vspa $core $tx_sym_buf_base_inject`; tx_sym_base_vir=`phy2vir $tx_sym_base`
+tx_num_sym=`get_wordvalue_from_vspa $core $tx_num_sym_in_buf_inject`
+tx_sym_buf_size=`get_wordvalue_from_vspa $core $tx_sym_buff_size_inject`
+end_tx_sym_buf=`align $((tx_sym_base+tx_num_sym*tx_sym_buf_size)) 4096`
+[ $((end_tx_sym_buf)) -gt $((next_HRAMaddr_phy)) ] && [ $((end_tx_sym_buf)) -lt $((HRAMaddr_phy+HRAM_size)) ] && { next_HRAMaddr_phy=$end_tx_sym_buf; echo "next_HRAMaddr_phy=$end_tx_sym_buf" >> ./runtime_config.txt; }
 ((dcs_used_tx[$dcs_id_tx]++))
-echo "***      DCS channel used:   TX: "${tag_tddfdd[$tx_fdd]} ${TAG_TXDCSID[$dcs_id_tx]} $txdcs KSPS ${tag_iqswap[iqswap_tx[dcs_id_tx]]} ${tag_pnswap_I[pnswap_tx_I[dcs_id_tx]]} ${tag_pnswap_Q[pnswap_tx_Q[dcs_id_tx]]}
+echo "***      DCS channel used:   "${tag_tddfdd[$tx_fdd]} ${TAG_TXDCSID[$dcs_id_tx]} $txdcs KSPS ${tag_iqswap[iqswap_tx[dcs_id_tx]]} ${tag_pnswap_I[pnswap_tx_I[dcs_id_tx]]} ${tag_pnswap_Q[pnswap_tx_Q[dcs_id_tx]]}
 if [ $dfe_only = 0 ];then
-echo "*** Symbols sent/received:   TX: $num_sym_tx ~$num_sym_tx_1ms/ms"
+echo "***          Symbols sent:   $num_sym_tx ~$num_sym_tx_1ms/ms from addr $tx_sym_base num_symbols $((tx_num_sym))"
 [ $((num_sym_tx_1ms)) -gt $((sym_num_1m*12/10)) ] && { str="***WARNING: TX sent more symbols than expected on ant $ant, sent $num_sym_tx_1ms/ms, expected $sym_num_1m/ms. Check TX DAC sampling rate\n"; error_list="$error_list$str"; }
 else
-echo "*** Samples sent/received:   TX: $num_sample_tx ~`rounding $num_sample_tx_1ms 15360` KSPS"
+echo "***          Samples sent:   $num_sample_tx ~`rounding $num_sample_tx_1ms 15360` KSPS from addr $tx_sym_base num_symbols $((tx_num_sym))"
 fi
 
 else
+rx_sym_base=`get_wordvalue_from_vspa $core $((rx_sym_buf_base_dump+trid*4))`; rx_sym_base_vir=`phy2vir $tx_sym_base`
+rx_num_sym=`get_wordvalue_from_vspa $core $((rx_num_sym_in_buff_dump+trid*4))`
+rx_sym_buf_size=`get_wordvalue_from_vspa $core $rx_sym_buff_size_dump`
+end_rx_sym_buf=`align $((rx_sym_base+rx_num_sym*rx_sym_buf_size)) 4096`
+[ $((end_rx_sym_buf)) -gt $((next_HRAMaddr_phy)) ] && [ $((end_rx_sym_buf)) -lt $((HRAMaddr_phy+HRAM_size)) ] && { next_HRAMaddr_phy=$end_rx_sym_buf; echo "next_HRAMaddr_phy=$end_rx_sym_buf" >> ./runtime_config.txt; }
 ((dcs_used_rx[$dcs_id_rx]++))
-echo "***      DCS channel used:   RX: "${tag_tddfdd[$rx_fdd]} ${TAG_RXDCSID[$dcs_id_rx]} $rxdcs KSPS ${tag_iqswap[iqswap_rx[dcs_id_rx]]} ${tag_pnswap_I[pnswap_rx_I[dcs_id_rx]]} ${tag_pnswap_Q[pnswap_rx_Q[dcs_id_rx]]}, HW_2x_Decimation ${onoff[axiq_2G_mode]}
+echo "***      DCS channel used:   "${tag_tddfdd[$rx_fdd]} ${TAG_RXDCSID[$dcs_id_rx]} $rxdcs KSPS ${tag_iqswap[iqswap_rx[dcs_id_rx]]} ${tag_pnswap_I[pnswap_rx_I[dcs_id_rx]]} ${tag_pnswap_Q[pnswap_rx_Q[dcs_id_rx]]}, HW_2x_Decimation ${onoff[axiq_2G_mode]}
 if [ $dfe_only = 0 ];then
-echo "*** Symbols sent/received:   RX: $num_sym_rx ~$num_sym_rx_1ms/ms"
+echo "***      Symbols received:   $num_sym_rx ~$num_sym_rx_1ms/ms from addr $rx_sym_base num_symbols $((rx_num_sym))"
 [ $((num_sym_rx_1ms)) -gt $((sym_num_1m*12/10)) ] && { str="***WARNING: RX received more symbols than expected on ant $ant, received $num_sym_rx_1ms/ms, expected $sym_num_1m/ms. Check RX ADC sampling rate\n"; error_list="$error_list$str"; }
 else
-echo "*** Samples sent/received:   RX: $num_sample_rx ~`rounding $num_sample_rx_1ms 15360` KSPS"
+echo "***      Samples received:   $num_sample_rx ~`rounding $num_sample_rx_1ms 15360` KSPS from addr $rx_sym_base num_symbols $((rx_num_sym))"
 fi
 fi
 
@@ -268,8 +290,6 @@ if [ $type_ru = 1 ];then
 	if [ $dfe_only = 1 ];then
 		tag_from_file="from TX circular buffer"
 	else
-		tx_sym_base=`get_wordvalue_from_vspa $core $tx_sym_buf_base_inject`; tx_sym_base_vir=`phy2vir $tx_sym_base`
-		tx_num_sym=`get_wordvalue_from_vspa $core $tx_num_sym_in_buf_inject`
 		if [ $((tx_sym_base)) -eq $((tx_sym_queue_base)) ];then
 			if [ $prach_wv = 0 ];then
 			tag_from_file="from $((tx_num_sym)) TX symbol buffers at address $tx_sym_base_vir but waveform not loaded"
