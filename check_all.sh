@@ -167,12 +167,12 @@ if [ $tag = TX+RX ]; then
 tx_sym_base=`get_wordvalue_from_vspa $core $tx_sym_buf_base_inject`; tx_sym_base_vir=`phy2vir $tx_sym_base`
 tx_num_sym=`get_wordvalue_from_vspa $core $tx_num_sym_in_buf_inject`
 tx_sym_buf_size=`get_wordvalue_from_vspa $core $tx_sym_buff_size_inject`
-end_tx_sym_buf=`align $((tx_sym_base+tx_num_sym*tx_sym_buf_size)) 4096`
+end_tx_sym_buf=`size_align $((tx_sym_base+tx_num_sym*tx_sym_buf_size)) 4096`
 [ $((end_tx_sym_buf)) -gt $((next_HRAMaddr_phy)) ] && [ $((end_tx_sym_buf)) -lt $((HRAMaddr_phy+HRAM_size)) ] && { next_HRAMaddr_phy=$end_tx_sym_buf; echo "next_HRAMaddr_phy=$end_tx_sym_buf" >> ./runtime_config.txt; }
 rx_sym_base=`get_wordvalue_from_vspa $core $((rx_sym_buf_base_dump+trid*4))`; rx_sym_base_vir=`phy2vir $tx_sym_base`
 rx_num_sym=`get_wordvalue_from_vspa $core $((rx_num_sym_in_buff_dump+trid*4))`
 rx_sym_buf_size=`get_wordvalue_from_vspa $core $rx_sym_buff_size_dump`
-end_rx_sym_buf=`align $((rx_sym_base+rx_num_sym*rx_sym_buf_size)) 4096`
+end_rx_sym_buf=`size_align $((rx_sym_base+rx_num_sym*rx_sym_buf_size)) 4096`
 [ $((end_rx_sym_buf)) -gt $((next_HRAMaddr_phy)) ] && [ $((end_rx_sym_buf)) -lt $((HRAMaddr_phy+HRAM_size)) ] && { next_HRAMaddr_phy=$end_rx_sym_buf; echo "next_HRAMaddr_phy=$end_rx_sym_buf" >> ./runtime_config.txt; }
 ((dcs_used_tx[$dcs_id_tx]++))
 ((dcs_used_rx[$dcs_id_rx]++))
@@ -192,7 +192,7 @@ elif [ $tag = TX ]; then
 tx_sym_base=`get_wordvalue_from_vspa $core $tx_sym_buf_base_inject`; tx_sym_base_vir=`phy2vir $tx_sym_base`
 tx_num_sym=`get_wordvalue_from_vspa $core $tx_num_sym_in_buf_inject`
 tx_sym_buf_size=`get_wordvalue_from_vspa $core $tx_sym_buff_size_inject`
-end_tx_sym_buf=`align $((tx_sym_base+tx_num_sym*tx_sym_buf_size)) 4096`
+end_tx_sym_buf=`size_align $((tx_sym_base+tx_num_sym*tx_sym_buf_size)) 4096`
 [ $((end_tx_sym_buf)) -gt $((next_HRAMaddr_phy)) ] && [ $((end_tx_sym_buf)) -lt $((HRAMaddr_phy+HRAM_size)) ] && { next_HRAMaddr_phy=$end_tx_sym_buf; echo "next_HRAMaddr_phy=$end_tx_sym_buf" >> ./runtime_config.txt; }
 ((dcs_used_tx[$dcs_id_tx]++))
 echo "***      DCS channel used:   "${tag_tddfdd[$tx_fdd]} ${TAG_TXDCSID[$dcs_id_tx]} $txdcs KSPS ${tag_iqswap[iqswap_tx[dcs_id_tx]]} ${tag_pnswap_I[pnswap_tx_I[dcs_id_tx]]} ${tag_pnswap_Q[pnswap_tx_Q[dcs_id_tx]]}
@@ -207,7 +207,7 @@ else
 rx_sym_base=`get_wordvalue_from_vspa $core $((rx_sym_buf_base_dump+trid*4))`; rx_sym_base_vir=`phy2vir $tx_sym_base`
 rx_num_sym=`get_wordvalue_from_vspa $core $((rx_num_sym_in_buff_dump+trid*4))`
 rx_sym_buf_size=`get_wordvalue_from_vspa $core $rx_sym_buff_size_dump`
-end_rx_sym_buf=`align $((rx_sym_base+rx_num_sym*rx_sym_buf_size)) 4096`
+end_rx_sym_buf=`size_align $((rx_sym_base+rx_num_sym*rx_sym_buf_size)) 4096`
 [ $((end_rx_sym_buf)) -gt $((next_HRAMaddr_phy)) ] && [ $((end_rx_sym_buf)) -lt $((HRAMaddr_phy+HRAM_size)) ] && { next_HRAMaddr_phy=$end_rx_sym_buf; echo "next_HRAMaddr_phy=$end_rx_sym_buf" >> ./runtime_config.txt; }
 ((dcs_used_rx[$dcs_id_rx]++))
 echo "***      DCS channel used:   "${tag_tddfdd[$rx_fdd]} ${TAG_RXDCSID[$dcs_id_rx]} $rxdcs KSPS ${tag_iqswap[iqswap_rx[dcs_id_rx]]} ${tag_pnswap_I[pnswap_rx_I[dcs_id_rx]]} ${tag_pnswap_Q[pnswap_rx_Q[dcs_id_rx]]}, HW_2x_Decimation ${onoff[axiq_2G_mode]}
