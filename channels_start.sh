@@ -126,8 +126,11 @@ ver_maj=$((($vspa_image_version >> 8) & 0xF))
 
 source ./check_dfe_cap_core_map.sh  #include here after MAX_NUM_1R_IN_CORE is resolved
 
-cat /sys/yami/yami_version | grep sdk3
-[ $? -ne 0 ] && e200_cmd_tool=gul_refapp || e200_cmd_tool=gul_cli
+e200_cmd_tool=gul_refapp
+if [ -f /sys/yami/yami_version ];then
+	cat /sys/yami/yami_version | grep sdk3
+	[ $? -eq 0 ] && e200_cmd_tool=gul_cli
+fi
 
 pci_bw_req_total=0
 next_HRAMaddr_phy=$HRAMaddr_phy

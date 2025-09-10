@@ -69,6 +69,7 @@ c6b30a1f4144c6f9ea722d3bace353df "TM3.3_10MHz_30kHz_FDD 61Msps time domain 20ms 
 de48af0f6cd8947ef36f25731d146800 "G-FR1-A1-5_20MHz_30kHz_TDD (3 6 1 4 0 0   2 10 2 2 0 0) 61Msps time domain 20ms DCSFDD dump"
 1444cd9c056670bd8bb4a0978f7668bf "G-FR1-A1-5_20MHz_30kHz_TDD (3 6 1 4 0 0   2 10 2 2 0 0) 61Msps time domain with phase compensation 20ms dump"
 dc646dbc1dda3a137273b520a6e0ffb4 "G-FR1-A1-5_20MHz_30kHz_TDD (3 6 1 4 0 0   2 10 2 2 0 0) 61Msps time domain with CFO 30Khz 20ms dump"
+c794c2d049993a5e4eecd0f80cccfe64 "G-FR1-A1-5_20MHz_30kHz_TDD (3 6 1 4 0 0   2 10 2 2 0 0) 61Msps time domain with CFO 30Khz 20ms dump CFO QEC integrated"
 331563c1ad6e5d98cb5c1bf6a0377c3c "TDD 20MHz_30kHz (3 6 1 4 0 0   2 10 2 2 0 0) 61Msps time domain single subcarrier 20ms dump"
 d7b2e14bd25aa8f0071e8d208f570b4e "TDD 20MHz_30kHz+60Khz (3 6 1 4 0 0   2 10 2 2 0 0) 61Msps time domain two subcarriers 20ms dump"
 d629f0fc7d631697b8dc687ab895e2d3 "G-FR1-A1-5_20MHz_30kHz_TDD (3 6 1 4 0 0   2 10 2 2 0 0) 61Msps time domain with QEC imb 20ms dump"
@@ -118,8 +119,10 @@ c918b11dcbe9ab0c6b3c375f87b9e4b5 "TM1.1 TX timedomain TDD 491Msps waveform with 
 c34e3efb4f1b2fb994a52e5a35b220ad "TM1.1 TX timedomain FDD 491Msps waveform 10ms input 20ms dump with 125% scaling" 
 0f4c37af7319d93521784f006f7622ea "TM1.1 TX timedomain FDD 491Msps waveform 10ms input 20ms dump CFR enabled" 
 9e17ebeb982eb6531cd201b7031bbbde "TM1.1 TX timedomain FDD 491Msps waveform 10ms input 6MB dump" 
-65b47d91b8683410f855a794eaf77fa5 "TM1.1 TX timedomain 4xupsampling new 64taps(stop1000) 491Msps waveform 10ms input 20ms dump QEC tap 0 applied" 
-0447ae3b9753efe777cb9f5940d82cad "TM1.1 TX timedomain 4xupsampling new 64taps(stop1000) 491Msps waveform 10ms input 20ms dump QEC tap 0 with DC offset -0.125:0.125 applied" 
+65b47d91b8683410f855a794eaf77fa5 "TM1.1 TX timedomain 4xupsampling new 64taps(stop1000) 491Msps waveform QEC tap 0 applied" 
+0447ae3b9753efe777cb9f5940d82cad "TM1.1 TX timedomain 4xupsampling new 64taps(stop1000) 491Msps waveform QEC tap 0 with DC offset -0.125:0.125 applied"
+132543d9f569f4abdc75aaead785267a "TM1.1 TX timedomain FDD 20Mhz 4xupsampling new 64taps(stop1000) 491Msps waveform CFO QEC integrated kernel QEC tap 0 with DC offset -0.125:0.125 applied"
+7981af48c309d3679ba3e38b54debe39 "TM1.1 TX timedomain TDD 20Mhz 4xupsampling new 64taps(stop1000) 491Msps waveform CFO QEC integrated kernel QEC tap 0 with DC offset -0.125:0.125 applied"
 5ff08266e33e9d202fb0681838353432 "TM1.1 TX timedomain 4xupsampling new 64taps(stop1000) 491Msps waveform DPDO 32KB (Freq domain input waveform)" 
 dbffa73607b3dd9d8eefec30ace3cc34 "TM1.1 TX timedomain 4xupsampling 64taps TDD 20ms dump" 
 
@@ -251,6 +254,7 @@ mem=0
 num_counter=0
 offset=0
 pow=0
+hexd=0
 
 arg_parse()
 {
@@ -272,6 +276,7 @@ arg_parse()
 	elif 	[ $1 = 20ms ]; 	then		dump_time_len=20
 	elif 	[ $1 = 40ms ]; 	then		dump_time_len=40
 	elif 	[ $1 = fast ]; 	then		fast=1
+	elif 	[ $1 = hexd ]; 	then		hexd=1
 	elif 	[ $1 = pow ]; then			pow=1
 	else
 		if [ $num_counter = 0 ];then	((num_counter++));	ant=$(get_ant_id_from_arg $1); [ $ant = null ] && { echo Wrong Argument: $1; print_usage; exit; }
@@ -444,6 +449,7 @@ fi
 [ $fast = 1 ] && exit
 [ $mem = 1 ] && { check_error $ant; exit; }
 
+[ $hexd = 1 ] && hexdump $dump_filename | head
 checksum=`md5sum $dump_filename`
 checksum=${checksum:0:32}
 echo md5sum $checksum

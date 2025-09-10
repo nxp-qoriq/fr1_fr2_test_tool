@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -8,6 +8,11 @@
 # comply with and are bound by, such license terms. If you do not agree to
 # be bound by the applicable license terms, then you may not retain,
 # install, activate or otherwise use the software.
+
+# ./debug_dump.sh [feca|hram|tag]
+#    feca:  dump feca reg space and fram
+#    hram:  dump hram
+#    tag:   dump VSPA DMEM and reg space with tag put in filename. If no argument specified, dump VSPA DMEM and reg space with tag=0
 
 if [ -f ./runtime_config.txt ];then
 source ./check_dfe_cap_core_map.sh
@@ -120,9 +125,36 @@ fi
 fi
 }
 
-
+dump_feca=0; dump_hram=0;dump_vspa=1;
 tag=0
-[ $# -ge 1 ] && tag=$1
+if [ $# -ge 1 ];then
+	if [ $1 = feca ];then
+		dump_feca=1; dump_vspa=0;
+		if [ $vspa_dev_type = LA9310 ];then
+			echo ***ERROR: NO FECA in LA93xx;
+			exit 0;
+		fi
+	elif [ $1 = hram ];then
+		dump_hram=1; dump_vspa=0;
+	else
+		tag=$1;
+	fi
+fi
+
+if [ $dump_feca = 1 ];then
+feca_addr=$((modembase_phy+0x1040000))
+log=`./utils/bin2mem -f fram.bin -a $FRAMaddr_vir -r $((FRAM_size))`
+log=`./utils/bin2mem -f feca.bin -a $feca_addr -r 4096`
+echo FECA FRAM dump done to file:fram.bin
+echo FECA reg  dump done to file:feca.bin
+exit 0
+fi
+
+if [ $dump_hram = 1 ];then
+log=`./utils/bin2mem -f hram.bin -a $HRAMaddr_vir -r $((HRAM_size))`
+echo HRAM dump done to file:hram.bin
+exit 0
+fi
 
 dfe_core=(0 0 0 0 0 0 0 0) 
 swversion_allcore=0

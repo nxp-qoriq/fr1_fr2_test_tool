@@ -1392,14 +1392,14 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		if(rx)
 		{
     		if(dis)
-    			*(int*)(vspa_dmem_base_vir+core*0x400000+rx_timing_offset) = -(*(int*)(vspa_dmem_base_vir+core*0x400000+rx_timing_offset_total));
+    			*(int*)(vspa_dmem_base_vir+core*0x400000+rx_timing_offset) = 0x80000000;
 			else
 				*(int*)(vspa_dmem_base_vir+core*0x400000+rx_timing_offset) = lsb;
 		}
 		else
 		{
     		if(dis)
-    			*(int*)(vspa_dmem_base_vir+core*0x400000+tx_timing_offset) = -(*(int*)(vspa_dmem_base_vir+core*0x400000+tx_timing_offset_total));
+    			*(int*)(vspa_dmem_base_vir+core*0x400000+tx_timing_offset) = 0x80000000;
 			else
 				*(int*)(vspa_dmem_base_vir+core*0x400000+tx_timing_offset) = lsb;
 		}

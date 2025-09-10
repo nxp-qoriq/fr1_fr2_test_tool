@@ -179,13 +179,13 @@ end_rx_sym_buf=`size_align $((rx_sym_base+rx_num_sym*rx_sym_buf_size)) 4096`
 echo "***      DCS channel used:   TX: "${tag_tddfdd[$tx_fdd]} ${TAG_TXDCSID[$dcs_id_tx]} $txdcs KSPS ${tag_iqswap[iqswap_tx[dcs_id_tx]]} ${tag_pnswap_I[pnswap_tx_I[dcs_id_tx]]} ${tag_pnswap_Q[pnswap_tx_Q[dcs_id_tx]]},   RX: ${tag_tddfdd[$rx_fdd]} ${TAG_RXDCSID[$dcs_id_rx]} $rxdcs KSPS ${tag_iqswap[iqswap_rx[dcs_id_rx]]} ${tag_pnswap_I[pnswap_rx_I[dcs_id_rx]]} ${tag_pnswap_Q[pnswap_rx_Q[dcs_id_rx]]}, HW_2x_Decimation ${onoff[axiq_2G_mode]}
 
 if [ $dfe_only = 0 ];then
-echo "***      Symbols sent    :   TX: $num_sym_tx ~$num_sym_tx_1ms/ms from addr $tx_sym_base num_symbols $((tx_num_sym))"
-echo "***      Symbols received:   RX: $num_sym_rx ~$num_sym_rx_1ms/ms from addr $rx_sym_base num_symbols $((rx_num_sym))"
+echo "***      Symbols sent    :   TX: $num_sym_tx ~$num_sym_tx_1ms/ms from addr $tx_sym_base n_sym $((tx_num_sym))"
+echo "***      Symbols received:   RX: $num_sym_rx ~$num_sym_rx_1ms/ms from addr $rx_sym_base n_sym $((rx_num_sym))"
 [ $((num_sym_tx_1ms)) -gt $((sym_num_1m*12/10)) ] && { str="***WARNING: TX sent more symbols than expected on ant $ant, sent $num_sym_tx_1ms/ms, expected $sym_num_1m/ms. Check TX DAC sampling rate\n"; error_list="$error_list$str"; }
 [ $((num_sym_rx_1ms)) -gt $((sym_num_1m*12/10)) ] && { str="***WARNING: RX received more symbols than expected on ant $ant, received $num_sym_rx_1ms/ms, expected $sym_num_1m/ms. Check RX ADC sampling rate\n"; error_list="$error_list$str"; }
 else
-echo "***      Samples sent    :   TX: $num_sample_tx ~`rounding $num_sample_tx_1ms 15360` KSPS from addr $tx_sym_base num_symbols $((tx_num_sym))"
-echo "***      Samples received:   RX: $num_sample_rx ~`rounding $num_sample_rx_1ms 15360` KSPS from addr $rx_sym_base num_symbols $((rx_num_sym))"
+echo "***      Samples sent    :   TX: $num_sample_tx ~`rounding $num_sample_tx_1ms 15360` KSPS from addr $tx_sym_base n_sym $((tx_num_sym))"
+echo "***      Samples received:   RX: $num_sample_rx ~`rounding $num_sample_rx_1ms 15360` KSPS from addr $rx_sym_base n_sym $((rx_num_sym))"
 fi
 
 elif [ $tag = TX ]; then
@@ -197,10 +197,10 @@ end_tx_sym_buf=`size_align $((tx_sym_base+tx_num_sym*tx_sym_buf_size)) 4096`
 ((dcs_used_tx[$dcs_id_tx]++))
 echo "***      DCS channel used:   "${tag_tddfdd[$tx_fdd]} ${TAG_TXDCSID[$dcs_id_tx]} $txdcs KSPS ${tag_iqswap[iqswap_tx[dcs_id_tx]]} ${tag_pnswap_I[pnswap_tx_I[dcs_id_tx]]} ${tag_pnswap_Q[pnswap_tx_Q[dcs_id_tx]]}
 if [ $dfe_only = 0 ];then
-echo "***          Symbols sent:   $num_sym_tx ~$num_sym_tx_1ms/ms from addr $tx_sym_base num_symbols $((tx_num_sym))"
+echo "***          Symbols sent:   $num_sym_tx ~$num_sym_tx_1ms/ms from addr $tx_sym_base n_sym $((tx_num_sym))"
 [ $((num_sym_tx_1ms)) -gt $((sym_num_1m*12/10)) ] && { str="***WARNING: TX sent more symbols than expected on ant $ant, sent $num_sym_tx_1ms/ms, expected $sym_num_1m/ms. Check TX DAC sampling rate\n"; error_list="$error_list$str"; }
 else
-echo "***          Samples sent:   $num_sample_tx ~`rounding $num_sample_tx_1ms 15360` KSPS from addr $tx_sym_base num_symbols $((tx_num_sym))"
+echo "***          Samples sent:   $num_sample_tx ~`rounding $num_sample_tx_1ms 15360` KSPS from addr $tx_sym_base n_sym $((tx_num_sym))"
 fi
 
 else
@@ -212,10 +212,10 @@ end_rx_sym_buf=`size_align $((rx_sym_base+rx_num_sym*rx_sym_buf_size)) 4096`
 ((dcs_used_rx[$dcs_id_rx]++))
 echo "***      DCS channel used:   "${tag_tddfdd[$rx_fdd]} ${TAG_RXDCSID[$dcs_id_rx]} $rxdcs KSPS ${tag_iqswap[iqswap_rx[dcs_id_rx]]} ${tag_pnswap_I[pnswap_rx_I[dcs_id_rx]]} ${tag_pnswap_Q[pnswap_rx_Q[dcs_id_rx]]}, HW_2x_Decimation ${onoff[axiq_2G_mode]}
 if [ $dfe_only = 0 ];then
-echo "***      Symbols received:   $num_sym_rx ~$num_sym_rx_1ms/ms from addr $rx_sym_base num_symbols $((rx_num_sym))"
+echo "***      Symbols received:   $num_sym_rx ~$num_sym_rx_1ms/ms from addr $rx_sym_base n_sym $((rx_num_sym))"
 [ $((num_sym_rx_1ms)) -gt $((sym_num_1m*12/10)) ] && { str="***WARNING: RX received more symbols than expected on ant $ant, received $num_sym_rx_1ms/ms, expected $sym_num_1m/ms. Check RX ADC sampling rate\n"; error_list="$error_list$str"; }
 else
-echo "***      Samples received:   $num_sample_rx ~`rounding $num_sample_rx_1ms 15360` KSPS from addr $rx_sym_base num_symbols $((rx_num_sym))"
+echo "***      Samples received:   $num_sample_rx ~`rounding $num_sample_rx_1ms 15360` KSPS from addr $rx_sym_base n_sym $((rx_num_sym))"
 fi
 fi
 
@@ -549,7 +549,7 @@ do
 		scaling_factor_output=$((`./utils/memrw r 32 $((test_tool_env_tx_scaling_output+i*4))`))
 		scaling_off=$((scaling_factor_output>>31)); scaling_factor_output=$((scaling_factor_output&0x7FFFFFFF))
 		idle_flag=`get_wordvalue_from_vspa ${anttx[$i]} $CONFIG_TX_SINGLE_TONE_AMP`
-		[ $((idle_flag)) -eq 1 ] && ant_running_tx[i]=3 || idle_flag=0
+		[ $((ant_running_tx[i])) -eq 1 ] && [ $((idle_flag)) -eq 1 ] && ant_running_tx[i]=3 || idle_flag=0
 		[ $((scaling_off|idle_flag)) = 1 ] && tag_scaling=OFF || tag_scaling="$scaling_factor_input/$scaling_factor_output"
 		echo "$i      $tag0 $tag1 ${TAG_IQSWAP[iqswap_tx[dcsid]]}  ${tag_running[ant_running_tx[i]]}      $tag_scaling"
 	fi

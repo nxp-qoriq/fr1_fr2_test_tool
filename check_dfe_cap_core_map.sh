@@ -263,13 +263,13 @@ devmem()
 
 print_addr_mapping()
 {
-echo Address Mapping:
-echo "ddr              $ddr_vir -- $ddr_phy, size $ddr_size"
-echo "PEB              $PEBaddr_vir -- $PEBaddr_phy" 
-echo "HRAM             $HRAMaddr_vir -- $HRAMaddr_phy" 
-echo "FRAM             $FRAMaddr_vir -- $FRAMaddr_phy" 
-echo "VSPA DMEM        $VDRAMaddr_vir -- $VDRAMaddr_phy"
-echo "modembase_phy    $modembase_phy"
+	echo -e "\nAddress Mapping:             Host View       Modem View"
+	echo "ddr                          $ddr_vir -- $ddr_phy, size $ddr_size"
+	echo "PEB                          $PEBaddr_vir -- $PEBaddr_phy" 
+	echo "HRAM                         $HRAMaddr_vir -- $HRAMaddr_phy" 
+	echo "FRAM                         $FRAMaddr_vir -- $FRAMaddr_phy" 
+	echo "VSPA DMEM                    $VDRAMaddr_vir -- $VDRAMaddr_phy"
+	echo "modembase_phy CCSR           $modembase_phy"
 }
 
 dpd_model_legal_check()
@@ -799,22 +799,21 @@ fi
 
 print_ddr_usage()
 {
-echo
-echo Test Tool memory usage:
-echo "addr_test_tool_env           `phy2vir $test_tool_env_base_phy`, `printf "0x%x" $test_tool_env_base_phy`, size `printf "0x%x" $test_tool_env_size`"
-echo "addr_trace_log               `phy2vir $trace_log_buf_base`, `printf "0x%x" $trace_log_buf_base`, size `printf "0x%x" $trace_log_buf_size`"
-echo "addr_tx_sym_queue            `phy2vir $tx_sym_queue_base`, `printf "0x%x" $tx_sym_queue_base`, size `printf "0x%x" $tx_sym_queue_size`"
-echo "addr_rx_sym_queue            `phy2vir $rx_sym_queue_base`, `printf "0x%x" $rx_sym_queue_base`, size `printf "0x%x" $rx_sym_queue_size`"
-echo "addr_cell_tracking_extbuf    `phy2vir $celltrack_extbuf_base`, `printf "0x%x" $celltrack_extbuf_base`, size `printf "0x%x" $celltrack_extbuf_size`"
-if [ $obs_buffer_phy != 0 ];then
-echo "addr_obs_buffer              `phy2vir $obs_buffer_phy`, `printf "0x%x" $obs_buffer_phy`, size `printf "0x%x" $obs_buffer_size`"
-fi
-echo "addr_tx_test_vector          `phy2vir $addr_tx_test_vector`, `printf "0x%x" $addr_tx_test_vector`, size `printf "0x%x" $size_tx_test_vector`"
-echo "addr_dump                    `phy2vir $addr_dump`, `printf "0x%x" $addr_dump`, size `printf "0x%x" $size_dump`"
-echo "addr_inject                  `phy2vir $addr_inject`, `printf "0x%x" $addr_inject`, size `printf "0x%x" $size_inject`"
-echo "End address                  `phy2vir $end_ddr`, `printf "0x%x" $end_ddr`"
-echo "total size used              `printf "0x%x" $((end_ddr-ddr_phy))`, available size `printf "0x%x" $ddr_size`"
-echo
+	echo -e "\nTest Tool memory usage:      Host View       Modem View"
+	echo "addr_test_tool_env           `phy2vir $test_tool_env_base_phy` -- `printf "0x%x" $test_tool_env_base_phy`, size `printf "0x%x" $test_tool_env_size`"
+	echo "addr_trace_log               `phy2vir $trace_log_buf_base` -- `printf "0x%x" $trace_log_buf_base`, size `printf "0x%x" $trace_log_buf_size`"
+	echo "addr_tx_sym_queue            `phy2vir $tx_sym_queue_base` -- `printf "0x%x" $tx_sym_queue_base`, size `printf "0x%x" $tx_sym_queue_size`"
+	echo "addr_rx_sym_queue            `phy2vir $rx_sym_queue_base` -- `printf "0x%x" $rx_sym_queue_base`, size `printf "0x%x" $rx_sym_queue_size`"
+	echo "addr_cell_tracking_extbuf    `phy2vir $celltrack_extbuf_base` -- `printf "0x%x" $celltrack_extbuf_base`, size `printf "0x%x" $celltrack_extbuf_size`"
+	if [ $obs_buffer_phy != 0 ];then
+	echo "addr_obs_buffer              `phy2vir $obs_buffer_phy` -- `printf "0x%x" $obs_buffer_phy`, size `printf "0x%x" $obs_buffer_size`"
+	fi
+	echo "addr_tx_test_vector          `phy2vir $addr_tx_test_vector` -- `printf "0x%x" $addr_tx_test_vector`, size `printf "0x%x" $size_tx_test_vector`"
+	echo "addr_dump                    `phy2vir $addr_dump` -- `printf "0x%x" $addr_dump`, size `printf "0x%x" $size_dump`"
+	echo "addr_inject                  `phy2vir $addr_inject` -- `printf "0x%x" $addr_inject`, size `printf "0x%x" $size_inject`"
+	echo "End address                  `phy2vir $end_ddr` -- `printf "0x%x" $end_ddr`"
+	echo "total size used              `printf "0x%x" $((end_ddr-ddr_phy))`, available size `printf "0x%x" $ddr_size`"
+	echo
 }
 
 check_running_status()   #API check_running_status <core_id> <trid>

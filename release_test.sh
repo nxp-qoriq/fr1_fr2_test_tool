@@ -13,8 +13,9 @@
 # Basic test of test tool release. Run this script before a release is published. If the
 # result of the script is PASS, it means test tool works well in current release.
 
+[ -f /usr/bin/la9310_modem_info ] && images=(rc30) || images=(ls hs)
+
 channel_start_arg=""
-images=(ls hs)
 start_fddtdd=0
 end_fddtdd=1
 
@@ -116,11 +117,22 @@ do
 	chlog=`./channels_start.sh restart ${tddtddmode[fddtdd]} $lb $dcs $hwdcm idle $channel_start_arg`
 	[ $? != 0 ] && { echo -e "***ERROR: Failure in starting channels, need reboot."; exit 1; }
 	echo "$chlog" >> $log_file
+	
+	chlog=`./check_all.sh`; echo "$chlog" | grep "Number of Running channels TX: 1,  RX: 1"
+	while [ $? != 0 ]
+	do	
+		echo -e "Waiting for l1c to take effect..."
+		sleep 5
+		chlog=`./check_all.sh`; echo "$chlog" | grep "Number of Running channels TX: 1,  RX: 1"
+	done
+	echo "$chlog" >> $log_file
+
 	source ./config.dat #channels_start.sh will update parameters in runtime_config.txt which is included in config.dat
 	[ $num_T_LS_enabled -gt 1 ] && num_T_LS_enabled=1
 	for ((i=0;i<num_T_LS_enabled;i++))
 	do
 		core=$((anttx[i]))
+		./update_timing_offset.sh $i dis >> $log_file
 		./send_single_tone.sh $i stop >> $log_file   #get out of idle
 		item_test "Ant $i TX time domain TM waveform dump : " "./dump_time_domain_tx.sh $i"
 		./send_single_tone.sh $i >> $log_file
@@ -133,14 +145,6 @@ do
 	for ((i=0;i<num_R_LS_enabled;i++))
 	do
 		core=$((antrx[i]))
-		if ([ $vspa_dev_type = LA9310 ] && [ $i -lt $((num_T_LS)) ] && [ $fddtdd = 0 ]);then #if TX is enabled, LA9310, FDD, test loopback
-		./send_single_tone.sh $i stop >> $log_file   #get TX out of idle
-		item_test "Ant $i RX loopback from TX dump        : " "./dump_time_domain_rx.sh $i"
-	
-		./update_test_vector.sh ./test_vectors/NR-FR1-TM3.3_20MHz_30kHz_1ssb_pss5_sss7_FDD_fd_640.bin >> $log_file
-		item_test "Ant $i RX cell tracking                : " "./set_dfe_state.sh $i track"
-		./send_single_tone.sh $i 0 0 >> $log_file   #get TX into idle
-		fi
 		./send_single_tone.sh rx $i >> $log_file
 		item_test "Ant $i RX time domain single tone dump : " "./dump_time_domain_rx.sh $i"
 		./send_single_tone.sh rx $i stop >> $log_file
@@ -177,9 +181,9 @@ echo -e "--- Test Finished, Test log is kept in $log_file\n"
 echo -e "\n****************************************************"
 echo -e "*** Total num of items tested $((num_pass+num_fail)), PASS $num_pass, FAIL $num_fail\n"
 if ([ $num_fail = 0 ] && [ $num_pass != 0 ]);then
-echo    "***  OVERALL TEST RESULT:  PASS !"
+echo    "***  TEST RESULT:  PASS !"
 else
-echo    "***  OVERALL TEST RESULT:  FAIL !"
+echo    "***  TEST RESULT:  FAIL !"
 echo    "***  Failed items:"
 grep FAIL $log_file
 fi

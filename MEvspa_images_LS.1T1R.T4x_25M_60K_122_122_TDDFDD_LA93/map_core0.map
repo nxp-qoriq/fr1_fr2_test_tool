@@ -1,9 +1,9 @@
 ;*********************************************************************************
 ;*StarCore Linker vspa-ld.exe version 3.0.300 - 2018.11.29 VSPA
 ;*
-;*Compilation date : Tue Dec 24 14:42:00 2024
+;*Compilation date : Wed Sep 10 15:02:32 2025
 ;*File Name : C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core0.map
-;*Invocation line: C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA_Tools\bin\vspa-ld.exe -o C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/geul-vspa0.eld -Map C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core0.map -LC:/0_dsp/Projects_VSPA/DFE_Ref/lib -llib_DFE_Ref_vspa2.elb -c C:/0_dsp/Projects_VSPA/DFE_Ref/LCF/LA9310_sp.lcf -core_type=sp -au_count 16 .\source_shared\DFE_func_rx.eln .\source_shared\DFE_func_tx.eln .\source_shared\DFE_init.eln .\source_shared\boot.eln .\source_shared\debug.eln .\source_shared\dump_inject.eln .\source_shared\global_var.eln .\source_shared\host_vspa_msg.eln .\source_shared\inter_core_msg.eln .\source_shared\main_pair_coreA.eln .\source_shared\pair_para.eln .\source_shared\startup_vspa2_modified.eln .\source_shared\kernel_FFT\ifft_cp.eln .\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln .\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln .\source_shared\eDMA\eDMA_la9310.eln -start-reread-lib C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA_Tools\lib\vspa2\librt_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA_Tools\lib\vspa2\libc99_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA_Tools\lib\vspa2\libm_au16_sp.elb -end-reread-lib
+;*Invocation line: C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA_Tools\bin\vspa-ld.exe -o C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/geul-vspa0.eld -Map C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core0.map -LC:/0_dsp/Projects_VSPA/DFE_Ref/lib -llib_DFE_Ref_vspa2.elb -c C:/0_dsp/Projects_VSPA/DFE_Ref/LCF/LA9310_sp.lcf -core_type=sp -au_count 16 .\source_shared\DFE_func_rx.eln .\source_shared\DFE_func_tx.eln .\source_shared\DFE_init.eln .\source_shared\boot.eln .\source_shared\debug.eln .\source_shared\dump_inject.eln .\source_shared\global_var.eln .\source_shared\host_vspa_msg.eln .\source_shared\inter_core_msg.eln .\source_shared\main_pair_coreA.eln .\source_shared\pair_para.eln .\source_shared\startup_vspa2_modified.eln .\source_shared\kernel_FFT\ifft_cp.eln .\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln .\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln -start-reread-lib C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA_Tools\lib\vspa2\librt_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA_Tools\lib\vspa2\libc99_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA_Tools\lib\vspa2\libm_au16_sp.elb -end-reread-lib
 ;*********************************************************************************
 ;*********************************UNREFERENCED DATA*******************************
 ;*********************************************************************************
@@ -52,14 +52,9 @@
 ;*		GLOBAL  	      2048         	      2048    	         0       	_qec_scratch                  	.\source_shared\main_pair_coreA.eln
 ;*		GLOBAL  	        64         	        64    	         0       	_tx_block_status              	.\source_shared\main_pair_coreA.eln
 ;*		GLOBAL  	       128         	       128    	         0       	_filter_taps_upsampling       	.\source_shared\main_pair_coreA.eln
-;*		GLOBAL  	       128         	       128    	         0       	_rx_pow_acc                   	.\source_shared\main_pair_coreA.eln
 ;*		GLOBAL  	       128         	       128    	         0       	_history_upfilter             	.\source_shared\main_pair_coreA.eln
 ;*		GLOBAL  	       256         	       256    	         0       	_history_2xdown               	.\source_shared\main_pair_coreA.eln
-;*ALL VARIABLES WERE REMOVED FROM MODULE: .\source_shared\main_pair_coreA.eln
-;*MODULE: .\source_shared\eDMA\eDMA_la9310.eln
-;*		GLOBAL  	        32         	        32    	         0       	_eDMA_TCD                     	.\source_shared\eDMA\eDMA_la9310.eln
-;*ALL VARIABLES WERE REMOVED FROM MODULE: .\source_shared\eDMA\eDMA_la9310.eln
-;*TOTAL DATA: 12956 BYTES REMOVED
+;*TOTAL DATA: 12796 BYTES REMOVED
 ;*********************************************************************************
 ;****************************UNREFERENCED FUNCTIONS*******************************
 ;*********************************************************************************
@@ -68,10 +63,12 @@
 ;*		GLOBAL  	        96         	        96    	         0       	_is_phy_rx_buf_available      	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	       240         	       240    	         0       	_start_rx_ippu_bitrev_reversIn_linearOut	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	        48         	        48    	         0       	_convert_2implement           	.\source_shared\DFE_func_rx.eln
-;*		GLOBAL  	       192         	       192    	         0       	_get_rx_dump_sym_buf_addr     	.\source_shared\DFE_func_rx.eln
-;*		GLOBAL  	        24         	        24    	         0       	_ack_phy_rx_buf_available     	.\source_shared\DFE_func_rx.eln
+;*		GLOBAL  	        88         	        88    	         0       	_get_rx_dump_sym_buf_addr     	.\source_shared\DFE_func_rx.eln
+;*		GLOBAL  	        56         	        56    	         0       	_ack_phy_rx_buf_available     	.\source_shared\DFE_func_rx.eln
 ;*MODULE: .\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	        24         	        24    	         0       	_tx_ppln_stop                 	.\source_shared\DFE_func_tx.eln
+;*		GLOBAL  	        64         	        64    	         0       	_vecclr_ippu_bank0            	.\source_shared\DFE_func_tx.eln
+;*		GLOBAL  	        64         	        64    	         0       	_vecclr_ippu_bank1            	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	       240         	       240    	         0       	_start_tx_ippu_bitrev_reversIn_linearOut	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	        32         	        32    	         0       	_ack_phy_tx_buf_rdy           	.\source_shared\DFE_func_tx.eln
 ;*MODULE: .\source_shared\DFE_init.eln
@@ -82,8 +79,9 @@
 ;*		GLOBAL  	       440         	       440    	         0       	_dma_start                    	.\source_shared\DFE_init.eln
 ;*		GLOBAL  	       440         	       440    	         0       	_dma_start_2xfr               	.\source_shared\DFE_init.eln
 ;*MODULE: .\source_shared\dump_inject.eln
-;*		GLOBAL  	       480         	       480    	         0       	_get_dpdout_dest_addr         	.\source_shared\dump_inject.eln
+;*		GLOBAL  	       520         	       520    	         0       	_get_dpdout_dest_addr         	.\source_shared\dump_inject.eln
 ;*MODULE: .\source_shared\host_vspa_msg.eln
+;*		GLOBAL  	        40         	        40    	         0       	_channel_restart              	.\source_shared\host_vspa_msg.eln
 ;*		GLOBAL  	       384         	       384    	         0       	_add_a_pattern                	.\source_shared\host_vspa_msg.eln
 ;*		GLOBAL  	        24         	        24    	         0       	_core_A_msg_parse             	.\source_shared\host_vspa_msg.eln
 ;*MODULE: .\source_shared\inter_core_msg.eln
@@ -98,24 +96,20 @@
 ;*		WEAK    	        32         	        32    	         0       	stb_multidef`2`_main          	.\source_shared\startup_vspa2_modified.eln
 ;*		WEAK    	        24         	        24    	         0       	stb_multidef`1`___init        	.\source_shared\startup_vspa2_modified.eln
 ;*MODULE: .\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
-;*		GLOBAL  	        40         	        40    	         0       	_Ant_buffer_rx_check_status_obs	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
+;*		GLOBAL  	       112         	       112    	         0       	_Ant_buffer_rx_check_status_obs	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*		GLOBAL  	        56         	        56    	         0       	_get_rx_allowed_status        	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
-;*		GLOBAL  	       168         	       168    	         0       	_Ant_buffer_rx_axiq_reset     	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
+;*		GLOBAL  	       312         	       312    	         0       	_Ant_buffer_rx_axiq_reset     	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*		GLOBAL  	        80         	        80    	         0       	_convert_sample_idx_to_sym_idx	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*		GLOBAL  	        40         	        40    	         0       	_Ant_buffer_rx_axiq_enable    	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
-;*		GLOBAL  	       376         	       376    	         0       	_Ant_buffer_rx_init           	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
+;*		GLOBAL  	       352         	       352    	         0       	_Ant_buffer_rx_init           	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*MODULE: .\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*		GLOBAL  	       112         	       112    	         0       	_Ant_buffer_tx_axiq_reset     	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*		GLOBAL  	       152         	       152    	         0       	_Ant_buffer_tx_init           	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*		GLOBAL  	        80         	        80    	         0       	_Ant_buffer_tx_axiq_clrerror  	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*		GLOBAL  	       312         	       312    	         0       	_Ant_buffer_tx_axiq_reset     	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*		GLOBAL  	        96         	        96    	         0       	_Ant_buffer_tx_init           	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*		GLOBAL  	        40         	        40    	         0       	_Ant_buffer_tx_axiq_enable    	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*MODULE: .\source_shared\eDMA\eDMA_la9310.eln
-;*		GLOBAL  	        64         	        64    	         0       	_iEdmaInit                    	.\source_shared\eDMA\eDMA_la9310.eln
-;*		GLOBAL  	        64         	        64    	         0       	_iEdmaChanInit                	.\source_shared\eDMA\eDMA_la9310.eln
-;*		GLOBAL  	       112         	       112    	         0       	_iEdmaXferReq                 	.\source_shared\eDMA\eDMA_la9310.eln
-;*ALL FUNCTIONS WERE REMOVED FROM MODULE: .\source_shared\eDMA\eDMA_la9310.eln
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(utilities.eln)
 ;*		GLOBAL  	        96         	        96    	         0       	_mpy_f32_f16                  	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(utilities.eln)
+;*		GLOBAL  	        96         	        96    	         0       	_mpy_f32_f32                  	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(utilities.eln)
+;*		GLOBAL  	       136         	       136    	         0       	_mpy_f32_f16_vs               	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(utilities.eln)
 ;*		GLOBAL  	        56         	        56    	         0       	_delay_cycles                 	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(utilities.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(utilities.eln)
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(bitRev_reverseIn_linearOut_vspa2.eln)
@@ -154,7 +148,7 @@
 ;*		GLOBAL  	        80         	        80    	         0       	_vecset_circ                  	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(mem.eln)
 ;*		GLOBAL  	       376         	       376    	         0       	_memcpy                       	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(mem.eln)
 ;*		GLOBAL  	       448         	       448    	         0       	_memcpy_dst_circ              	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(mem.eln)
-;*TOTAL CODE: 8128 BYTES REMOVED
+;*TOTAL CODE: 8424 BYTES REMOVED
 ;*********************************************************************************
 ;*************************CALL TREE FOR FUNCTIONS*********************************
 ;*********************************************************************************
@@ -162,16 +156,18 @@
 ;*		GLOBAL 	_is_phy_rx_buf_available
 ;*		GLOBAL 	_start_rx_ippu_bitrev_reversIn_linearOut	calls the following functions:
 ;*				GLOBAL  	_bitRev2048_reverseIn_linearOut_vspa2_b1_b1	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(bitRev_reverseIn_linearOut_vspa2.eln)
+;*		GLOBAL 	_set_rx_sym_idx
 ;*		GLOBAL 	_rx_sym_ready_processing	calls the following functions:
-;*				GLOBAL  	_set_rx_slot_sym_idx	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
+;*				GLOBAL  	_set_rx_sym_idx	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL 	_pipeline_reset_rx	calls the following functions:
 ;*				GLOBAL  	_vecclr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(mem.eln)
-;*		GLOBAL 	_rx_processing_symbol_level
+;*		GLOBAL 	_rx_processing_symbol_level	calls the following functions:
+;*				GLOBAL  	_PHY_DFE_interf_rx_check_dma_start	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
+;*				GLOBAL  	_PHY_DFE_interf_rx_check_dma_finish	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL 	_get_valid_size_for_fft_in
 ;*		GLOBAL 	_convert_2implement
 ;*		GLOBAL 	_get_rx_dump_sym_buf_addr
 ;*		GLOBAL 	_ack_phy_rx_buf_available
-;*		GLOBAL 	_set_rx_slot_sym_idx
 ;*		GLOBAL 	_PHY_DFE_interf_rx_check_dma_finish	calls the following functions:
 ;*				GLOBAL  	_rx_sym_ready_processing	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL 	_PHY_DFE_interf_rx_check_dma_start	calls the following functions:
@@ -187,7 +183,6 @@
 ;*		GLOBAL 	_PHY_DFE_interf_tx_check_dma_start	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*				GLOBAL  	_check_phy_tx_buf_rdy	DEFINED ON MODULE	.\source_shared\DFE_func_tx.eln
-;*				GLOBAL  	_tx_sym_ready_processing	DEFINED ON MODULE	.\source_shared\DFE_func_tx.eln
 ;*				GLOBAL  	_pipeline_reset_tx	DEFINED ON MODULE	.\source_shared\DFE_func_tx.eln
 ;*				GLOBAL  	_get_available_size_for_ifft_out	DEFINED ON MODULE	.\source_shared\DFE_func_tx.eln
 ;*				GLOBAL  	_advance_tx_sym_idx	DEFINED ON MODULE	.\source_shared\DFE_func_tx.eln
@@ -207,6 +202,8 @@
 ;*		GLOBAL 	_tx_circ_update_for_dfe_only_mode
 ;*		GLOBAL 	_PHY_DFE_interf_tx_check_dma_finish	calls the following functions:
 ;*				GLOBAL  	_tx_sym_ready_processing	DEFINED ON MODULE	.\source_shared\DFE_func_tx.eln
+;*		GLOBAL 	_vecclr_ippu_bank0
+;*		GLOBAL 	_vecclr_ippu_bank1
 ;*		GLOBAL 	_get_tx_1block_from_cfr_out	calls the following functions:
 ;*				GLOBAL  	_tx_circ_update_for_dfe_only_mode	DEFINED ON MODULE	.\source_shared\DFE_func_tx.eln
 ;*				GLOBAL  	_mem_clr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(mem.eln)
@@ -217,6 +214,8 @@
 ;*		GLOBAL 	_check_phy_tx_buf_rdy
 ;*		GLOBAL 	_ack_phy_tx_buf_rdy
 ;*MODULE: .\source_shared\DFE_init.eln
+;*		GLOBAL 	_init_coreB	calls the following functions:
+;*				GLOBAL  	_pipeline_reset_tx	DEFINED ON MODULE	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL 	_current_dma_chan
 ;*		GLOBAL 	_init_common	calls the following functions:
 ;*				GLOBAL  	_host_msg_handling	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
@@ -238,6 +237,9 @@
 ;*		GLOBAL 	_dump_inject_data_1block
 ;*		GLOBAL 	_get_dpdout_dest_addr
 ;*MODULE: .\source_shared\host_vspa_msg.eln
+;*		GLOBAL 	_channel_restart
+;*		GLOBAL 	_check_msg	calls the following functions:
+;*				GLOBAL  	_host_msg_handling	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
 ;*		LOCAL   	__Z6iord64m
 ;*		GLOBAL 	_add_a_pattern
 ;*		GLOBAL 	_core_A_msg_parse
@@ -256,29 +258,29 @@
 ;*		GLOBAL 	_ext_word_write
 ;*		GLOBAL 	_inter_core_gpio_msg_processing
 ;*MODULE: .\source_shared\main_pair_coreA.eln
-;*		GLOBAL 	_init_coreA	calls the following functions:
-;*				GLOBAL  	_init_common	DEFINED ON MODULE	.\source_shared\DFE_init.eln
+;*		GLOBAL 	_init_coreA
 ;*		GLOBAL 	_decim_2x_handler	calls the following functions:
 ;*				GLOBAL  	_decimator_2x_8_Taps_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(ddc2x.eln)
 ;*	ENTRY	GLOBAL 	_main	calls the following functions:
+;*				GLOBAL  	_Ant_buffer_tx_dma_check	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*				GLOBAL  	_Ant_buffer_tx_apply_buffer	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*				GLOBAL  	_host_msg_handling	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
-;*				GLOBAL  	_set_rx_slot_sym_idx	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
 ;*				GLOBAL  	_single_tone_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(single_tone.eln)
 ;*				GLOBAL  	_dump_inject_data_1block	DEFINED ON MODULE	.\source_shared\dump_inject.eln
 ;*				GLOBAL  	_Ant_buffer_rx_check_status	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
+;*				GLOBAL  	_check_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
 ;*				GLOBAL  	_get_tx_1block_from_cfr_out	DEFINED ON MODULE	.\source_shared\DFE_func_tx.eln
+;*				GLOBAL  	_set_rx_sym_idx	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
+;*				GLOBAL  	_init_common	DEFINED ON MODULE	.\source_shared\DFE_init.eln
 ;*				GLOBAL  	_pipeline_reset_rx	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
 ;*				GLOBAL  	_Ant_buffer_rx_poll_buffer	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*				GLOBAL  	_Ant_buffer_tx_write_complete	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*				GLOBAL  	_PHY_DFE_interf_rx_check_dma_start	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
 ;*				GLOBAL  	_qec_opt_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(qec_opt.eln)
 ;*				GLOBAL  	_Ant_buffer_rx_free_buffer	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*				GLOBAL  	_Ant_buffer_tx_check_status	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*				GLOBAL  	_PHY_DFE_interf_rx_check_dma_finish	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
 ;*				GLOBAL  	_init_coreA	DEFINED ON MODULE	.\source_shared\main_pair_coreA.eln
 ;*				GLOBAL  	_rx_processing_symbol_level	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
 ;*				GLOBAL  	_get_valid_size_for_fft_in	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
+;*				GLOBAL  	_init_coreB	DEFINED ON MODULE	.\source_shared\DFE_init.eln
 ;*				GLOBAL  	_single_tone_add_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(single_tone.eln)
 ;*				GLOBAL  	_tx_processing_symbol_level	DEFINED ON MODULE	.\source_shared\DFE_func_tx.eln
 ;*MODULE: .\source_shared\startup_vspa2_modified.eln
@@ -291,7 +293,8 @@
 ;*				GLOBAL  	_init_bss	DEFINED ON MODULE	.\source_shared\startup_vspa2_modified.eln
 ;*		WEAK	stb_multidef`1`___init
 ;*MODULE: .\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
-;*		GLOBAL 	_Ant_buffer_rx_check_status_obs
+;*		GLOBAL 	_Ant_buffer_rx_check_status_obs	calls the following functions:
+;*				GLOBAL  	_rx_error_handling	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*		GLOBAL 	_Ant_buffer_rx_check_status	calls the following functions:
 ;*				GLOBAL  	_rx_error_handling	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*		GLOBAL 	_get_rx_pattern_size
@@ -302,7 +305,7 @@
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*		GLOBAL 	_rx_error_handling	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
-;*				GLOBAL  	_mailbox_send_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
+;*				GLOBAL  	_check_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
 ;*		GLOBAL 	_get_rx_allowed_status
 ;*		GLOBAL 	_Ant_buffer_rx_axiq_reset	calls the following functions:
 ;*				GLOBAL  	_delay_cycles	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(utilities.eln)
@@ -315,41 +318,33 @@
 ;*		GLOBAL 	_advance_to_next_rx_pattern_size
 ;*		GLOBAL 	_convert_sample_idx_to_sym_idx
 ;*		GLOBAL 	_Ant_buffer_rx_axiq_enable
-;*		GLOBAL 	_Ant_buffer_rx_init	calls the following functions:
-;*				GLOBAL  	_Ant_buffer_rx_axiq_reset	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
+;*		GLOBAL 	_Ant_buffer_rx_init
 ;*		GLOBAL 	_Ant_buffer_rx_free_buffer	calls the following functions:
 ;*				GLOBAL  	_Ant_buffer_rx_dma_feed	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*MODULE: .\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*		GLOBAL 	_Ant_buffer_tx_axiq_reset	calls the following functions:
 ;*				GLOBAL  	_delay_cycles	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(utilities.eln)
-;*				GLOBAL  	_Ant_buffer_tx_axiq_clrerror	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*		GLOBAL 	_Ant_buffer_tx_init	calls the following functions:
-;*				GLOBAL  	_Ant_buffer_tx_axiq_reset	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*		GLOBAL 	_Ant_buffer_tx_init
 ;*		GLOBAL 	_Ant_buffer_tx_dma_check	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
-;*		GLOBAL 	_Ant_buffer_tx_axiq_clrerror	calls the following functions:
-;*				GLOBAL  	_delay_cycles	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(utilities.eln)
 ;*		GLOBAL 	_Ant_buffer_tx_check_status	calls the following functions:
 ;*				GLOBAL  	_tx_error_handling	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*		GLOBAL 	_tx_error_handling	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
-;*				GLOBAL  	_mailbox_send_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
+;*				GLOBAL  	_check_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
 ;*		GLOBAL 	_Ant_buffer_tx_axiq_enable
 ;*		GLOBAL 	_Ant_buffer_tx_write_complete	calls the following functions:
 ;*				GLOBAL  	_Ant_buffer_tx_dma_feed	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*		GLOBAL 	_Ant_buffer_tx_dma_feed	calls the following functions:
-;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*				GLOBAL  	_dump_inject_data_1block	DEFINED ON MODULE	.\source_shared\dump_inject.eln
 ;*				GLOBAL  	_mem_clr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(mem.eln)
 ;*		GLOBAL 	_Ant_buffer_tx_apply_buffer	calls the following functions:
 ;*				GLOBAL  	_Ant_buffer_tx_dma_check	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*				GLOBAL  	_Ant_buffer_tx_dma_feed	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*MODULE: .\source_shared\eDMA\eDMA_la9310.eln
-;*		GLOBAL 	_iEdmaInit
-;*		GLOBAL 	_iEdmaChanInit
-;*		GLOBAL 	_iEdmaXferReq
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(utilities.eln)
 ;*		GLOBAL 	_mpy_f32_f16
+;*		GLOBAL 	_mpy_f32_f32
+;*		GLOBAL 	_mpy_f32_f16_vs
 ;*		GLOBAL 	_delay_cycles
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(qec_opt.eln)
 ;*		GLOBAL 	_qec_opt_asm
@@ -412,11 +407,11 @@
 ; 0x00000100  VCPU_DataReserveSize
 ; 0x00000400  StackSize
 ; 0x00000800  IPPU_PRAMSize
-; 0x0000250c  __bss_end
-; 0x0000250c  __data_start
-; 0x00002780  __data_end
-; 0x00002780  __end
-; 0x00002780  _end
+; 0x00002508  __bss_end
+; 0x00002508  __data_start
+; 0x00002784  __data_end
+; 0x00002784  __end
+; 0x00002784  _end
 ; 0x00003b00  VCPU_DRAMSize
 ; 0x00003c00  StackStart
 ; 0x00003c00  __stack
@@ -439,8 +434,8 @@
 ;    r-x |0x00000000..0x00007fff|  memory .vpram (32768 bytes)
 ;*********************************************************************************
 ;		 Address space with id 1:
-;    rw- |0x00000000..0x0000277f|  memory .vdram (10112 bytes)
-;        |0x00002780..0x00003bff|  memory free space  (5248 bytes)
+;    rw- |0x00000000..0x00002783|  memory .vdram (10116 bytes)
+;        |0x00002784..0x00003bff|  memory free space  (5244 bytes)
 ;    rw- |0x00003c00..0x00003fff|  memory memory_stack_and_heap (1024 bytes)
 ;    rw- |0x00004000..0x00007fff|  memory .idram (16384 bytes)
 ;*********************************************************************************
@@ -451,7 +446,7 @@
 ;    Value        Size  Symbol
 ; ========  ==========  ==================================================
 ;*********************************************************************************
-0x00000000       10112  Section: .vdram (Segment: .vdram)
+0x00000000       10116  Section: .vdram (Segment: .vdram)
 ;*********************************************************************************
 0x00000000         768      Section: .vbss0(.\source_shared\global_var.eln)
 0x00000000         768          _dfe_ctrl (run_address 0x00000000)
@@ -459,9 +454,9 @@
 0x00000300           0          _axi_flag_buf (run_address 0x00000300)
 0x00000300         128      Section: .bss_line_aligned(.\source_shared\debug.eln)
 0x00000300         128          _log_buffer (run_address 0x00000300)
-0x00000380        4096      Section: .bss_line_aligned(.\source_shared\global_var.eln)
+0x00000380        4096      Section: .bss_line_aligned(.\source_shared\main_pair_coreA.eln)
 0x00000380        4096          _ant_buf (run_address 0x00000380)
-0x00001380        4096      Section: .bss_line_aligned(.\source_shared\global_var.eln)
+0x00001380        4096      Section: .bss_line_aligned(.\source_shared\main_pair_coreA.eln)
 0x00001380        4096          _ant_buf0 (run_address 0x00001380)
 0x00002380           0      Section: .bss(.\source_shared\DFE_func_rx.eln)
 0x00002380           0          _axi_flag_rx_symbol_ready (run_address 0x00002380)
@@ -510,15 +505,11 @@
 0x00002400           0      Section: .bss(.\source_shared\main_pair_coreA.eln)
 0x00002400           0          _history_2xdown (run_address 0x00002400)
 0x00002400           0      Section: .bss(.\source_shared\main_pair_coreA.eln)
-0x00002400           0          _rx_pow_acc (run_address 0x00002400)
-0x00002400           0      Section: .bss(.\source_shared\main_pair_coreA.eln)
 0x00002400           0          _qec_scratch (run_address 0x00002400)
 0x00002400         144      Section: .bss(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
 0x00002400         144          _antman_ctrl_rx (run_address 0x00002400)
-0x00002490         124      Section: .bss(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00002490         124          _antman_ctrl_tx (run_address 0x00002490)
-0x00002580           0      Section: .data_aligned(.\source_shared\global_var.eln)
-0x00002580           0          _real_window (run_address 0x00002580)
+0x00002490         120      Section: .bss(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x00002490         120          _antman_ctrl_tx (run_address 0x00002490)
 0x00002580           0      Section: .data_aligned(.\source_shared\global_var.eln)
 0x00002580           0          _phcom_coeff_tx (run_address 0x00002580)
 0x00002580           0      Section: .data_aligned(.\source_shared\global_var.eln)
@@ -528,8 +519,6 @@
 0x00002600         256      Section: .data_aligned(.\source_shared\global_var.eln)
 0x00002600         256          _DFE_qec_params_opt_rx (run_address 0x00002600)
 0x00002700           0      Section: .data_aligned(.\source_shared\main_pair_coreA.eln)
-0x00002700           0          _filter_taps_downsampling (run_address 0x00002700)
-0x00002700           0      Section: .data_aligned(.\source_shared\main_pair_coreA.eln)
 0x00002700           0          _filter_taps_upsampling (run_address 0x00002700)
 0x00002700           0      Section: .data(.\source_shared\dump_inject.eln)
 0x00002700           0          _dpd_dump (run_address 0x00002700)
@@ -537,10 +526,12 @@
 0x00002700          36          _ant_tx_dump (run_address 0x00002700)
 0x00002724          72      Section: .data(.\source_shared\dump_inject.eln)
 0x00002724          72          _ant_rx_dump (run_address 0x00002724)
-0x0000276c           4      Section: .data(.\source_shared\startup_vspa2_modified.eln)
-0x0000276c           4          ___entry (run_address 0x0000276c)
-0x00002780           0      Section: .data(.\source_shared\eDMA\eDMA_la9310.eln)
-0x00002780           0          _eDMA_TCD (run_address 0x00002780)
+0x00002780           0      Section: .data(.\source_shared\global_var.eln)
+0x00002780           0          _real_window (run_address 0x00002780)
+0x00002780           0      Section: .data(.\source_shared\main_pair_coreA.eln)
+0x00002780           0          _filter_taps_downsampling (run_address 0x00002780)
+0x00002780           4      Section: .data(.\source_shared\startup_vspa2_modified.eln)
+0x00002780           4          ___entry (run_address 0x00002780)
 ;*********************************************************************************
 0x00000000           0  Section: .ipram (Segment: .ipram)
 ;*********************************************************************************
@@ -558,7 +549,7 @@
 0x00000000           0          _bitRev2048_reverseIn_linearOut_vspa2_b1_b0 (run_address 0x00000000)
 0x00000000           0          _bitRev2048_reverseIn_linearOut_vspa2_b1_b1 (run_address 0x00000000)
 ;*********************************************************************************
-0x00000000       18360  Section: .vpram (Segment: .vpram)
+0x00000000       18624  Section: .vpram (Segment: .vpram)
 ;*********************************************************************************
 0x00000000         192      Section: .init(.\source_shared\startup_vspa2_modified.eln)
 0x00000000         120          _start (run_address 0x00000000)
@@ -590,258 +581,263 @@
 0x00000558           0          _memcpy_both_circ (run_address 0x00000558)
 0x00000558         256          _mem_clr_circ (run_address 0x00000558)
 0x00000570         232          _mem_clr (run_address 0x00000570)
-0x00000658         288      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(qec_opt.eln))
-0x00000658         288          _qec_opt_asm (run_address 0x00000658)
-0x00000778         240      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(single_tone.eln))
-0x00000778         240          _single_tone_asm (run_address 0x00000778)
-0x00000790         216          _single_tone_add_asm (run_address 0x00000790)
-0x00000868           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(utilities.eln))
-0x00000868           0          _mpy_f32_f16 (run_address 0x00000868)
-0x00000868           0          _delay_cycles (run_address 0x00000868)
-0x00000868           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00000868           0          _convert_2implement (run_address 0x00000868)
-0x00000868                      F_convert_2implement_end (run_address 0x00000868)
-0x00000868         112      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00000868         112          _pipeline_reset_rx (run_address 0x00000868)
-0x000008d8                      F_pipeline_reset_rx_end (run_address 0x000008d8)
-0x000008d8           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x000008d8           0          _start_rx_ippu_bitrev_reversIn_linearOut (run_address 0x000008d8)
-0x000008d8                      F_start_rx_ippu_bitrev_reversIn_linearOut_end (run_address 0x000008d8)
-0x000008d8           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x000008d8           0          _get_rx_dump_sym_buf_addr (run_address 0x000008d8)
-0x000008d8                      F_get_rx_dump_sym_buf_addr_end (run_address 0x000008d8)
-0x000008d8           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x000008d8           0          _is_phy_rx_buf_available (run_address 0x000008d8)
-0x000008d8                      F_is_phy_rx_buf_available_end (run_address 0x000008d8)
-0x000008d8           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x000008d8           0          _ack_phy_rx_buf_available (run_address 0x000008d8)
-0x000008d8                      F_ack_phy_rx_buf_available_end (run_address 0x000008d8)
-0x000008d8         176      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x000008d8         176          _set_rx_slot_sym_idx (run_address 0x000008d8)
-0x00000988                      F_set_rx_slot_sym_idx_end (run_address 0x00000988)
-0x00000988         128      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00000988         128          _rx_sym_ready_processing (run_address 0x00000988)
-0x00000a08                      F_rx_sym_ready_processing_end (run_address 0x00000a08)
-0x00000a08         168      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00000a08         168          _PHY_DFE_interf_rx_check_dma_finish (run_address 0x00000a08)
-0x00000ab0                      F_PHY_DFE_interf_rx_check_dma_finish_end (run_address 0x00000ab0)
-0x00000ab0          56      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00000ab0          56          _get_valid_size_for_fft_in (run_address 0x00000ab0)
-0x00000ae8                      F_get_valid_size_for_fft_in_end (run_address 0x00000ae8)
-0x00000ae8         176      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00000ae8         176          _PHY_DFE_interf_rx_check_dma_start (run_address 0x00000ae8)
-0x00000b98                      F_PHY_DFE_interf_rx_check_dma_start_end (run_address 0x00000b98)
-0x00000b98         128      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00000b98         128          _rx_processing_symbol_level (run_address 0x00000b98)
-0x00000c18                      F_rx_processing_symbol_level_end (run_address 0x00000c18)
-0x00000c18           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00000c18           0          _start_tx_ippu_bitrev_reversIn_linearOut (run_address 0x00000c18)
-0x00000c18                      F_start_tx_ippu_bitrev_reversIn_linearOut_end (run_address 0x00000c18)
-0x00000c18           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00000c18           0          _tx_ppln_stop (run_address 0x00000c18)
-0x00000c18                      F_tx_ppln_stop_end (run_address 0x00000c18)
-0x00000c18           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00000c18           0          _ack_phy_tx_buf_rdy (run_address 0x00000c18)
-0x00000c18                      F_ack_phy_tx_buf_rdy_end (run_address 0x00000c18)
-0x00000c18         192      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00000c18         192          _tx_circ_update_for_dfe_only_mode (run_address 0x00000c18)
-0x00000cd8                      F_tx_circ_update_for_dfe_only_mode_end (run_address 0x00000cd8)
-0x00000cd8          48      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00000cd8          48          _circ_addr_advance (run_address 0x00000cd8)
-0x00000d08                      F_circ_addr_advance_end (run_address 0x00000d08)
-0x00000d08         576      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00000d08         576          _get_tx_1block_from_cfr_out (run_address 0x00000d08)
-0x00000f48                      F_get_tx_1block_from_cfr_out_end (run_address 0x00000f48)
-0x00000f48         112      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00000f48         112          _advance_tx_sym_idx (run_address 0x00000f48)
-0x00000fb8                      F_advance_tx_sym_idx_end (run_address 0x00000fb8)
-0x00000fb8          64      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00000fb8          64          _get_tx_pattern_size (run_address 0x00000fb8)
-0x00000ff8                      F_get_tx_pattern_size_end (run_address 0x00000ff8)
-0x00000ff8          96      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00000ff8          96          _advance_to_next_tx_pattern_size (run_address 0x00000ff8)
-0x00001058                      F_advance_to_next_tx_pattern_size_end (run_address 0x00001058)
-0x00001058         440      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00001058         440          _tx_sym_counter_update (run_address 0x00001058)
-0x00001210                      F_tx_sym_counter_update_end (run_address 0x00001210)
-0x00001210         216      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00001210         216          _tx_sym_ready_processing (run_address 0x00001210)
-0x000012e8                      F_tx_sym_ready_processing_end (run_address 0x000012e8)
-0x000012e8         144      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x000012e8         144          _PHY_DFE_interf_tx_check_dma_finish (run_address 0x000012e8)
-0x00001378                      F_PHY_DFE_interf_tx_check_dma_finish_end (run_address 0x00001378)
-0x00001378          72      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00001378          72          _pipeline_reset_tx (run_address 0x00001378)
-0x000013c0                      F_pipeline_reset_tx_end (run_address 0x000013c0)
-0x000013c0          40      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x000013c0          40          _get_available_size_for_ifft_out (run_address 0x000013c0)
-0x000013e8                      F_get_available_size_for_ifft_out_end (run_address 0x000013e8)
-0x000013e8          80      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x000013e8          80          _check_phy_tx_buf_rdy (run_address 0x000013e8)
-0x00001438                      F_check_phy_tx_buf_rdy_end (run_address 0x00001438)
-0x00001438        1888      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00001438        1888          _PHY_DFE_interf_tx_check_dma_start (run_address 0x00001438)
-0x00001b98                      F_PHY_DFE_interf_tx_check_dma_start_end (run_address 0x00001b98)
-0x00001b98          80      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00001b98          80          _tx_processing_symbol_level (run_address 0x00001b98)
-0x00001be8                      F_tx_processing_symbol_level_end (run_address 0x00001be8)
-0x00001be8           0      Section: .text(.\source_shared\DFE_init.eln)
-0x00001be8           0          _current_dma_chan (run_address 0x00001be8)
-0x00001be8                      F_current_dma_chan_end (run_address 0x00001be8)
-0x00001be8           0      Section: .text(.\source_shared\DFE_init.eln)
-0x00001be8           0          _dma_completed (run_address 0x00001be8)
-0x00001be8                      F_dma_completed_end (run_address 0x00001be8)
-0x00001be8           0      Section: .text(.\source_shared\DFE_init.eln)
-0x00001be8           0          _advance_dma_chan (run_address 0x00001be8)
-0x00001be8                      F_advance_dma_chan_end (run_address 0x00001be8)
-0x00001be8           0      Section: .text(.\source_shared\DFE_init.eln)
-0x00001be8           0          _dma_start (run_address 0x00001be8)
-0x00001be8                      F_dma_start_end (run_address 0x00001be8)
-0x00001be8           0      Section: .text(.\source_shared\DFE_init.eln)
-0x00001be8           0          _dma_start_2xfr (run_address 0x00001be8)
-0x00001be8                      F_dma_start_2xfr_end (run_address 0x00001be8)
-0x00001be8           0      Section: .text(.\source_shared\DFE_init.eln)
-0x00001be8           0          _dma_start_with_axi_slave_flag_set (run_address 0x00001be8)
-0x00001be8                      F_dma_start_with_axi_slave_flag_set_end (run_address 0x00001be8)
-0x00001be8         192      Section: .text(.\source_shared\DFE_init.eln)
-0x00001be8         192          ___init (run_address 0x00001be8)
-0x00001ca8                      F___init_end (run_address 0x00001ca8)
-0x00001ca8         440      Section: .text(.\source_shared\DFE_init.eln)
-0x00001ca8         440          _init_common (run_address 0x00001ca8)
-0x00001e60                      F_init_common_end (run_address 0x00001e60)
-0x00001e60         232      Section: .text(.\source_shared\boot.eln)
-0x00001e60         232          _boot (run_address 0x00001e60)
-0x00001f48                      F_boot_end (run_address 0x00001f48)
-0x00001f48         392      Section: .text(.\source_shared\debug.eln)
-0x00001f48         392          _log_2int (run_address 0x00001f48)
-0x000020d0                      F_log_2int_end (run_address 0x000020d0)
-0x000020d0           0      Section: .text(.\source_shared\dump_inject.eln)
-0x000020d0           0          _get_dpdout_dest_addr (run_address 0x000020d0)
-0x000020d0                      F_get_dpdout_dest_addr_end (run_address 0x000020d0)
-0x000020d0         648      Section: .text(.\source_shared\dump_inject.eln)
-0x000020d0         648          _dump_inject_data_1block (run_address 0x000020d0)
-0x00002358                      F_dump_inject_data_1block_end (run_address 0x00002358)
-0x00002358           0      Section: .text(.\source_shared\host_vspa_msg.eln)
-0x00002358           0          _add_a_pattern (run_address 0x00002358)
-0x00002358                      F_add_a_pattern_end (run_address 0x00002358)
-0x00002358          88      Section: .text(.\source_shared\host_vspa_msg.eln)
-0x00002358          88          _convert_sym_idx_to_sample_idx (run_address 0x00002358)
-0x000023b0                      F_convert_sym_idx_to_sample_idx_end (run_address 0x000023b0)
-0x000023b0          72      Section: .text(.\source_shared\host_vspa_msg.eln)
-0x000023b0          72          _get_num_samples_in_symbol_idx_range (run_address 0x000023b0)
-0x000023f8                      F_get_num_samples_in_symbol_idx_range_end (run_address 0x000023f8)
-0x000023f8           0      Section: .text(.\source_shared\host_vspa_msg.eln)
-0x000023f8           0          _core_A_msg_parse (run_address 0x000023f8)
-0x000023f8                      F_core_A_msg_parse_end (run_address 0x000023f8)
-0x000023f8          32      Section: .text(.\source_shared\host_vspa_msg.eln)
-0x00002418         112      Section: .text(.\source_shared\host_vspa_msg.eln)
-0x00002418         112          _mailbox_send_msg (run_address 0x00002418)
-0x00002488                      F_mailbox_send_msg_end (run_address 0x00002488)
-0x00002488        2760      Section: .text(.\source_shared\host_vspa_msg.eln)
-0x00002488        2760          _host_msg_handling (run_address 0x00002488)
-0x00002f50                      F_host_msg_handling_end (run_address 0x00002f50)
-0x00002f50           0      Section: .text(.\source_shared\inter_core_msg.eln)
-0x00002f50           0          _ext_word_write (run_address 0x00002f50)
-0x00002f50                      F_ext_word_write_end (run_address 0x00002f50)
-0x00002f50           0      Section: .text(.\source_shared\inter_core_msg.eln)
-0x00002f50           0          _ext_word_write_2int (run_address 0x00002f50)
-0x00002f50                      F_ext_word_write_2int_end (run_address 0x00002f50)
-0x00002f50           0      Section: .text(.\source_shared\inter_core_msg.eln)
-0x00002f50           0          _wait_for_cores (run_address 0x00002f50)
-0x00002f50                      F_wait_for_cores_end (run_address 0x00002f50)
-0x00002f50           0      Section: .text(.\source_shared\inter_core_msg.eln)
-0x00002f50           0          _inter_core_gpio_msg_processing (run_address 0x00002f50)
-0x00002f50                      F_inter_core_gpio_msg_processing_end (run_address 0x00002f50)
-0x00002f50           0      Section: .text(.\source_shared\main_pair_coreA.eln)
-0x00002f50           0          _decim_2x_handler (run_address 0x00002f50)
-0x00002f50                      F_decim_2x_handler_end (run_address 0x00002f50)
-0x00002f50         280      Section: .text(.\source_shared\main_pair_coreA.eln)
-0x00002f50         280          _init_coreA (run_address 0x00002f50)
-0x00003068                      F_init_coreA_end (run_address 0x00003068)
-0x00003068        1944      Section: .text(.\source_shared\main_pair_coreA.eln)
-0x00003068        1944          _main (run_address 0x00003068)
-0x00003800                      F_main_end (run_address 0x00003800)
-0x00003800           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00003800           0          _Ant_buffer_rx_axiq_enable (run_address 0x00003800)
-0x00003800                      F_Ant_buffer_rx_axiq_enable_end (run_address 0x00003800)
-0x00003800           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00003800           0          _get_rx_allowed_status (run_address 0x00003800)
-0x00003800                      F_get_rx_allowed_status_end (run_address 0x00003800)
-0x00003800           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00003800           0          _convert_sample_idx_to_sym_idx (run_address 0x00003800)
-0x00003800                      F_convert_sample_idx_to_sym_idx_end (run_address 0x00003800)
-0x00003800           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00003800           0          _Ant_buffer_rx_axiq_reset (run_address 0x00003800)
-0x00003800                      F_Ant_buffer_rx_axiq_reset_end (run_address 0x00003800)
-0x00003800           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00003800           0          _Ant_buffer_rx_init (run_address 0x00003800)
-0x00003800                      F_Ant_buffer_rx_init_end (run_address 0x00003800)
-0x00003800         152      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00003800         152          _rx_error_handling (run_address 0x00003800)
-0x00003898                      F_rx_error_handling_end (run_address 0x00003898)
-0x00003898         200      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00003898         200          _Ant_buffer_rx_check_status (run_address 0x00003898)
-0x00003960                      F_Ant_buffer_rx_check_status_end (run_address 0x00003960)
-0x00003960           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00003960           0          _Ant_buffer_rx_check_status_obs (run_address 0x00003960)
-0x00003960                      F_Ant_buffer_rx_check_status_obs_end (run_address 0x00003960)
-0x00003960         264      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00003960         264          _Ant_buffer_rx_dma_check (run_address 0x00003960)
-0x00003a68                      F_Ant_buffer_rx_dma_check_end (run_address 0x00003a68)
-0x00003a68          64      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00003a68          64          _get_rx_pattern_size (run_address 0x00003a68)
-0x00003aa8                      F_get_rx_pattern_size_end (run_address 0x00003aa8)
-0x00003aa8          96      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00003aa8          96          _advance_to_next_rx_pattern_size (run_address 0x00003aa8)
-0x00003b08                      F_advance_to_next_rx_pattern_size_end (run_address 0x00003b08)
-0x00003b08        1400      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00003b08        1400          _Ant_buffer_rx_dma_feed (run_address 0x00003b08)
-0x00004080                      F_Ant_buffer_rx_dma_feed_end (run_address 0x00004080)
-0x00004080         128      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00004080         128          _Ant_buffer_rx_poll_buffer (run_address 0x00004080)
-0x00004100                      F_Ant_buffer_rx_poll_buffer_end (run_address 0x00004100)
-0x00004100         136      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00004100         136          _Ant_buffer_rx_free_buffer (run_address 0x00004100)
-0x00004188                      F_Ant_buffer_rx_free_buffer_end (run_address 0x00004188)
-0x00004188           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00004188           0          _Ant_buffer_tx_axiq_enable (run_address 0x00004188)
-0x00004188                      F_Ant_buffer_tx_axiq_enable_end (run_address 0x00004188)
-0x00004188           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00004188           0          _Ant_buffer_tx_axiq_clrerror (run_address 0x00004188)
-0x00004188                      F_Ant_buffer_tx_axiq_clrerror_end (run_address 0x00004188)
-0x00004188           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00004188           0          _Ant_buffer_tx_axiq_reset (run_address 0x00004188)
-0x00004188                      F_Ant_buffer_tx_axiq_reset_end (run_address 0x00004188)
-0x00004188           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00004188           0          _Ant_buffer_tx_init (run_address 0x00004188)
-0x00004188                      F_Ant_buffer_tx_init_end (run_address 0x00004188)
-0x00004188         152      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00004188         152          _tx_error_handling (run_address 0x00004188)
-0x00004220                      F_tx_error_handling_end (run_address 0x00004220)
-0x00004220         176      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00004220         176          _Ant_buffer_tx_check_status (run_address 0x00004220)
-0x000042d0                      F_Ant_buffer_tx_check_status_end (run_address 0x000042d0)
-0x000042d0         376      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x000042d0         376          _Ant_buffer_tx_dma_check (run_address 0x000042d0)
-0x00004448                      F_Ant_buffer_tx_dma_check_end (run_address 0x00004448)
-0x00004448         576      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00004448         576          _Ant_buffer_tx_dma_feed (run_address 0x00004448)
-0x00004688                      F_Ant_buffer_tx_dma_feed_end (run_address 0x00004688)
-0x00004688         128      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00004688         128          _Ant_buffer_tx_apply_buffer (run_address 0x00004688)
-0x00004708                      F_Ant_buffer_tx_apply_buffer_end (run_address 0x00004708)
-0x00004708         176      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00004708         176          _Ant_buffer_tx_write_complete (run_address 0x00004708)
-0x000047b8                      F_Ant_buffer_tx_write_complete_end (run_address 0x000047b8)
-0x000047b8           0      Section: .text(.\source_shared\eDMA\eDMA_la9310.eln)
-0x000047b8           0          _iEdmaInit (run_address 0x000047b8)
-0x000047b8                      F_iEdmaInit_end (run_address 0x000047b8)
-0x000047b8           0      Section: .text(.\source_shared\eDMA\eDMA_la9310.eln)
-0x000047b8           0          _iEdmaChanInit (run_address 0x000047b8)
-0x000047b8                      F_iEdmaChanInit_end (run_address 0x000047b8)
-0x000047b8           0      Section: .text(.\source_shared\eDMA\eDMA_la9310.eln)
-0x000047b8           0          _iEdmaXferReq (run_address 0x000047b8)
-0x000047b8                      F_iEdmaXferReq_end (run_address 0x000047b8)
+0x00000658         152      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(qec_opt.eln))
+0x00000658         152          _qec_opt_asm (run_address 0x00000658)
+0x000006f0         240      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(single_tone.eln))
+0x000006f0         240          _single_tone_asm (run_address 0x000006f0)
+0x00000708         216          _single_tone_add_asm (run_address 0x00000708)
+0x000007e0           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa2.elb(utilities.eln))
+0x000007e0           0          _mpy_f32_f16 (run_address 0x000007e0)
+0x000007e0           0          _mpy_f32_f16_vs (run_address 0x000007e0)
+0x000007e0           0          _mpy_f32_f32 (run_address 0x000007e0)
+0x000007e0           0          _delay_cycles (run_address 0x000007e0)
+0x000007e0           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x000007e0           0          _convert_2implement (run_address 0x000007e0)
+0x000007e0                      F_convert_2implement_end (run_address 0x000007e0)
+0x000007e0         112      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x000007e0         112          _pipeline_reset_rx (run_address 0x000007e0)
+0x00000850                      F_pipeline_reset_rx_end (run_address 0x00000850)
+0x00000850           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00000850           0          _start_rx_ippu_bitrev_reversIn_linearOut (run_address 0x00000850)
+0x00000850                      F_start_rx_ippu_bitrev_reversIn_linearOut_end (run_address 0x00000850)
+0x00000850           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00000850           0          _get_rx_dump_sym_buf_addr (run_address 0x00000850)
+0x00000850                      F_get_rx_dump_sym_buf_addr_end (run_address 0x00000850)
+0x00000850           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00000850           0          _ack_phy_rx_buf_available (run_address 0x00000850)
+0x00000850                      F_ack_phy_rx_buf_available_end (run_address 0x00000850)
+0x00000850           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00000850           0          _is_phy_rx_buf_available (run_address 0x00000850)
+0x00000850                      F_is_phy_rx_buf_available_end (run_address 0x00000850)
+0x00000850         416      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00000850         416          _set_rx_sym_idx (run_address 0x00000850)
+0x000009f0                      F_set_rx_sym_idx_end (run_address 0x000009f0)
+0x000009f0         192      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x000009f0         192          _rx_sym_ready_processing (run_address 0x000009f0)
+0x00000ab0                      F_rx_sym_ready_processing_end (run_address 0x00000ab0)
+0x00000ab0         136      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00000ab0         136          _PHY_DFE_interf_rx_check_dma_finish (run_address 0x00000ab0)
+0x00000b38                      F_PHY_DFE_interf_rx_check_dma_finish_end (run_address 0x00000b38)
+0x00000b38          56      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00000b38          56          _get_valid_size_for_fft_in (run_address 0x00000b38)
+0x00000b70                      F_get_valid_size_for_fft_in_end (run_address 0x00000b70)
+0x00000b70         168      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00000b70         168          _PHY_DFE_interf_rx_check_dma_start (run_address 0x00000b70)
+0x00000c18                      F_PHY_DFE_interf_rx_check_dma_start_end (run_address 0x00000c18)
+0x00000c18         192      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00000c18         192          _rx_processing_symbol_level (run_address 0x00000c18)
+0x00000cd8                      F_rx_processing_symbol_level_end (run_address 0x00000cd8)
+0x00000cd8           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00000cd8           0          _start_tx_ippu_bitrev_reversIn_linearOut (run_address 0x00000cd8)
+0x00000cd8                      F_start_tx_ippu_bitrev_reversIn_linearOut_end (run_address 0x00000cd8)
+0x00000cd8           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00000cd8           0          _vecclr_ippu_bank0 (run_address 0x00000cd8)
+0x00000cd8                      F_vecclr_ippu_bank0_end (run_address 0x00000cd8)
+0x00000cd8           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00000cd8           0          _vecclr_ippu_bank1 (run_address 0x00000cd8)
+0x00000cd8                      F_vecclr_ippu_bank1_end (run_address 0x00000cd8)
+0x00000cd8           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00000cd8           0          _tx_ppln_stop (run_address 0x00000cd8)
+0x00000cd8                      F_tx_ppln_stop_end (run_address 0x00000cd8)
+0x00000cd8           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00000cd8           0          _ack_phy_tx_buf_rdy (run_address 0x00000cd8)
+0x00000cd8                      F_ack_phy_tx_buf_rdy_end (run_address 0x00000cd8)
+0x00000cd8         192      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00000cd8         192          _tx_circ_update_for_dfe_only_mode (run_address 0x00000cd8)
+0x00000d98                      F_tx_circ_update_for_dfe_only_mode_end (run_address 0x00000d98)
+0x00000d98          48      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00000d98          48          _circ_addr_advance (run_address 0x00000d98)
+0x00000dc8                      F_circ_addr_advance_end (run_address 0x00000dc8)
+0x00000dc8         536      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00000dc8         536          _get_tx_1block_from_cfr_out (run_address 0x00000dc8)
+0x00000fe0                      F_get_tx_1block_from_cfr_out_end (run_address 0x00000fe0)
+0x00000fe0         256      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00000fe0         256          _advance_tx_sym_idx (run_address 0x00000fe0)
+0x000010e0                      F_advance_tx_sym_idx_end (run_address 0x000010e0)
+0x000010e0          64      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x000010e0          64          _get_tx_pattern_size (run_address 0x000010e0)
+0x00001120                      F_get_tx_pattern_size_end (run_address 0x00001120)
+0x00001120          96      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00001120          96          _advance_to_next_tx_pattern_size (run_address 0x00001120)
+0x00001180                      F_advance_to_next_tx_pattern_size_end (run_address 0x00001180)
+0x00001180         432      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00001180         432          _tx_sym_counter_update (run_address 0x00001180)
+0x00001330                      F_tx_sym_counter_update_end (run_address 0x00001330)
+0x00001330         224      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00001330         224          _tx_sym_ready_processing (run_address 0x00001330)
+0x00001410                      F_tx_sym_ready_processing_end (run_address 0x00001410)
+0x00001410         152      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00001410         152          _PHY_DFE_interf_tx_check_dma_finish (run_address 0x00001410)
+0x000014a8                      F_PHY_DFE_interf_tx_check_dma_finish_end (run_address 0x000014a8)
+0x000014a8          72      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x000014a8          72          _pipeline_reset_tx (run_address 0x000014a8)
+0x000014f0                      F_pipeline_reset_tx_end (run_address 0x000014f0)
+0x000014f0          40      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x000014f0          40          _get_available_size_for_ifft_out (run_address 0x000014f0)
+0x00001518                      F_get_available_size_for_ifft_out_end (run_address 0x00001518)
+0x00001518          80      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00001518          80          _check_phy_tx_buf_rdy (run_address 0x00001518)
+0x00001568                      F_check_phy_tx_buf_rdy_end (run_address 0x00001568)
+0x00001568        1608      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00001568        1608          _PHY_DFE_interf_tx_check_dma_start (run_address 0x00001568)
+0x00001bb0                      F_PHY_DFE_interf_tx_check_dma_start_end (run_address 0x00001bb0)
+0x00001bb0          80      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00001bb0          80          _tx_processing_symbol_level (run_address 0x00001bb0)
+0x00001c00                      F_tx_processing_symbol_level_end (run_address 0x00001c00)
+0x00001c00           0      Section: .text(.\source_shared\DFE_init.eln)
+0x00001c00           0          _current_dma_chan (run_address 0x00001c00)
+0x00001c00                      F_current_dma_chan_end (run_address 0x00001c00)
+0x00001c00           0      Section: .text(.\source_shared\DFE_init.eln)
+0x00001c00           0          _dma_completed (run_address 0x00001c00)
+0x00001c00                      F_dma_completed_end (run_address 0x00001c00)
+0x00001c00           0      Section: .text(.\source_shared\DFE_init.eln)
+0x00001c00           0          _advance_dma_chan (run_address 0x00001c00)
+0x00001c00                      F_advance_dma_chan_end (run_address 0x00001c00)
+0x00001c00           0      Section: .text(.\source_shared\DFE_init.eln)
+0x00001c00           0          _dma_start (run_address 0x00001c00)
+0x00001c00                      F_dma_start_end (run_address 0x00001c00)
+0x00001c00           0      Section: .text(.\source_shared\DFE_init.eln)
+0x00001c00           0          _dma_start_2xfr (run_address 0x00001c00)
+0x00001c00                      F_dma_start_2xfr_end (run_address 0x00001c00)
+0x00001c00           0      Section: .text(.\source_shared\DFE_init.eln)
+0x00001c00           0          _dma_start_with_axi_slave_flag_set (run_address 0x00001c00)
+0x00001c00                      F_dma_start_with_axi_slave_flag_set_end (run_address 0x00001c00)
+0x00001c00         192      Section: .text(.\source_shared\DFE_init.eln)
+0x00001c00         192          ___init (run_address 0x00001c00)
+0x00001cc0                      F___init_end (run_address 0x00001cc0)
+0x00001cc0          48      Section: .text(.\source_shared\DFE_init.eln)
+0x00001cc0          48          _init_coreB (run_address 0x00001cc0)
+0x00001cf0                      F_init_coreB_end (run_address 0x00001cf0)
+0x00001cf0         400      Section: .text(.\source_shared\DFE_init.eln)
+0x00001cf0         400          _init_common (run_address 0x00001cf0)
+0x00001e80                      F_init_common_end (run_address 0x00001e80)
+0x00001e80         232      Section: .text(.\source_shared\boot.eln)
+0x00001e80         232          _boot (run_address 0x00001e80)
+0x00001f68                      F_boot_end (run_address 0x00001f68)
+0x00001f68         392      Section: .text(.\source_shared\debug.eln)
+0x00001f68         392          _log_2int (run_address 0x00001f68)
+0x000020f0                      F_log_2int_end (run_address 0x000020f0)
+0x000020f0           0      Section: .text(.\source_shared\dump_inject.eln)
+0x000020f0           0          _get_dpdout_dest_addr (run_address 0x000020f0)
+0x000020f0                      F_get_dpdout_dest_addr_end (run_address 0x000020f0)
+0x000020f0         672      Section: .text(.\source_shared\dump_inject.eln)
+0x000020f0         672          _dump_inject_data_1block (run_address 0x000020f0)
+0x00002390                      F_dump_inject_data_1block_end (run_address 0x00002390)
+0x00002390           0      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00002390           0          _channel_restart (run_address 0x00002390)
+0x00002390                      F_channel_restart_end (run_address 0x00002390)
+0x00002390           0      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00002390           0          _add_a_pattern (run_address 0x00002390)
+0x00002390                      F_add_a_pattern_end (run_address 0x00002390)
+0x00002390          88      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00002390          88          _convert_sym_idx_to_sample_idx (run_address 0x00002390)
+0x000023e8                      F_convert_sym_idx_to_sample_idx_end (run_address 0x000023e8)
+0x000023e8          72      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x000023e8          72          _get_num_samples_in_symbol_idx_range (run_address 0x000023e8)
+0x00002430                      F_get_num_samples_in_symbol_idx_range_end (run_address 0x00002430)
+0x00002430           0      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00002430           0          _core_A_msg_parse (run_address 0x00002430)
+0x00002430                      F_core_A_msg_parse_end (run_address 0x00002430)
+0x00002430          32      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00002450         112      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00002450         112          _mailbox_send_msg (run_address 0x00002450)
+0x000024c0                      F_mailbox_send_msg_end (run_address 0x000024c0)
+0x000024c0        2640      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x000024c0        2640          _host_msg_handling (run_address 0x000024c0)
+0x00002f10                      F_host_msg_handling_end (run_address 0x00002f10)
+0x00002f10         128      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00002f10         128          _check_msg (run_address 0x00002f10)
+0x00002f90                      F_check_msg_end (run_address 0x00002f90)
+0x00002f90           0      Section: .text(.\source_shared\inter_core_msg.eln)
+0x00002f90           0          _ext_word_write (run_address 0x00002f90)
+0x00002f90                      F_ext_word_write_end (run_address 0x00002f90)
+0x00002f90           0      Section: .text(.\source_shared\inter_core_msg.eln)
+0x00002f90           0          _ext_word_write_2int (run_address 0x00002f90)
+0x00002f90                      F_ext_word_write_2int_end (run_address 0x00002f90)
+0x00002f90           0      Section: .text(.\source_shared\inter_core_msg.eln)
+0x00002f90           0          _wait_for_cores (run_address 0x00002f90)
+0x00002f90                      F_wait_for_cores_end (run_address 0x00002f90)
+0x00002f90           0      Section: .text(.\source_shared\inter_core_msg.eln)
+0x00002f90           0          _inter_core_gpio_msg_processing (run_address 0x00002f90)
+0x00002f90                      F_inter_core_gpio_msg_processing_end (run_address 0x00002f90)
+0x00002f90           0      Section: .text(.\source_shared\main_pair_coreA.eln)
+0x00002f90           0          _decim_2x_handler (run_address 0x00002f90)
+0x00002f90                      F_decim_2x_handler_end (run_address 0x00002f90)
+0x00002f90         256      Section: .text(.\source_shared\main_pair_coreA.eln)
+0x00002f90         256          _init_coreA (run_address 0x00002f90)
+0x00003090                      F_init_coreA_end (run_address 0x00003090)
+0x00003090        2184      Section: .text(.\source_shared\main_pair_coreA.eln)
+0x00003090        2184          _main (run_address 0x00003090)
+0x00003918                      F_main_end (run_address 0x00003918)
+0x00003918           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00003918           0          _Ant_buffer_rx_axiq_reset (run_address 0x00003918)
+0x00003918                      F_Ant_buffer_rx_axiq_reset_end (run_address 0x00003918)
+0x00003918           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00003918           0          _Ant_buffer_rx_axiq_enable (run_address 0x00003918)
+0x00003918                      F_Ant_buffer_rx_axiq_enable_end (run_address 0x00003918)
+0x00003918           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00003918           0          _get_rx_allowed_status (run_address 0x00003918)
+0x00003918                      F_get_rx_allowed_status_end (run_address 0x00003918)
+0x00003918           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00003918           0          _convert_sample_idx_to_sym_idx (run_address 0x00003918)
+0x00003918                      F_convert_sample_idx_to_sym_idx_end (run_address 0x00003918)
+0x00003918           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00003918           0          _Ant_buffer_rx_init (run_address 0x00003918)
+0x00003918                      F_Ant_buffer_rx_init_end (run_address 0x00003918)
+0x00003918         184      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00003918         184          _rx_error_handling (run_address 0x00003918)
+0x000039d0                      F_rx_error_handling_end (run_address 0x000039d0)
+0x000039d0         168      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x000039d0         168          _Ant_buffer_rx_check_status (run_address 0x000039d0)
+0x00003a78                      F_Ant_buffer_rx_check_status_end (run_address 0x00003a78)
+0x00003a78           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00003a78           0          _Ant_buffer_rx_check_status_obs (run_address 0x00003a78)
+0x00003a78                      F_Ant_buffer_rx_check_status_obs_end (run_address 0x00003a78)
+0x00003a78         264      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00003a78         264          _Ant_buffer_rx_dma_check (run_address 0x00003a78)
+0x00003b80                      F_Ant_buffer_rx_dma_check_end (run_address 0x00003b80)
+0x00003b80          64      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00003b80          64          _get_rx_pattern_size (run_address 0x00003b80)
+0x00003bc0                      F_get_rx_pattern_size_end (run_address 0x00003bc0)
+0x00003bc0          96      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00003bc0          96          _advance_to_next_rx_pattern_size (run_address 0x00003bc0)
+0x00003c20                      F_advance_to_next_rx_pattern_size_end (run_address 0x00003c20)
+0x00003c20        1408      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00003c20        1408          _Ant_buffer_rx_dma_feed (run_address 0x00003c20)
+0x000041a0                      F_Ant_buffer_rx_dma_feed_end (run_address 0x000041a0)
+0x000041a0         128      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x000041a0         128          _Ant_buffer_rx_poll_buffer (run_address 0x000041a0)
+0x00004220                      F_Ant_buffer_rx_poll_buffer_end (run_address 0x00004220)
+0x00004220         136      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00004220         136          _Ant_buffer_rx_free_buffer (run_address 0x00004220)
+0x000042a8                      F_Ant_buffer_rx_free_buffer_end (run_address 0x000042a8)
+0x000042a8           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x000042a8           0          _Ant_buffer_tx_axiq_reset (run_address 0x000042a8)
+0x000042a8                      F_Ant_buffer_tx_axiq_reset_end (run_address 0x000042a8)
+0x000042a8           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x000042a8           0          _Ant_buffer_tx_axiq_enable (run_address 0x000042a8)
+0x000042a8                      F_Ant_buffer_tx_axiq_enable_end (run_address 0x000042a8)
+0x000042a8           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x000042a8           0          _Ant_buffer_tx_init (run_address 0x000042a8)
+0x000042a8                      F_Ant_buffer_tx_init_end (run_address 0x000042a8)
+0x000042a8         184      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x000042a8         184          _tx_error_handling (run_address 0x000042a8)
+0x00004360                      F_tx_error_handling_end (run_address 0x00004360)
+0x00004360         168      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x00004360         168          _Ant_buffer_tx_check_status (run_address 0x00004360)
+0x00004408                      F_Ant_buffer_tx_check_status_end (run_address 0x00004408)
+0x00004408         376      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x00004408         376          _Ant_buffer_tx_dma_check (run_address 0x00004408)
+0x00004580                      F_Ant_buffer_tx_dma_check_end (run_address 0x00004580)
+0x00004580         528      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x00004580         528          _Ant_buffer_tx_dma_feed (run_address 0x00004580)
+0x00004790                      F_Ant_buffer_tx_dma_feed_end (run_address 0x00004790)
+0x00004790         128      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x00004790         128          _Ant_buffer_tx_apply_buffer (run_address 0x00004790)
+0x00004810                      F_Ant_buffer_tx_apply_buffer_end (run_address 0x00004810)
+0x00004810         176      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x00004810         176          _Ant_buffer_tx_write_complete (run_address 0x00004810)
+0x000048c0                      F_Ant_buffer_tx_write_complete_end (run_address 0x000048c0)
 ;*********************************************************************************
 0x00003c00        1024  Section: memory_stack_and_heap (Segment: memory_stack_and_heap)
 ;*********************************************************************************
