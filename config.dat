@@ -204,6 +204,7 @@ else
 		HRAMaddr_vir=$(printf "0x%x" $((PEBaddr_vir-0x200000+0x5000000)))
 		FRAMaddr_vir=$(printf "0x%x" $((HRAMaddr_vir+0x01000000)))    
 		VDRAMaddr_vir=$(printf "0x%x" $((HRAMaddr_vir-0x04000000)))
+		PEB_size=$((0x200000))
 		HRAM_size=$((0x600000))
 		FRAM_size=$((768*1024))
 		VCPUDMEM_SIZE=0x20000
@@ -245,6 +246,7 @@ else
 		HRAMaddr_vir=$(printf "0x%x" $((PEBaddr_vir+TCM_AVAILABLE_OFFSET)))  #TCM 2nd half
 		FRAMaddr_vir=$(printf "0x%x" $((PEBaddr_vir+TCM_AVAILABLE_OFFSET)))  #TCM
 		VDRAMaddr_vir=$(printf "0x%x" $((PEBaddr_vir+0x400000)))
+		PEB_size=0
 		HRAM_size=$TCM_AVAILABLE_SIZE
 		FRAM_size=0
 		VCPUDMEM_SIZE=0x4000

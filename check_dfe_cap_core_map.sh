@@ -623,6 +623,14 @@ size_align()
 	((size=(size+align-1)/align*align))
 	echo $size
 }
+align_hi() #$1: data or addr, $2: alignment
+{
+	echo $((($1+$2-1)/$2*$2))
+}
+align_lo() #$1: data or addr, $2: alignment
+{
+	echo $(($1/$2*$2))
+}
 
 dmem2phy() #$1=core id, $2=vspa dmem addr in vspa view
 {
@@ -759,12 +767,12 @@ dumpfile()
 	fi
 	
 	if ([ $lsize -ne 0 ] && [ $lsize -le $((ddr_size)) ]);then     # 0<size<=128MB
-		local log=`./utils/bin2mem -f $2 -a $1 $arg_c -r $lsize`
+		local log=`./utils/bin2mem -f $2 -a $1 $arg_c -r $lsize`; echo ./utils/bin2mem -f $2 -a $1 $arg_c -r $lsize >> ./command_list.sh
 	else
 		echo Dumping from address $1 size $lsize which is out of valid range. Continue dumping \(Y/N\)?
 		read keyin
 		if ([ $keyin = Y ] || [ $keyin = y ]);then
-			local log=`./utils/bin2mem -f $2 -a $1 $arg_c -r $lsize`
+			local log=`./utils/bin2mem -f $2 -a $1 $arg_c -r $lsize`; echo ./utils/bin2mem -f $2 -a $1 $arg_c -r $lsize >> ./command_list.sh
 		else
 			echo Aborted.
 			echo

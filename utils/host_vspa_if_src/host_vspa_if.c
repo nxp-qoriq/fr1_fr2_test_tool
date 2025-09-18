@@ -1488,6 +1488,7 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		unsigned int offset = granul * (para_hi&0x3F);
 		//if(control==0)
 		//{
+			*(unsigned int*)(dest+4) = 0;                    //clear sample counter pre
 			*(unsigned int*)(dest+8) = offset;
 			*(unsigned int*)(dest+12) = GET_DUMP_ADDR(lsb);
 			*(unsigned int*)(dest+16) = GET_SIZE_NUM32KB_TO_DUMP(lsb)*dump_granul;

@@ -9,9 +9,7 @@
 # be bound by the applicable license terms, then you may not retain,
 # install, activate or otherwise use the software.
 
-# ./debug_dump.sh [feca|hram|tag]
-#    feca:  dump feca reg space and fram
-#    hram:  dump hram
+# ./debug_dump.sh [tag]
 #    tag:   dump VSPA DMEM and reg space with tag put in filename. If no argument specified, dump VSPA DMEM and reg space with tag=0
 
 if [ -f ./runtime_config.txt ];then
@@ -67,13 +65,13 @@ vcpuaddr=`printf 0x%08x $vcpuaddr`
 ippuaddr=`printf 0x%08x $ippuaddr`
 ((ipaddr=modembase_phy+0x1000000+coreid*0x4000))
 ipaddr=`printf 0x%08x $ipaddr`
-
-log=`./utils/bin2mem -f vspa_coredump_core$coreid\_$2.bin -a $vcpuaddr -r $((VCPUDMEM_SIZE))`
+dump_filename=vspa_core$coreid\_dump_$2.bin
+log=`./utils/bin2mem -f $dump_filename -a $vcpuaddr -r $((VCPUDMEM_SIZE))`
 log=`./utils/bin2mem -f debug_dump_temp.bin -a $ippuaddr -r $((IPPUDMEM_SIZE))`
-cat debug_dump_temp.bin >> vspa_coredump_core$coreid\_$2.bin
+cat debug_dump_temp.bin >> $dump_filename
 log=`./utils/bin2mem -f debug_dump_temp.bin -a $ipaddr -r 16384`
-cat debug_dump_temp.bin >> vspa_coredump_core$coreid\_$2.bin
-echo Core$coreid coredump done to file:vspa_coredump_core$coreid\_$2.bin
+cat debug_dump_temp.bin >> $dump_filename
+echo "VSPA CORE$coreid dump done to file:$dump_filename"
 }
 
 ext_log_dump()
@@ -84,8 +82,8 @@ ext_log_buf_phy=`get_wordvalue_from_vspa $coreid $ext_log_buf_base`
 ext_log_buf_sz=`get_wordvalue_from_vspa $coreid $ext_log_buf_size`
 if [ $((ext_log_buf_sz)) -ne 0 ];then
 start_addr_host=`phy2vir $ext_log_buf_phy`
-log=`./utils/bin2mem -f vspa_exttrace_core$coreid\_$2.bin -a $start_addr_host -r $((ext_log_buf_sz))`
-echo Core$coreid exttrace done to file:vspa_exttrace_core$coreid\_$2.bin
+log=`./utils/bin2mem -f vspa_core$coreid\_exttrace_dump_$2.bin -a $start_addr_host -r $((ext_log_buf_sz))`
+echo "VSPA CORE$coreid exttrace dump done to file:vspa_core$coreid\_exttrace_dump_$2.bin"
 
 #echo Parsing trace and log into text file... This may take a while, press CTRL+C to abort...
 #timestamp_pre=`devmem $((start_addr_host))`
@@ -125,37 +123,33 @@ fi
 fi
 }
 
-dump_feca=0; dump_hram=0;dump_vspa=1;
-tag=0
-if [ $# -ge 1 ];then
-	if [ $1 = feca ];then
-		dump_feca=1; dump_vspa=0;
-		if [ $vspa_dev_type = LA9310 ];then
-			echo ***ERROR: NO FECA in LA93xx;
-			exit 0;
-		fi
-	elif [ $1 = hram ];then
-		dump_hram=1; dump_vspa=0;
-	else
-		tag=$1;
+tag=0; feca_dump=0; vspa_dump=0;
+arg_parse()
+{
+	if		[ $1 = feca ]; 	then	[ $vspa_dev_type = LA9310 ] && { echo ***ERROR: NO FECA in LA93xx; exit 1; } || feca_dump=1
+	elif 	[ $1 = vspa ]; 	then	vspa_dump=1
+	else							tag=$1
 	fi
+}
+
+for i in "$@"
+do
+	arg_parse $i
+done
+
+[ $((feca_dump|vspa_dump)) -eq 0 ] && vspa_dump=1
+
+if [ $vspa_dev_type = LA9310 ];then
+	log=`./utils/bin2mem -f tcm_dump_$tag.bin -a $HRAMaddr_vir -r $((HRAM_size))`; echo "TCM        dump done to file:tcm_dump_$tag.bin"
+elif [ $feca_dump = 1 ];then
+	feca_addr=$((modembase_phy+0x1040000))
+	log=`./utils/bin2mem -f fram_dump_$tag.bin -a $FRAMaddr_vir -r $((FRAM_size))`; echo "FECA FRAM  dump done to file:fram_dump_$tag.bin"
+	log=`./utils/bin2mem -f feca_dump_$tag.bin -a $feca_addr -r 4096`; echo "FECA REG   dump done to file:feca_dump_$tag.bin"
+	log=`./utils/bin2mem -f hram_dump_$tag.bin -a $HRAMaddr_vir -r $((HRAM_size))`; echo "HRAM       dump done to file:hram_dump_$tag.bin"
+	log=`./utils/bin2mem -f pebm_dump_$tag.bin -a $PEBaddr_vir -r $((PEB_size))`; echo "PEBM       dump done to file:pebm_dump_$tag.bin"
 fi
 
-if [ $dump_feca = 1 ];then
-feca_addr=$((modembase_phy+0x1040000))
-log=`./utils/bin2mem -f fram.bin -a $FRAMaddr_vir -r $((FRAM_size))`
-log=`./utils/bin2mem -f feca.bin -a $feca_addr -r 4096`
-echo FECA FRAM dump done to file:fram.bin
-echo FECA reg  dump done to file:feca.bin
-exit 0
-fi
-
-if [ $dump_hram = 1 ];then
-log=`./utils/bin2mem -f hram.bin -a $HRAMaddr_vir -r $((HRAM_size))`
-echo HRAM dump done to file:hram.bin
-exit 0
-fi
-
+if [ $vspa_dump = 1 ];then
 dfe_core=(0 0 0 0 0 0 0 0) 
 swversion_allcore=0
 slave_core=(0 0 0 0 0 0 0 0)
@@ -187,3 +181,4 @@ done
 
 rm debug_dump_temp.bin
 echo
+fi
