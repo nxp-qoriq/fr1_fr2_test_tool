@@ -1266,9 +1266,9 @@ parse_error() #$1=msg_hi $2=msg_lo
 	elif [ $(($error_type)) -eq $((0x06)) ];then
 		echo -n " Error from core $core: VSPA IPPU cmd error."
 	elif [ $(($error_type)) -eq $((0x11)) ];then
-		echo -n " Error from core $core: TX symbols deadline missed, sent to DFE by host too late."
+		echo -n " Error from core $core: TX symbols deadline missed, sent by host too late."
 	elif [ $(($error_type)) -eq $((0x12)) ];then
-		echo -n " Error from core $core: RX symbols deadline missed, fetched from DFE by host too late."
+		echo -n " Error from core $core: RX symbols deadline missed, fetched by host too late. symbol index $((msg_hi&0xffff))."
 	elif [ $(($error_type)) -eq $((0x21)) ];then
 		echo -n " Error from core $core: TX ant data arrived at DCS too late, TX ant buffer empty."
 	elif [ $(($error_type)) -eq $((0x22)) ];then

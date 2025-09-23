@@ -12,11 +12,7 @@
 # ./debug_dump.sh [tag]
 #    tag:   dump VSPA DMEM and reg space with tag put in filename. If no argument specified, dump VSPA DMEM and reg space with tag=0
 
-if [ -f ./runtime_config.txt ];then
-source ./check_dfe_cap_core_map.sh
-else
 source ./config.dat
-fi
 
 log_opcode_list=(
 0xFF000000 "Log Stopped"					
@@ -71,7 +67,9 @@ log=`./utils/bin2mem -f debug_dump_temp.bin -a $ippuaddr -r $((IPPUDMEM_SIZE))`
 cat debug_dump_temp.bin >> $dump_filename
 log=`./utils/bin2mem -f debug_dump_temp.bin -a $ipaddr -r 16384`
 cat debug_dump_temp.bin >> $dump_filename
-echo "VSPA CORE$coreid dump done to file:$dump_filename"
+checksum=`md5sum $dump_filename`
+checksum=${checksum:0:32}
+echo "VSPA CORE$coreid dump done to file:$dump_filename", md5sum $checksum
 }
 
 ext_log_dump()
@@ -165,7 +163,7 @@ do
 		((slave_core[$i]=(swversion>>13)&7))
 	fi
 done
-[ $((one_dfe_core)) -ge $INVALID_CORE ] && { echo ***ERROR: VSPA images are not $test_tool_name images.; echo; exit 1; }
+[ $((one_dfe_core)) -ge $INVALID_CORE ] && echo -e "***WARNING: VSPA images are not fr1 fr2 test tool images, or the test tool boot failed."
 ((flag_dfe_initialized=(swversion_allcore>>12)&1))
 vspa_image_version=`printf "0x%x" $((swversion_allcore&0xFFF))`
 

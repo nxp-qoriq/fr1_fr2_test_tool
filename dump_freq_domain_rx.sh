@@ -101,8 +101,7 @@ time_len=$time_len_default
 mem=0
 num_32KB=0
 num_counter=0
-size_hram=$((6*1024*1024))
-dump_via_hram=0; force_ddr=0; force_hram=0
+dump_via_hram=1
 fast=0
 nsym=0
 
@@ -110,8 +109,8 @@ arg_parse()
 {
 	arg=$1
 	if [ $1 = kd ]; then							keep_dumping=1; echo "Keep dumping all the time, until dumping once command is issued."
-	elif ([ $1 = HRAM ] || [ $1 = hram ]); then		dump_via_hram=1; force_hram=1
-	elif ([ $1 = DDR ] || [ $1 = ddr ]); then		dump_via_hram=0; force_ddr=1
+	elif ([ $1 = HRAM ] || [ $1 = hram ]); then		dump_via_hram=1
+	elif ([ $1 = DDR ] || [ $1 = ddr ]); then		dump_via_hram=0
 	elif [ $1 = mem ]; then							mem=1
 	elif 	([ $1 = 0.5ms ] || [ $1 = .5ms ]); 	then			time_len=500; tag=0.5
 	elif 	[ $1 = 1ms ]; 	then		time_len=1000; tag=1
@@ -140,7 +139,6 @@ do
 	arg_parse $i
 done
 [ $fr1_used = 0 ] && ant=$(((ant%2)+4))
-([ $((bbsps_rx[ant])) -ge 400000 ] && [ $((force_hram+force_ddr)) = 0 ]) && { dump_via_hram=1; force_hram=1; }
 dcsid=$ant
 check_ant_enable_rx $ant #[ $((ant_enable[ant]&BITMASK_ANT_ENABLE_RX)) = 0 ] && { echo ***ERROR: Current RX ant $ant is not enabled.; exit 1; }
 
@@ -165,24 +163,28 @@ else
 	filename0=rx_freqdomain_$filelen\ms_dump
 fi
 
+if [ $dump_via_hram = 1 ];then
+	size_hram=`align_lo $((HRAMaddr_phy+HRAM_size-next_HRAMaddr_phy)) 4096`
+	addr_phy=$((HRAMaddr_phy+HRAM_size-size_hram))
+	addr_vir=`printf "0x%x" $((HRAMaddr_vir+HRAM_size-size_hram))`
+	if [ $((size_hram)) -ge $size_file ];then
+		echo Clearing memory from $addr_vir with size $size_hram...; clear_mem $addr_vir $size_hram
+		echo Using HRAM size $size_hram starting from $addr_vir as intermediate buffer for dumping...
+	else
+		#if [ $((bbsps_rx[ant])) -ge 400000 ];then
+		#	echo ***ERROR: HRAM size $((size_hram)) is not big enough to hold the dump size $size_file, try dumping with smaller size such as 0.5ms or 1ms
+		#	exit 1  #if bandwidth is very high and HRAM size is not enough, exit, otherwise switch to DDR
+		#else
+			dump_via_hram=0;
+		#fi
+	fi
+fi
 if [ $dump_via_hram = 0 ];then
 	malloc_for_dump $size_file
 	addr_phy=$addr_dump
 	addr_vir=`phy2vir $addr_phy`
 	echo Clearing memory from $addr_vir with size $size_file...; clear_mem $addr_vir $size_file
 	echo Using DDR size $size_file starting from $addr_vir as intermediate buffer for dumping...
-else
-	end_hram=$next_HRAMaddr_phy
-	available_hram=$((HRAMaddr_phy+HRAM_size-end_hram))
-	if [ $size_hram -gt $available_hram ];then
-		size_hram=$((available_hram/1024/1024*1024*1024))
-	fi
-
-	addr_phy=$((HRAMaddr_phy+HRAM_size-size_hram))
-	addr_vir=`printf "0x%x" $((HRAMaddr_vir+6*1024*1024-size_hram))`
-	[ $((size_hram)) -lt $size_file ] && { echo ***ERROR: HRAM size $((size_hram)) is not big enough to hold the dump size $size_file, try dumping with smaller size such as 0.5ms or 1ms; exit 1; }
-	echo Clearing memory from $addr_vir with size $size_hram...; clear_mem $addr_vir $size_hram
-	echo Using HRAM size $size_hram starting from $addr_vir as intermediate buffer for dumping...
 fi
 
 filenamesym=0

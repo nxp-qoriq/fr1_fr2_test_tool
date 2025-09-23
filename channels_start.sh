@@ -462,7 +462,7 @@ else
 				vspa_mbox_ifsend $i $host_vspa_mbox_id $dfe_mode_msb $dfe_mode_lsb; 
 				sleep 0.1
 				[ $msg_recv_flag = 0 ] && vspa_mbox_ifrecv $i $host_vspa_mbox_id
-				([ $msg_recv_flag = 0 ] || [ $((msg_recv_msb32&0xFF000000)) -ne $((0x0F000000)) ]) && { echo "***ERROR: VSPA core $i did not respond to restart msg."; channels_start_fail; }
+				([ $msg_recv_flag = 0 ] || ([ $((msg_recv_msb32&0xFF000000)) -ne $((0x0F000000)) ] && [ $((msg_recv_msb32)) -ne $((0xF1000000)) ])) && { echo "***ERROR: VSPA core $i did not respond to restart msg."; channels_start_fail; }
 				flag_dfe_initialized=$(((`./utils/devmem $((modembase_phy+0x1000000+i*0x4000+4)) w` >>12)&1))
 				[ $flag_dfe_initialized -ne 0 ] && { echo -e "***ERROR: VSPA core $i restart failure, can not enter initialization stage\n"; channels_start_fail; }
 				echo Core $i restarted from initialized stage to expected un-initialized state.
