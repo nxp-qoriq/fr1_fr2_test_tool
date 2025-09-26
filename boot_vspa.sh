@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -264,8 +264,9 @@ if [ $flag_la93 = 1 ];then
 		echo -e "***ERROR: Illegal ADC sampling rate config $adc_sps\n"; exit 1
 	fi
 	
-	echo insmod $boot_tool scratch_buf_size=0x4000000 scratch_buf_phys_addr=0x92400000 adc_mask=0xf $adc_rate_tag dac_mask=0x1 $dac_rate_tag alt_firmware_name=$malt_firmware_name alt_vspa_fw_name=fr1_fr2_test_tool_vspa0.eld
-	insmod $boot_tool scratch_buf_size=0x4000000 scratch_buf_phys_addr=0x92400000 adc_mask=0xf $adc_rate_tag dac_mask=0x1 $dac_rate_tag alt_firmware_name=$malt_firmware_name alt_vspa_fw_name=fr1_fr2_test_tool_vspa0.eld
+	boot_cmd="insmod $boot_tool scratch_buf_size=0x4000000 scratch_buf_phys_addr=0x92400000 adc_mask=0xf $adc_rate_tag dac_mask=0x1 $dac_rate_tag alt_firmware_name=$malt_firmware_name alt_vspa_fw_name=fr1_fr2_test_tool_vspa0.eld"
+	echo "$boot_cmd"
+	$boot_cmd
 	[ $? -ne 0 ] && { echo -e "***ERROR: Failure in insmod $boot_tool, need reboot."; exit 1; }
 
 	sleep 1
@@ -278,8 +279,9 @@ else
 		echo 1 > /sys/bus/pci/rescan
 		echo 8 > /proc/sys/kernel/printk
 		#tail -f /var/log/syslog &
-		echo $boot_tool scratch_buf_size=$mscratch_buf_size share_buf_size=$mshare_buf_size scratch_buf_phys_addr=$mscratch_buf_phys_addr $dcs_enable_arg $dcs1_enable_arg rf_data_size=$mrf_data_size rfic_disable=0 alt_firmware_name=$malt_firmware_name alt_vspa_fw_name_prefix=$malt_vspa_fw_name_prefix $mpci_addr_array
-		insmod $boot_tool scratch_buf_size=$mscratch_buf_size share_buf_size=$mshare_buf_size scratch_buf_phys_addr=$mscratch_buf_phys_addr $dcs_enable_arg $dcs1_enable_arg rf_data_size=$mrf_data_size rfic_disable=0 alt_firmware_name=$malt_firmware_name alt_vspa_fw_name_prefix=$malt_vspa_fw_name_prefix $mpci_addr_array
+		boot_cmd="insmod $boot_tool scratch_buf_size=$mscratch_buf_size share_buf_size=$mshare_buf_size scratch_buf_phys_addr=$mscratch_buf_phys_addr $dcs_enable_arg $dcs1_enable_arg rf_data_size=$mrf_data_size rfic_disable=0 alt_firmware_name=$malt_firmware_name alt_vspa_fw_name_prefix=$malt_vspa_fw_name_prefix $mpci_addr_array"
+		echo "$boot_cmd"
+		$boot_cmd
 		ret=$? 
 		out=$(modem_info)
 		[ "$out" != "" ] && [ $ret -eq 0 ] && break
@@ -289,9 +291,11 @@ else
 	modem_num=$((var))
 	tag="\nNo. of LA12xx Modem Detected: $modem_num \nNext step: run ./channels_start.sh\n"
 fi
-echo "vspa_image_folder_name=$arg; obs_sps=$obs_sps" > ./boot_vspa_log.txt
+boot_cmd_hist=0
+source ./boot_vspa_log.txt
+echo -e "boot_cmd_hist=\"$boot_cmd\"\nvspa_image_folder_name=$arg\nobs_sps=$obs_sps\n" > ./boot_vspa_log.txt
 rm backup_filter_coeff*.bin > /dev/null 2>&1  #remove leftover files from previous image
-rm runtime_config.*  > /dev/null 2>&1
+[ "$boot_cmd_hist" != "$boot_cmd" ] && { echo Different boot from previous boot, remove runtime_config.txt; rm runtime_config.*  > /dev/null 2>&1; } #keep runtime config if boot arg is same, this will allow user app boot to use test tool commands for debugging
 rm phcom_coeff_*.bin  > /dev/null 2>&1
 
 source ./config.dat
