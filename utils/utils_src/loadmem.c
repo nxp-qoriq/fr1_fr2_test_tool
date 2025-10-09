@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
-				if ((fp = fopen(filename, "wba")) == NULL)
+				if ((fp = fopen(filename, "ab")) == NULL)
 				{
 					printf("File open failure, filename = %s.\n", filename);
 					return -1;
