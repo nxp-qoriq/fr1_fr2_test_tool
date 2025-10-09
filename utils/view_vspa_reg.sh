@@ -51,8 +51,8 @@ start_addr_host=`printf 0x%x $start_addr_host`
 end_addr_host=`printf 0x%x $end_addr_host`
 echo start_addr_host = $start_addr_host, end_addr_host=$end_addr_host
 
-echo ./utils/devmem5 r $start_addr_host $end_addr_host w
-./utils/devmem5 r $start_addr_host $end_addr_host w
+echo ./utils/loadmem null $start_addr_host -r $size
+./utils/loadmem null $start_addr_host -r $size
 
 if [ "$module_name" = dma ];then
 	echo "DMA_STAT:     "`./utils/memrw r 32 $((start_addr_host+0x10))`
@@ -71,7 +71,7 @@ elif [ "$module_name" = axiq ];then
 	gpo4=`./utils/memrw r 32 $((start_addr_host+0x80+4*4))`
 	gpo5=`./utils/memrw r 32 $((start_addr_host+0x80+4*5))`
 	gpo7=`./utils/memrw r 32 $((start_addr_host+0x80+4*7))`
-	./utils/devmem5 r $((start_addr_host+0x80)) $((end_addr_host+0x80)) w   #show CONTROL REGS
+	./utils/loadmem null $((start_addr_host+0x80)) -r $size #show CONTROL REGS
 	
 	echo
 	echo "TX CHAN CONTROL:"
@@ -114,7 +114,7 @@ elif [ "$module_name" = axiq ];then
 	gpo13=`./utils/memrw r 32 $((start_addr_host+0x80+4*13))`  #LA12xx TX and RX AXIQ DCS5 CONTROL
 	gpo9=`./utils/memrw r 32 $((start_addr_host+0x80+4*9))`  #LA12xx TX AXIQ DCS0,1 CONTROL
 	gpo11=`./utils/memrw r 32 $((start_addr_host+0x80+4*11))`  #LA12xx TX AXIQ DCS2,3 CONTROL
-	./utils/devmem5 r $((start_addr_host+0x80)) $((end_addr_host+0x80)) w   #show CONTROL REGS
+	./utils/loadmem null $((start_addr_host+0x80)) -r $size  #show CONTROL REGS
 	
 	echo 
 	echo "TX CHAN CONTROL: 0 1 2 3 4 5"
@@ -125,13 +125,13 @@ elif [ "$module_name" = axiq ];then
 	
 	echo
 	echo "TX CHAN STATUS:  0 1 2 3 4 5"
-	echo " ENABLE:         "`show_bits $gpi9 $((0*8+0)) 1` `show_bits $gpi9 $((1*8+0)) 1` `show_bits $gpi12 $((0*8+0)) 1` `show_bits $gpi12 $((1*8+0)) 1` `show_bits $gpi15 $((0*8+0)) 1` `show_bits $gpi15 $((2*8+0)) 1`
-	echo " FIFO NOT EMPTY: "`show_bits $gpi9 $((0*8+1)) 1` `show_bits $gpi9 $((1*8+1)) 1` `show_bits $gpi12 $((0*8+1)) 1` `show_bits $gpi12 $((1*8+1)) 1` `show_bits $gpi15 $((0*8+1)) 1` `show_bits $gpi15 $((2*8+1)) 1`
-	echo " TX ALLOWED:     "`show_bits $gpi9 $((0*8+2)) 1` `show_bits $gpi9 $((1*8+2)) 1` `show_bits $gpi12 $((0*8+2)) 1` `show_bits $gpi12 $((1*8+2)) 1` `show_bits $gpi15 $((0*8+2)) 1` `show_bits $gpi15 $((2*8+2)) 1`
-	echo " RESET COMPLETE: "`show_bits $gpi9 $((0*8+3)) 1` `show_bits $gpi9 $((1*8+3)) 1` `show_bits $gpi12 $((0*8+3)) 1` `show_bits $gpi12 $((1*8+3)) 1` `show_bits $gpi15 $((0*8+3)) 1` `show_bits $gpi15 $((2*8+3)) 1`
-	echo " UNDERFLOW:      "`show_bits $gpi9 $((0*8+4)) 1` `show_bits $gpi9 $((1*8+4)) 1` `show_bits $gpi12 $((0*8+4)) 1` `show_bits $gpi12 $((1*8+4)) 1` `show_bits $gpi15 $((0*8+4)) 1` `show_bits $gpi15 $((2*8+4)) 1`
-	echo " OVERFLOW:       "`show_bits $gpi9 $((0*8+5)) 1` `show_bits $gpi9 $((1*8+5)) 1` `show_bits $gpi12 $((0*8+5)) 1` `show_bits $gpi12 $((1*8+5)) 1` `show_bits $gpi15 $((0*8+5)) 1` `show_bits $gpi15 $((2*8+5)) 1`
-	echo " RESET ERROR:    "`show_bits $gpi9 $((0*8+6)) 1` `show_bits $gpi9 $((1*8+6)) 1` `show_bits $gpi12 $((0*8+6)) 1` `show_bits $gpi12 $((1*8+6)) 1` `show_bits $gpi15 $((0*8+6)) 1` `show_bits $gpi15 $((2*8+6)) 1`
+	echo " ENABLE:         "`show_bits $gpi9 $((0*8+0)) 1` `show_bits $gpi9 $((1*8+0)) 1` `show_bits $gpi12 $((0*8+0)) 1` `show_bits $gpi12 $((1*8+0)) 1` `show_bits $gpi15 $((1*8+0)) 1` `show_bits $gpi15 $((3*8+0)) 1`
+	echo " FIFO NOT EMPTY: "`show_bits $gpi9 $((0*8+1)) 1` `show_bits $gpi9 $((1*8+1)) 1` `show_bits $gpi12 $((0*8+1)) 1` `show_bits $gpi12 $((1*8+1)) 1` `show_bits $gpi15 $((1*8+1)) 1` `show_bits $gpi15 $((3*8+1)) 1`
+	echo " TX ALLOWED:     "`show_bits $gpi9 $((0*8+2)) 1` `show_bits $gpi9 $((1*8+2)) 1` `show_bits $gpi12 $((0*8+2)) 1` `show_bits $gpi12 $((1*8+2)) 1` `show_bits $gpi15 $((1*8+2)) 1` `show_bits $gpi15 $((3*8+2)) 1`
+	echo " RESET COMPLETE: "`show_bits $gpi9 $((0*8+3)) 1` `show_bits $gpi9 $((1*8+3)) 1` `show_bits $gpi12 $((0*8+3)) 1` `show_bits $gpi12 $((1*8+3)) 1` `show_bits $gpi15 $((1*8+3)) 1` `show_bits $gpi15 $((3*8+3)) 1`
+	echo " UNDERFLOW:      "`show_bits $gpi9 $((0*8+4)) 1` `show_bits $gpi9 $((1*8+4)) 1` `show_bits $gpi12 $((0*8+4)) 1` `show_bits $gpi12 $((1*8+4)) 1` `show_bits $gpi15 $((1*8+4)) 1` `show_bits $gpi15 $((3*8+4)) 1`
+	echo " OVERFLOW:       "`show_bits $gpi9 $((0*8+5)) 1` `show_bits $gpi9 $((1*8+5)) 1` `show_bits $gpi12 $((0*8+5)) 1` `show_bits $gpi12 $((1*8+5)) 1` `show_bits $gpi15 $((1*8+5)) 1` `show_bits $gpi15 $((3*8+5)) 1`
+	echo " RESET ERROR:    "`show_bits $gpi9 $((0*8+6)) 1` `show_bits $gpi9 $((1*8+6)) 1` `show_bits $gpi12 $((0*8+6)) 1` `show_bits $gpi12 $((1*8+6)) 1` `show_bits $gpi15 $((1*8+6)) 1` `show_bits $gpi15 $((3*8+6)) 1`
 
 	echo 
 	echo "RX CHAN CONTROL: 0 1 2 3 4 5"
@@ -142,13 +142,13 @@ elif [ "$module_name" = axiq ];then
 
 	echo
 	echo "RX CHAN STATUS:  0 1 2 3 4 5"
-	echo " ENABLE:         "`show_bits $gpi8 $((0*8+0)) 1` `show_bits $gpi8 $((1*8+0)) 1` `show_bits $gpi11 $((0*8+0)) 1` `show_bits $gpi11 $((1*8+0)) 1` `show_bits $gpi15 $((1*8+0)) 1` `show_bits $gpi15 $((3*8+0)) 1`
-	echo " FIFO NOT EMPTY: "`show_bits $gpi8 $((0*8+1)) 1` `show_bits $gpi8 $((1*8+1)) 1` `show_bits $gpi11 $((0*8+1)) 1` `show_bits $gpi11 $((1*8+1)) 1` `show_bits $gpi15 $((1*8+1)) 1` `show_bits $gpi15 $((3*8+1)) 1`
-	echo " RX ALLOWED:     "`show_bits $gpi8 $((0*8+2)) 1` `show_bits $gpi8 $((1*8+2)) 1` `show_bits $gpi11 $((0*8+2)) 1` `show_bits $gpi11 $((1*8+2)) 1` `show_bits $gpi15 $((1*8+2)) 1` `show_bits $gpi15 $((3*8+2)) 1`
-	echo " RESET COMPLETE: "`show_bits $gpi8 $((0*8+3)) 1` `show_bits $gpi8 $((1*8+3)) 1` `show_bits $gpi11 $((0*8+3)) 1` `show_bits $gpi11 $((1*8+3)) 1` `show_bits $gpi15 $((1*8+3)) 1` `show_bits $gpi15 $((3*8+3)) 1`
-	echo " UNDERFLOW:      "`show_bits $gpi8 $((0*8+4)) 1` `show_bits $gpi8 $((1*8+4)) 1` `show_bits $gpi11 $((0*8+4)) 1` `show_bits $gpi11 $((1*8+4)) 1` `show_bits $gpi15 $((1*8+4)) 1` `show_bits $gpi15 $((3*8+4)) 1`
-	echo " OVERFLOW:       "`show_bits $gpi8 $((0*8+5)) 1` `show_bits $gpi8 $((1*8+5)) 1` `show_bits $gpi11 $((0*8+5)) 1` `show_bits $gpi11 $((1*8+5)) 1` `show_bits $gpi15 $((1*8+5)) 1` `show_bits $gpi15 $((3*8+5)) 1`
-	echo " RESET ERROR:    "`show_bits $gpi8 $((0*8+6)) 1` `show_bits $gpi8 $((1*8+6)) 1` `show_bits $gpi11 $((0*8+6)) 1` `show_bits $gpi11 $((1*8+6)) 1` `show_bits $gpi15 $((1*8+6)) 1` `show_bits $gpi15 $((3*8+6)) 1`
+	echo " ENABLE:         "`show_bits $gpi8 $((0*8+0)) 1` `show_bits $gpi8 $((1*8+0)) 1` `show_bits $gpi11 $((0*8+0)) 1` `show_bits $gpi11 $((1*8+0)) 1` `show_bits $gpi15 $((0*8+0)) 1` `show_bits $gpi15 $((2*8+0)) 1`
+	echo " FIFO NOT EMPTY: "`show_bits $gpi8 $((0*8+1)) 1` `show_bits $gpi8 $((1*8+1)) 1` `show_bits $gpi11 $((0*8+1)) 1` `show_bits $gpi11 $((1*8+1)) 1` `show_bits $gpi15 $((0*8+1)) 1` `show_bits $gpi15 $((2*8+1)) 1`
+	echo " RX ALLOWED:     "`show_bits $gpi8 $((0*8+2)) 1` `show_bits $gpi8 $((1*8+2)) 1` `show_bits $gpi11 $((0*8+2)) 1` `show_bits $gpi11 $((1*8+2)) 1` `show_bits $gpi15 $((0*8+2)) 1` `show_bits $gpi15 $((2*8+2)) 1`
+	echo " RESET COMPLETE: "`show_bits $gpi8 $((0*8+3)) 1` `show_bits $gpi8 $((1*8+3)) 1` `show_bits $gpi11 $((0*8+3)) 1` `show_bits $gpi11 $((1*8+3)) 1` `show_bits $gpi15 $((0*8+3)) 1` `show_bits $gpi15 $((2*8+3)) 1`
+	echo " UNDERFLOW:      "`show_bits $gpi8 $((0*8+4)) 1` `show_bits $gpi8 $((1*8+4)) 1` `show_bits $gpi11 $((0*8+4)) 1` `show_bits $gpi11 $((1*8+4)) 1` `show_bits $gpi15 $((0*8+4)) 1` `show_bits $gpi15 $((2*8+4)) 1`
+	echo " OVERFLOW:       "`show_bits $gpi8 $((0*8+5)) 1` `show_bits $gpi8 $((1*8+5)) 1` `show_bits $gpi11 $((0*8+5)) 1` `show_bits $gpi11 $((1*8+5)) 1` `show_bits $gpi15 $((0*8+5)) 1` `show_bits $gpi15 $((2*8+5)) 1`
+	echo " RESET ERROR:    "`show_bits $gpi8 $((0*8+6)) 1` `show_bits $gpi8 $((1*8+6)) 1` `show_bits $gpi11 $((0*8+6)) 1` `show_bits $gpi11 $((1*8+6)) 1` `show_bits $gpi15 $((0*8+6)) 1` `show_bits $gpi15 $((2*8+6)) 1`
 	fi
 	exit 0;
 fi

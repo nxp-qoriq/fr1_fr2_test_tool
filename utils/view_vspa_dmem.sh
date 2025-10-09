@@ -72,8 +72,8 @@ if [ $((ext_log_buf_size)) -ne 0 ];then
 
 echo Print log from internal memory $start_addr_host size $ext_log_buf_size
 echo start_addr_host = $start_addr_host, end_addr_host=$end_addr_host
-echo devmem5 r $start_addr_host $end_addr_host $bit_width
-./utils/devmem5 r $start_addr_host $end_addr_host $bit_width | more
+echo ./utils/loadmem $start_addr_host -r $size $bit_width
+./utils/loadmem $start_addr_host -r $size $bit_width | more
 
 start_addr_host=`phy2vir $ext_log_buf_phy`
 end_addr_host=`printf 0x%x $((start_addr_host+ext_log_buf_size-1))`
@@ -82,8 +82,8 @@ fi
 fi
 fi
 echo start_addr_host = $start_addr_host, end_addr_host=$end_addr_host
-echo devmem5 r $start_addr_host $end_addr_host $bit_width
-./utils/devmem5 r $start_addr_host $end_addr_host $bit_width | more
+echo ./utils/loadmem null $start_addr_host -r $size $bit_width
+./utils/loadmem null $start_addr_host -r $size $bit_width | more
 
 #read -p "Press ENTER to view the next block, Other key to break: " -s -n 1 yesno; [ "$yesno" != "" ] && { echo; echo; exit 0; }
 #start_addr=$((start_addr+size))
