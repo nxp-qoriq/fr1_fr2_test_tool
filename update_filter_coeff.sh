@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -110,7 +110,7 @@ if [ $filter_type -eq 4 ];then  #rx fir filter
 	[ -f $backup_filename ] || { dumpfile $addr_vir $backup_filename $((num_taps*4)); echo Original filter coeff backed up to $backup_filename; }
 	if [ $dis = 1 ];then
 		./utils/memset $addr_vir $((num_taps-1)) 0
-		./utils/devmem $((addr_vir+4*(num_taps/2))) w 0x3f800000 #write the middle tap to 1.0 for passthrough
+		./utils/memrw w 32 $((addr_vir+4*(num_taps/2))) 0x3f800000 #write the middle tap to 1.0 for passthrough
 		echo RX LPF filter taps at address $addr_vir are set to passthrough on ant $ant.
 	else
 		[ $filesize -ne $((num_taps*4)) ] && { echo -e "***ERROR: File size $filesize is not expected $((num_taps*4)).\n"; exit 1; }
@@ -124,7 +124,7 @@ elif [ $filter_type -eq 3 ];then  #2xdown
 	[ -f $backup_filename ] || { dumpfile $addr_vir $backup_filename $((num_downsampling_taps*4)); echo Original filter coeff backed up to $backup_filename; }
 	if [ $dis = 1 ];then
 		./utils/memset $addr_vir $((num_downsampling_taps-1)) 0
-		./utils/devmem $((addr_vir+4*(num_downsampling_taps-1))) w 0x3f800000 #write the last tap to 1.0 for passthrough
+		./utils/memrw w 32 $((addr_vir+4*(num_downsampling_taps-1))) 0x3f800000 #write the last tap to 1.0 for passthrough
 		echo Down sampling filter taps at address $addr_vir are set to passthrough on ant $ant.
 	else
 		[ $filesize -ne $((num_downsampling_taps*4)) ] && { echo -e "***ERROR: File size $filesize is not expected $((num_downsampling_taps*4)).\n"; exit 1; }

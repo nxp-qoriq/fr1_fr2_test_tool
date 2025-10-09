@@ -198,6 +198,7 @@ if [ $mem = 0 ];then
 
 if [ $filenamesym != 0 ];then
 	sym_buf_size=`size_align $((sym_size*4)) 128`
+	[ -f $filenamesym ] && rm $filenamesym
 	dumpfile $addr_vir $filenamesym $((nsym*sym_buf_size))
 	echo Antenna $dcsid dump done, from address $addr_vir, size:$((nsym*sym_buf_size)), file:$filenamesym
 	check_error_ant $dcsid
@@ -205,7 +206,7 @@ if [ $filenamesym != 0 ];then
 fi
 
 filename=$filename0\_ant$dcsid.bin
-dumpfile $addr_vir $filename $size_file
+[ -f $filename ] && rm $filename; dumpfile $addr_vir $filename $size_file
 echo Antenna $dcsid dump done, from address $addr_vir, size:$size_file, file:$filename
 
 if [ $num_32KB -ne 0 ];then
@@ -214,6 +215,7 @@ if [ $((option8_rx[dcsid])) -eq 1 ];then
 else
 	filename1=rx_freqdomain_$((num_32KB*32))KB_dump_ant$dcsid.bin
 fi
+[ -f $filename1 ] && rm $filename1
 dumpfile $addr_vir $filename1 $((num_32KB*32768))
 echo Antenna $dcsid dump done, from address $addr_vir, size:$((num_32KB*32768)), file:$filename1
 fi

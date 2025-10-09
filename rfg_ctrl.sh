@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -51,9 +51,9 @@ wait_for_pps()
 		set_tbgen_ccsr_offset "HS"
 	fi
 
-	local TS10MSLO=$(devmem $TBGEN_REG_TS10MSLO)
+	local TS10MSLO=$(./utils/memrw r 32 $TBGEN_REG_TS10MSLO)
 	sleep 2
-	local TS10MSLO_comp=$(devmem $TBGEN_REG_TS10MSLO)
+	local TS10MSLO_comp=$(./utils/memrw r 32 $TBGEN_REG_TS10MSLO)
 
 	if [ $((TS10MSLO_comp)) -eq $((TS10MSLO)) ];then
 		return 1
@@ -70,14 +70,14 @@ wait_till_tbgen_tick()
 		set_tbgen_ccsr_offset "HS"
 	fi
 
-	local MSTRCNTHI=$(devmem $TBGEN_REG_MSTRCNTHI)
-	local MSTRCNTLO=$(devmem $TBGEN_REG_MSTRCNTLO)
+	local MSTRCNTHI=$(./utils/memrw r 32 $TBGEN_REG_MSTRCNTHI)
+	local MSTRCNTLO=$(./utils/memrw r 32 $TBGEN_REG_MSTRCNTLO)
 	MCTR=$(((MSTRCNTHI << 32) | MSTRCNTLO))
 
 	if [[ $2 -gt $MCTR ]]; then
 		while [ $2 -gt $MCTR ]; do
-			MSTRCNTHI=$(devmem $TBGEN_REG_MSTRCNTHI)
-			MSTRCNTLO=$(devmem $TBGEN_REG_MSTRCNTLO)
+			MSTRCNTHI=$(./utils/memrw r 32 $TBGEN_REG_MSTRCNTHI)
+			MSTRCNTLO=$(./utils/memrw r 32 $TBGEN_REG_MSTRCNTLO)
 			MCTR=$(((MSTRCNTHI << 32) | MSTRCNTLO))
 		done
 	else
@@ -97,16 +97,16 @@ start_rfg()
 	TBGEN_FREQ=$tbgen2_freq
     fi
 	
-    devmem $TBGEN_RFG_REG_REFCLKS_PER_10MS w $(($TBGEN_FREQ / 100))
+    ./utils/memrw w 32 $TBGEN_RFG_REG_REFCLKS_PER_10MS $(($TBGEN_FREQ / 100))
 	
     # Radio Frame Generator output is used as the source for the 10ms Frame SYNC signal
-    local rfgcr=$(devmem $TBGEN_RFG_REG_CTRL)
+    local rfgcr=$(./utils/memrw r 32 $TBGEN_RFG_REG_CTRL)
     rfgcr=$((rfgcr & ~0x4))
     rfgcr=$((rfgcr | 0x40003))
-    devmem $TBGEN_RFG_REG_CTRL w $rfgcr
+    ./utils/memrw w 32 $TBGEN_RFG_REG_CTRL $rfgcr
     rfgcr=$((rfgcr & ~0x2))
     sleep 1
-    devmem $TBGEN_RFG_REG_CTRL w $rfgcr
+    ./utils/memrw w 32 $TBGEN_RFG_REG_CTRL $rfgcr
 }
 
 # stop reference tngem output
@@ -114,10 +114,10 @@ start_rfg()
 stop_rfg()
 {
     set_tbgen_ccsr_offset $@
-    local rfgcr=$(devmem $TBGEN_RFG_REG_CTRL)
+    local rfgcr=$(./utils/memrw r 32 $TBGEN_RFG_REG_CTRL)
     rfgcr=$((rfgcr | 0x4))
     rfgcr=$((rfgcr & ~0x3))
-    devmem $TBGEN_RFG_REG_CTRL w $rfgcr
+    ./utils/memrw w 32 $TBGEN_RFG_REG_CTRL $rfgcr
 }
 
 get_tdd_ctrl()
@@ -154,16 +154,16 @@ get_tbgen_mode()
 get_tbgen_counter()
 {
     set_tbgen_ccsr_offset $1
-    local ts10mshi=$(devmem $TBGEN_REG_TS10MSHI)
-    local ts10mslo=$(devmem $TBGEN_REG_TS10MSLO)
+    local ts10mshi=$(./utils/memrw r 32 $TBGEN_REG_TS10MSHI)
+    local ts10mslo=$(./utils/memrw r 32 $TBGEN_REG_TS10MSLO)
     local ts10ms=$(( $((ts10mshi << 32)) | ts10mslo ))
     echo $ts10ms
 }
 get_tbgen_master_counter()
 {
     set_tbgen_ccsr_offset $1
-    local ts10mshi=$(devmem $TBGEN_REG_MSTRCNTHI)
-    local ts10mslo=$(devmem $TBGEN_REG_MSTRCNTLO)
+    local ts10mshi=$(./utils/memrw r 32 $TBGEN_REG_MSTRCNTHI)
+    local ts10mslo=$(./utils/memrw r 32 $TBGEN_REG_MSTRCNTLO)
     local ts10ms=$(( $((ts10mshi << 32)) | ts10mslo ))
     echo $ts10ms
 }
@@ -182,16 +182,16 @@ set_tbgen_offset()
     local tdd_REG_MODE=$((tdd_REG_CTRL + 0xC))
     local tdd_REG_DURATION=$((tdd_REG_CTRL + 0x10))
 
-    devmem $tdd_REG_DURATION w 0x0
+    ./utils/memrw w 32 $tdd_REG_DURATION 0x0
 
     local tbgen_mode=$(get_tbgen_mode $3)
-    devmem $tdd_REG_MODE w $tbgen_mode
+    ./utils/memrw w 32 $tdd_REG_MODE $tbgen_mode
 
     offset=$4
-    devmem $tdd_REG_OSETHI w $((offset >> 32))
-    devmem $tdd_REG_OSETLO w $((offset & 0xffffffff))
+    ./utils/memrw w 32 $tdd_REG_OSETHI $((offset >> 32))
+    ./utils/memrw w 32 $tdd_REG_OSETLO $((offset & 0xffffffff))
 
-    devmem $tdd_REG_CTRL w 0x3
+    ./utils/memrw w 32 $tdd_REG_CTRL 0x3
 }
 
 get_pulse_length()
@@ -217,19 +217,19 @@ enable_dpd_hsadc()
     local tdd_REG_DURATION1=$((tdd_REG_CTRL + 0x14))
 
 	high_pusle_len=$(get_pulse_length)		 #set number of tbgen clocks for 8K samples
-    devmem $tdd_REG_DURATION0 w $high_pusle_len
-    devmem $tdd_REG_DURATION1 w $((($tbgen2_freq * OBS_PULSE_PERIOD / 1000) - high_pusle_len))		#Idle period = (10 sec - high_pulse_length)
-    echo devmem $tdd_REG_DURATION0 w $high_pusle_len
-    echo devmem $tdd_REG_DURATION1 w $((($tbgen2_freq * OBS_PULSE_PERIOD / 1000) - high_pusle_len))		#Idle period = (10 sec - high_pulse_length)
+    ./utils/memrw w 32 $tdd_REG_DURATION0 $high_pusle_len
+    ./utils/memrw w 32 $tdd_REG_DURATION1 $((($tbgen2_freq * OBS_PULSE_PERIOD / 1000) - high_pusle_len))		#Idle period = (10 sec - high_pulse_length)
+    echo ./utils/memrw w 32 $tdd_REG_DURATION0 $high_pusle_len
+    echo ./utils/memrw w 32 $tdd_REG_DURATION1 $((($tbgen2_freq * OBS_PULSE_PERIOD / 1000) - high_pusle_len))		#Idle period = (10 sec - high_pulse_length)
 
     local tbgen_mode=$(get_tbgen_mode "rx")
-    devmem $tdd_REG_MODE w $tbgen_mode
+    ./utils/memrw w 32 $tdd_REG_MODE $tbgen_mode
 
     offset=$2
-    devmem $tdd_REG_OSETHI w $((offset >> 32))
-    devmem $tdd_REG_OSETLO w $((offset & 0xffffffff))
+    ./utils/memrw w 32 $tdd_REG_OSETHI $((offset >> 32))
+    ./utils/memrw w 32 $tdd_REG_OSETLO $((offset & 0xffffffff))
 
-    devmem $tdd_REG_CTRL w 0x13
+    ./utils/memrw w 32 $tdd_REG_CTRL 0x13
     echo 'configured hsadc'
 }
 
@@ -237,20 +237,20 @@ put_hsadc_in_low_power_mode()
 {
 	tdd_REG_CTRL=`printf 0x%x $(get_tdd_ctrl "HS" 2)`
 	./utils/memrw w 32 $tdd_REG_CTRL 0x100
-	echo Put HSADC0 in low-power mode, devmem $tdd_REG_CTRL w 0x100
+	echo Put HSADC0 in low-power mode, ./utils/memrw w 32 $tdd_REG_CTRL 0x100
 
 	tdd_REG_CTRL=`printf 0x%x $(get_tdd_ctrl "HS" 3)`
 	./utils/memrw w 32 $tdd_REG_CTRL 0x100
-	echo Put HSADC1 in low-power mode, devmem $tdd_REG_CTRL w 0x100
+	echo Put HSADC1 in low-power mode, ./utils/memrw w 32 $tdd_REG_CTRL 0x100
 }
 
 get_hsadc_outof_low_power_mode()
 {
 	tdd_REG_CTRL=`printf 0x%x $(get_tdd_ctrl "HS" 2)`
-	echo Bring HSADC0 out of low power mode, devmem $tdd_REG_CTRL w 0x0
-	./utils/devmem $tdd_REG_CTRL w 0x0
+	echo Bring HSADC0 out of low power mode, ./utils/memrw w 32 $tdd_REG_CTRL 0x0
+	./utils/memrw w 32 $tdd_REG_CTRL 0x0
 
 	tdd_REG_CTRL=`printf 0x%x $(get_tdd_ctrl "HS" 3)`
-	echo Bring HSADC1 out of low power mode, devmem $tdd_REG_CTRL w 0x0
-	./utils/devmem $tdd_REG_CTRL w 0x0
+	echo Bring HSADC1 out of low power mode, ./utils/memrw w 32 $tdd_REG_CTRL 0x0
+	./utils/memrw w 32 $tdd_REG_CTRL 0x0
 }

@@ -81,7 +81,7 @@ do
 	[ $((read_ptr_fpga)) -ge $((lx2_addr_ifft_out_buf_base+size_ifft_out_buf)) ] && read_ptr_fpga=$lx2_addr_ifft_out_buf_base #cirlar buffer
 
 	echo Writing LA at PCI address $lx2_addr_ifft_out_buf_total_release_size with total release size $total_read_size
-	./utils/devmem $lx2_addr_ifft_out_buf_total_release_size w $total_read_size
+	./utils/memrw w 32 $lx2_addr_ifft_out_buf_total_release_size $total_read_size
 
 #sleep 1    #sleep here just for users to look at the log manually to understand the steps.  In FPGA implementation, it should wait until a block transmit time has passed.
 interation=$((interation+1))

@@ -119,9 +119,9 @@ noupdate=0
 if [ $from_file = 0 ];then
 	if ([ $inc = 0 ] || [ ! -f $save_filename ]);then
 		./utils/memset $addr_vir $num_coeff_word 0         #clear qec coeff memory, set to passthrough coeff
-		devmem $((addr_vir+34*4)) w 0x3F800000 #set f1
-		devmem $((addr_vir+36*4)) w 0x3F800000 #set f4
-		devmem $((addr_vir+37*4)) w 0x3F800000 #set gain real
+		./utils/memrw w 32 $((addr_vir+34*4)) 0x3F800000 #set f1
+		./utils/memrw w 32 $((addr_vir+36*4)) 0x3F800000 #set f4
+		./utils/memrw w 32 $((addr_vir+37*4)) 0x3F800000 #set gain real
 		[ $((flag_imb+flag_gain+flag_dc)) -eq 0 ] && { dis=1; echo $tagtxrx QEC coeff for antenna $ant is set to passthrough.; }
 	else
 		echo "Loading previous $tagtxrx QEC coeff to address $addr_vir for antenna $ant from file $save_filename..."
@@ -149,33 +149,33 @@ if [ $flag_imb = 1 ];then
 	else                  f124=(`echo $imb_db $imb_deg | awk '{gamma=10^($1/20); theta_z=$2*3.14159265/180; f1=1/gamma;      f2=sin(theta_z)/cos(theta_z)/gamma; f4=1/cos(theta_z); printf("%10.16f %10.16f %10.16f\n", f1,f2,f4);}'`)
 	fi
 	f124=(`./utils/hex2float -r ${f124[0]} ${f124[1]} ${f124[2]}`)
-	devmem $((addr_vir+34*4)) w ${f124[0]}; devmem $((addr_vir+35*4)) w ${f124[1]}; devmem $((addr_vir+36*4)) w ${f124[2]}
+	./utils/memrw w 32 $((addr_vir+34*4)) ${f124[0]} $((addr_vir+35*4)) ${f124[1]} $((addr_vir+36*4)) ${f124[2]}
 fi
-[ $flag_gain = 1 ] && { gain=(`./utils/hex2float -r $gain_re $gain_im`); devmem $((addr_vir+37*4)) w ${gain[0]}; devmem $((addr_vir+38*4)) w ${gain[1]}; }
-[ $flag_dc = 1 ] && { dc=(`./utils/hex2float -r $dc_re $dc_im`); devmem $((addr_vir+39*4)) w ${dc[0]}; devmem $((addr_vir+40*4)) w ${dc[1]}; }
+[ $flag_gain = 1 ] && { gain=(`./utils/hex2float -r $gain_re $gain_im`); ./utils/memrw w 32 $((addr_vir+37*4)) ${gain[0]} $((addr_vir+38*4)) ${gain[1]}; }
+[ $flag_dc = 1 ] && { dc=(`./utils/hex2float -r $dc_re $dc_im`); ./utils/memrw w 32 $((addr_vir+39*4)) ${dc[0]} $((addr_vir+40*4)) ${dc[1]}; }
 
-intdel=`devmem $((addr_vir+32*4))`; num_taps=`devmem $((addr_vir+33*4))`
+intdel=`./utils/memrw r 32 $((addr_vir+32*4))`; num_taps=`./utils/memrw r 32 $((addr_vir+33*4))`
 ([ $((num_taps)) -eq 0 ] || ([ $((num_taps)) -ge 6 ] && [ $((num_taps)) -le 16 ])) || { echo "***ERROR: Illegal QEC timing skew filter taps $((num_taps)), expected num taps must be 0 or between 6 and 16. command failed"; exit 1; }
 ([ $((intdel)) -eq 0 ] || [ $((intdel)) -lt $((num_taps)) ]) || { echo "***ERROR: Illegal integar delay $((intdel)), expected delay must be 0 or smaller than num of timing skew filter taps $((num_taps)). command failed"; exit 1; }
 
-[ $((dis+noupdate)) = 0 ] && { dumpfile $addr_vir $save_filename $((num_coeff_word*4)); echo "Updated coeff saved to file $save_filename"; }
+[ $((dis+noupdate)) = 0 ] && { [ -f $save_filename ] && rm $save_filename; dumpfile $addr_vir $save_filename $((num_coeff_word*4)); echo "Updated coeff saved to file $save_filename"; }
 
-f1=`devmem $((addr_vir+34*4))`
-f2=`devmem $((addr_vir+35*4))`
-f4=`devmem $((addr_vir+36*4))`
-gainI=`devmem $((addr_vir+37*4))`
-gainQ=`devmem $((addr_vir+38*4))`
-dcoffI=`devmem $((addr_vir+39*4))`
-dcoffQ=`devmem $((addr_vir+40*4))`
+f1=`./utils/memrw r 32 $((addr_vir+34*4))`
+f2=`./utils/memrw r 32 $((addr_vir+35*4))`
+f4=`./utils/memrw r 32 $((addr_vir+36*4))`
+gainI=`./utils/memrw r 32 $((addr_vir+37*4))`
+gainQ=`./utils/memrw r 32 $((addr_vir+38*4))`
+dcoffI=`./utils/memrw r 32 $((addr_vir+39*4))`
+dcoffQ=`./utils/memrw r 32 $((addr_vir+40*4))`
 
 if ([ $((vspa_image_version)) -ge $((0x500)) ] && [ $((gainQ)) -eq 0 ]);then
-	devmem $((addr_vir+38*4)) w $gainI  #set gain_Im = gain_re.
+	./utils/memrw w 32 $((addr_vir+38*4)) $gainI  #set gain_Im = gain_re.
 	gainQ=$gainI
 fi
-devmem $((addr_vir+41*4)) w $gainI  #backup used for scaling for non-optimized QEC
-devmem $((addr_vir+42*4)) w $gainQ
-devmem $((addr_vir+43*4)) w $dcoffI
-devmem $((addr_vir+44*4)) w $dcoffQ
+./utils/memrw w 32 $((addr_vir+41*4)) $gainI  #backup used for scaling for non-optimized QEC
+./utils/memrw w 32 $((addr_vir+42*4)) $gainQ
+./utils/memrw w 32 $((addr_vir+43*4)) $dcoffI
+./utils/memrw w 32 $((addr_vir+44*4)) $dcoffQ
 
 if [ $txqec_timing_skew = 0 ];then #when optimized QEC is used
 if [ $((vspa_image_version)) -ge $((0x501)) ];then
@@ -215,27 +215,27 @@ else
 fi
 
 if ([ $vspa_dev_type = LA9310 ] || [ $((vspa_image_version)) -lt $((0x501)) ]);then #LA9310 will convert struct in mailbox API
-devmem $((addr_vir+34*4)) w $f1
-devmem $((addr_vir+35*4)) w $f2
-devmem $((addr_vir+36*4)) w $f4
-devmem $((addr_vir+37*4)) w $gainI
-devmem $((addr_vir+38*4)) w $gainQ
-devmem $((addr_vir+39*4)) w $dcoffI
-devmem $((addr_vir+40*4)) w $dcoffQ
+./utils/memrw w 32 $((addr_vir+34*4)) $f1
+./utils/memrw w 32 $((addr_vir+35*4)) $f2
+./utils/memrw w 32 $((addr_vir+36*4)) $f4
+./utils/memrw w 32 $((addr_vir+37*4)) $gainI
+./utils/memrw w 32 $((addr_vir+38*4)) $gainQ
+./utils/memrw w 32 $((addr_vir+39*4)) $dcoffI
+./utils/memrw w 32 $((addr_vir+40*4)) $dcoffQ
 
 else #LA12xx needs converted struct from v501
-devmem $((addr_vir+0*4)) w $f1
-devmem $((addr_vir+1*4)) w $f4
-devmem $((addr_vir+2*4)) w 0
-devmem $((addr_vir+3*4)) w $f2
-devmem $((addr_vir+4*4)) w $dcoffI
-devmem $((addr_vir+5*4)) w $dcoffQ
-devmem $((addr_vir+6*4)) w $f1          #backup used for scaling for optimized QEC
-devmem $((addr_vir+7*4)) w $f4
-devmem $((addr_vir+8*4)) w 0
-devmem $((addr_vir+9*4)) w $f2
-devmem $((addr_vir+10*4)) w $dcoffI
-devmem $((addr_vir+11*4)) w $dcoffQ
+./utils/memrw w 32 $((addr_vir+0*4))  $f1
+./utils/memrw w 32 $((addr_vir+1*4))  $f4
+./utils/memrw w 32 $((addr_vir+2*4))  0
+./utils/memrw w 32 $((addr_vir+3*4))  $f2
+./utils/memrw w 32 $((addr_vir+4*4))  $dcoffI
+./utils/memrw w 32 $((addr_vir+5*4))  $dcoffQ
+./utils/memrw w 32 $((addr_vir+6*4))  $f1          #backup used for scaling for optimized QEC
+./utils/memrw w 32 $((addr_vir+7*4))  $f4
+./utils/memrw w 32 $((addr_vir+8*4))  0
+./utils/memrw w 32 $((addr_vir+9*4))  $f2
+./utils/memrw w 32 $((addr_vir+10*4)) $dcoffI
+./utils/memrw w 32 $((addr_vir+11*4)) $dcoffQ
 fi
 fi
 

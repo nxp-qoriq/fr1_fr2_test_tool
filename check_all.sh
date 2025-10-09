@@ -494,7 +494,7 @@ echo "Board Name              :  " "$board_name"
 echo "Number of enabled channels TX: $((num_T_LS_enabled+num_T_HS_enabled)),  RX: $((num_R_LS_enabled+num_R_HS_enabled))"
 echo "Number of Running channels TX: $num_running_chan_tx,  RX: $num_running_chan_rx "
 tagCPE=("BaseStation" "UE/CPE"); DUTRtag=("DL=TX UL=RX" "DL=RX UL=TX"); tagLPHY=("" "LowPHY Only"); tagDFE=("" "DFE only")
-cell_state=`./utils/devmem $test_tool_env_cell_state`
+cell_state=`./utils/memrw r 32 $test_tool_env_cell_state`
 echo "MODE: TX ${tag_tddfdd[tx_fdd]}, RX ${tag_tddfdd[rx_fdd]}, ${tagLPHY[lphy]} ${tagDFE[dfe_only]}  ${tagCPE[cpe]} (${DUTRtag[cpe]}), ${tag_UEMODE[$((cell_state))]}"
 if [ $((tx_fdd&rx_fdd)) = 0 ];then
 	echo -n "TDD PATTERN: "

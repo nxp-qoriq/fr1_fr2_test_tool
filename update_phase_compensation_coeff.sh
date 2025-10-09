@@ -139,8 +139,7 @@ do
 done
 tag="$txrx phase compensation coefficients set to passthrough on antenna $ant from address $addr_vir"
 fi
-
-dumpfile $addr_vir $coeff_filename $((expected_size)); echo Updated coeff saved to file $coeff_filename  #keep the coefficients to file
+[ -f $coeff_filename ] && rm $coeff_filename; dumpfile $addr_vir $coeff_filename $((expected_size)); echo Updated coeff saved to file $coeff_filename  #keep the coefficients to file
 
 [ "$input_scaling_factor" = "" ] && input_scaling_factor=`./utils/memrw r 32 $((test_tool_env_tx_scaling_input+ant*4))`
 ./utils/scale $((addr_vir)) $((addr_vir)) $((sym_num_1m/2*2)) $((input_scaling_factor)) float  #scaling

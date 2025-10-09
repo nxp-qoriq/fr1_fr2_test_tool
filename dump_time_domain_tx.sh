@@ -385,6 +385,7 @@ dump_1time()
 	dump_time_domain_tx_1time $txcore $tid $addr_phy $addr_vir $size_32KB_aligned $dpdo $obs $offset
 	[ $? -ne 0 ] && exit 1
 	[ $flag_deqec = 1 ] && [ $dpdo = 1 ] && { echo deqec; deqec $txcore $addr_vir $((size/4)); }
+	[ -f $dump_filename ] && rm $dump_filename
 	dumpfile $addr_vir $dump_filename $size
 	
 	if ([ $fast = 0 ] && [ $pow = 1 ]);then
@@ -419,17 +420,15 @@ dump_via_hram_mlti_times()
 		lsb=$(printf 0x%x $lsb)
 		flag_addr=$((addr_vir+size0-4))
 		[ $tx_fdd = 0 ] && clear_mem $addr_vir $size_hram
-		devmem $flag_addr w 0x1234abcd
+		./utils/memrw w 32 $flag_addr 0x1234abcd
 		vspa_mbox send $txcore $host_vspa_mbox_id $msb $lsb
 		wait_for_flag_change $flag_addr 0x1234abcd
 
 		if [ $mem = 0 ];then
-			dumpfile $addr_vir temp_dump.bin $size1
-			cat temp_dump.bin >> $dump_filename
+			dumpfile $addr_vir $dump_filename $size1   #dumpfile will append data to file
 		fi
 	done
 	echo 100%
-	[ $mem = 0 ] && rm temp_dump.bin
 }
 
 if [ $dump_via_hram = 1 ];then 	

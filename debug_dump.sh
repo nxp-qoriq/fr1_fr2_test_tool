@@ -62,11 +62,10 @@ ippuaddr=`printf 0x%08x $ippuaddr`
 ((ipaddr=modembase_phy+0x1000000+coreid*0x4000))
 ipaddr=`printf 0x%08x $ipaddr`
 dump_filename=vspa_core$coreid\_dump_$2.bin
-log=`./utils/bin2mem -f $dump_filename -a $vcpuaddr -r $((VCPUDMEM_SIZE))`
-log=`./utils/bin2mem -f debug_dump_temp.bin -a $ippuaddr -r $((IPPUDMEM_SIZE))`
-cat debug_dump_temp.bin >> $dump_filename
-log=`./utils/bin2mem -f debug_dump_temp.bin -a $ipaddr -r 16384`
-cat debug_dump_temp.bin >> $dump_filename
+[ -f $dump_filename ] && rm $dump_filename
+log=`./utils/loadmem $dump_filename $vcpuaddr -r $((VCPUDMEM_SIZE))`
+log=`./utils/loadmem $dump_filename $ippuaddr -r $((IPPUDMEM_SIZE))`
+log=`./utils/loadmem $dump_filename $ipaddr -r 16384`
 checksum=`md5sum $dump_filename`
 checksum=${checksum:0:32}
 echo "VSPA CORE$coreid dump done to file:$dump_filename", md5sum $checksum
@@ -80,7 +79,8 @@ ext_log_buf_phy=`get_wordvalue_from_vspa $coreid $ext_log_buf_base`
 ext_log_buf_sz=`get_wordvalue_from_vspa $coreid $ext_log_buf_size`
 if [ $((ext_log_buf_sz)) -ne 0 ];then
 start_addr_host=`phy2vir $ext_log_buf_phy`
-log=`./utils/bin2mem -f vspa_core$coreid\_exttrace_dump_$2.bin -a $start_addr_host -r $((ext_log_buf_sz))`
+[ -f vspa_core$coreid\_exttrace_dump_$2.bin ] && rm vspa_core$coreid\_exttrace_dump_$2.bin
+log=`./utils/loadmem vspa_core$coreid\_exttrace_dump_$2.bin $start_addr_host -r $((ext_log_buf_sz))`
 echo "VSPA CORE$coreid exttrace dump done to file:vspa_core$coreid\_exttrace_dump_$2.bin"
 
 #echo Parsing trace and log into text file... This may take a while, press CTRL+C to abort...
@@ -138,13 +138,18 @@ done
 [ $((feca_dump|vspa_dump)) -eq 0 ] && vspa_dump=1
 
 if [ $vspa_dev_type = LA9310 ];then
-	log=`./utils/bin2mem -f tcm_dump_$tag.bin -a $HRAMaddr_vir -r $((HRAM_size))`; echo "TCM        dump done to file:tcm_dump_$tag.bin"
+	[ -f tcm_dump_$tag.bin ] && rm tcm_dump_$tag.bin
+	log=`./utils/loadmem tcm_dump_$tag.bin $HRAMaddr_vir -r $((HRAM_size))`; echo "TCM        dump done to file:tcm_dump_$tag.bin"
 elif [ $feca_dump = 1 ];then
 	feca_addr=$((modembase_phy+0x1040000))
-	log=`./utils/bin2mem -f fram_dump_$tag.bin -a $FRAMaddr_vir -r $((FRAM_size))`; echo "FECA FRAM  dump done to file:fram_dump_$tag.bin"
-	log=`./utils/bin2mem -f feca_dump_$tag.bin -a $feca_addr -r 4096`; echo "FECA REG   dump done to file:feca_dump_$tag.bin"
-	log=`./utils/bin2mem -f hram_dump_$tag.bin -a $HRAMaddr_vir -r $((HRAM_size))`; echo "HRAM       dump done to file:hram_dump_$tag.bin"
-	log=`./utils/bin2mem -f pebm_dump_$tag.bin -a $PEBaddr_vir -r $((PEB_size))`; echo "PEBM       dump done to file:pebm_dump_$tag.bin"
+	[ -f fram_dump_$tag.bin ] && rm fram_dump_$tag.bin
+	[ -f feca_dump_$tag.bin ] && rm feca_dump_$tag.bin
+	[ -f hram_dump_$tag.bin ] && rm hram_dump_$tag.bin
+	[ -f pebm_dump_$tag.bin ] && rm pebm_dump_$tag.bin
+	log=`./utils/loadmem fram_dump_$tag.bin $FRAMaddr_vir -r $((FRAM_size))`; echo "FECA FRAM  dump done to file:fram_dump_$tag.bin"
+	log=`./utils/loadmem feca_dump_$tag.bin $feca_addr -r 4096`; echo "FECA REG   dump done to file:feca_dump_$tag.bin"
+	log=`./utils/loadmem hram_dump_$tag.bin $HRAMaddr_vir -r $((HRAM_size))`; echo "HRAM       dump done to file:hram_dump_$tag.bin"
+	log=`./utils/loadmem pebm_dump_$tag.bin $PEBaddr_vir -r $((PEB_size))`; echo "PEBM       dump done to file:pebm_dump_$tag.bin"
 fi
 
 if [ $vspa_dump = 1 ];then
@@ -154,7 +159,7 @@ slave_core=(0 0 0 0 0 0 0 0)
 one_dfe_core=$INVALID_CORE
 for ((i=0;i<NUM_CORES;i++))
 do
-	swversion=`./utils/devmem $((modembase_phy+0x1000000+i*0x4000+4)) w`
+	swversion=`./utils/memrw r 32 $((modembase_phy+0x1000000+i*0x4000+4))`
 	((swversion_iden=swversion>>16))
 	if [ $((swversion_iden)) -eq $((0xDFEF)) ];then
 		((swversion_allcore=swversion_allcore|swversion))
@@ -177,6 +182,5 @@ do
 	fi
 done
 
-rm debug_dump_temp.bin
 echo
 fi

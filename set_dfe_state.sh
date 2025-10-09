@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2024 NXP
+# Copyright 2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -86,11 +86,11 @@ sign_convert()
 
 [ $state != track ] && [ $state != $CELL_STATE_SEARCH ] && [ $((tx_fdd|rx_fdd)) -eq 0 ] && check_ant_enable_tx $ant
 check_ant_enable_rx $ant
-cell_state_pre=`./utils/devmem $test_tool_env_cell_state`
+cell_state_pre=`./utils/memrw r 32 $test_tool_env_cell_state`
 if [ $state != track ];then
 	[ $((cell_state_pre)) = $state ] && { echo -e "DFE is already in current state\n"; exit 1; }
 	([ $((cell_state_pre)) != $CELL_STATE_ATTACH ] && [ $state = $CELL_STATE_NORMAL ]) && { echo -e "Set cell state to ATTACH first before setting to NORMAL.\n"; exit 1; }
-	./utils/devmem $test_tool_env_cell_state w $state
+	./utils/memrw w 32 $test_tool_env_cell_state $state
 else
 	[ $((cell_state_pre)) = $CELL_STATE_SEARCH ] && { echo -e "Current state is SEARCH, can not do cell tracking.\n"; exit 1; }
 	[ $((cell_state_pre)) = $CELL_STATE_STOPPED ] && { echo -e "Current state is STOPPED, can not do cell tracking.\n"; exit 1; }
@@ -138,8 +138,8 @@ elif [ $state = $CELL_STATE_ATTACH ];then
 	./utils/memset `phy2vir $tx_sym_queue_base` $((tx_sym_queue_size/4)) 0
 
 	echo Setting DFE MODE option8 bit to set TX in Time Domain.
-	msb=`devmem $((test_tool_env_dfe_mode_msg+txcore*8+0))`
-	lsb=`devmem $((test_tool_env_dfe_mode_msg+txcore*8+4))`
+	msb=`./utils/memrw r 32 $((test_tool_env_dfe_mode_msg+txcore*8+0))`
+	lsb=`./utils/memrw r 32 $((test_tool_env_dfe_mode_msg+txcore*8+4))`
 	msb=$((msb|DFE_MODE_OPTION8))
 	vspa_mbox_ifsend $txcore $host_vspa_mbox_id $msb $lsb
 	
@@ -159,7 +159,7 @@ elif [ $state = $CELL_STATE_ATTACH ];then
 	
 	else
 	./channels_start.sh restart option8 rt
-	./utils/devmem $test_tool_env_cell_state w $state
+	./utils/memrw w 32 $test_tool_env_cell_state $state
 	fi
 
 	echo -e "\n ${GREEN} DFE state has changed to $tag_state state. Run ./check_all.sh to see current status."
@@ -173,8 +173,8 @@ elif [ $state = $CELL_STATE_NORMAL ];then
 	./utils/memset `phy2vir $tx_sym_queue_base` $((tx_sym_queue_size/4)) 0
 	
 	echo Restoring DFE MODE to original state.
-	msb=`devmem $((test_tool_env_dfe_mode_msg+txcore*8+0))`
-	lsb=`devmem $((test_tool_env_dfe_mode_msg+txcore*8+4))`
+	msb=`./utils/memrw r 32 $((test_tool_env_dfe_mode_msg+txcore*8+0))`
+	lsb=`./utils/memrw r 32 $((test_tool_env_dfe_mode_msg+txcore*8+4))`
 	vspa_mbox_ifsend $txcore $host_vspa_mbox_id $msb $lsb
 	echo Starting to play waveform
 	log=`./inject_freq_domain_tx.sh $ant` #to start playing default waveform
@@ -195,7 +195,7 @@ elif [ $state = $CELL_STATE_NORMAL ];then
 	
 	else
 	./channels_start.sh restart
-	./utils/devmem $test_tool_env_cell_state w $state
+	./utils/memrw w 32 $test_tool_env_cell_state $state
 	fi
 
 	echo -e "\n${GREEN}DFE state has changed to $tag_state state. Run ./check_all.sh to see current status.${NC} \n"
@@ -204,7 +204,7 @@ else
 extbuf_phy=$celltrack_extbuf_base
 extbuf_vir=`phy2vir $extbuf_phy`
 
-devmem $((extbuf_vir+0)) w 0xFFFFFFFF	#set flag before sending cell tracking request
+./utils/memrw w 32 $((extbuf_vir+0)) 0xFFFFFFFF	#set flag before sending cell tracking request
 echo send_celltrack_cmd $rxcore $ssb_period $ssb_sym_id $ssb_re_offset $nid2 $nid1
 send_celltrack_cmd $rxcore $ssb_period $ssb_sym_id $ssb_re_offset $nid2 $nid1
 echo !! Cell Tracking request sent. Cell Tracking result: !!

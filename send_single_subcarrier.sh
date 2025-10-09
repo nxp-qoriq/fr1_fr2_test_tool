@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -71,7 +71,7 @@ get_chan_para $ant $txcore
 
 addr_vir=`phy2vir ${addr_tx_wv[$ant]}`
 if [ $add = 1 ];then
-	./utils/devmem $((addr_vir + (sym_size/2+index)*4 )) w $value
+	./utils/memrw w 32 $((addr_vir + (sym_size/2+index)*4 )) $value
 	echo "Sending multiple single sub carriers, adding new subcarrier $index * $scs Khz with specified sample value $value on antenna $ant"
 	exit 0;
 fi
@@ -79,7 +79,7 @@ fi
 if [ $stopping = 0 ]; then
 	log=`./inject_freq_domain_tx.sh $ant nsym=1`   #sending 1 symbol repeatedly
 	./utils/memset $addr_vir $sym_size 0  #clear the symbol to all 0
-	./utils/devmem $((addr_vir + (sym_size/2+index)*4 )) w $value
+	./utils/memrw w 32 $((addr_vir + (sym_size/2+index)*4 )) $value
 	echo "Sending single sub carrier $index * $scs Khz with specified sample value $value on antenna $ant"
 else
 	./update_test_vector.sh $ant

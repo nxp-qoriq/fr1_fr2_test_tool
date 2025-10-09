@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -65,21 +65,21 @@ fi
 
 flag_invalid=0x1234abcd
 
-devmem $addr_vir w $flag_invalid  #clear SINAD buffer
+./utils/memrw w 32 $addr_vir $flag_invalid  #clear SINAD buffer
 
 if [ $fast = 0 ];then
-echo devmem $addr_vir w $flag_invalid
+echo ./utils/memrw w 32 $addr_vir $flag_invalid
 echo vspa_mbox send $rxcore $host_vspa_mbox_id $msb $lsb
 fi
 
 vspa_mbox send $rxcore $host_vspa_mbox_id $msb $lsb
 
 addrQ=`printf "0x%08x" $((addr_vir+4))`
-sinadI=`devmem $addr_vir w`
+sinadI=`./utils/memrw r 32 $addr_vir`
 counter=1000
 while [ $((sinadI)) -eq $((flag_invalid)) ]
 do
-	sinadI=`devmem $addr_vir w`
+	sinadI=`./utils/memrw r 32 $addr_vir`
 	((counter--))
 	[ $counter -eq 0 ] && { echo "*** ERROR: VSPA response timeout, command failed."; echo; exit; }
 done
@@ -95,17 +95,17 @@ echo
 
 echo SINA measurement result:
 addr_test1=`printf "0x%08x" $((addr_vir+8))`
-echo Noise Win Start = $((`devmem $addr_test1 w`))
+echo Noise Win Start = $((`./utils/memrw r 32 $addr_test1`))
 addr_test2=`printf "0x%08x" $((addr_vir+12))`
-echo "Noise Win End   "= $((`devmem $addr_test2 w`))
+echo "Noise Win End   "= $((`./utils/memrw r 32 $addr_test2`))
 addr_test3=`printf "0x%08x" $((addr_vir+16))`
-echo "Signal Start    "= $((`devmem $addr_test3 w`))
+echo "Signal Start    "= $((`./utils/memrw r 32 $addr_test3`))
 addr_test4=`printf "0x%08x" $((addr_vir+20))`
-echo "Signal Len      "= $((`devmem $addr_test4 w`))
+echo "Signal Len      "= $((`./utils/memrw r 32 $addr_test4`))
 
 fi
 
 echo SINAD_I at address: $addr_vir, Q at address $addrQ, data type is 32-bit float little endian.
-echo "SINAD_I: $(eval "./utils/hex2float $(devmem $addr_vir)")"
-echo "SINAD_Q: $(eval "./utils/hex2float $(devmem $addrQ)")"
+echo "SINAD_I: $(eval "./utils/hex2float $(./utils/memrw r 32 $addr_vir)")"
+echo "SINAD_Q: $(eval "./utils/hex2float $(./utils/memrw r 32 $addrQ)")"
 echo

@@ -194,6 +194,7 @@ dump_1time()
 		addr_vir_ant=$((addr_vir+i*size_32KB_aligned_per_ant))
 		if [ $mem = 0 ];then
 			dump_filename=$dump_filename0${sync_dump_ant[i]}.bin
+			[ -f $dump_filename ] && rm $dump_filename
 			dumpfile $addr_vir_ant $dump_filename $size
 			echo "Antenna ${sync_dump_ant[i]} dumping done, size:$size, address:`printf 0x%x $addr_vir_ant`, file:$dump_filename"
 			[ $fast = 0 ] && { md5sum_check ${sync_dump_ant[i]} $dump_filename; check_error_ant ${sync_dump_ant[i]}; }
@@ -230,7 +231,7 @@ dump_via_hram_mlti_times()
 		[ $fast = 0 ] && echo -n "$(($i*100/num_loop))%"
 		msb=`printf "0x%08x" $((0x0A180000 + (tid<<15) + (dcm<<13) + (offset_granul<<8) + i))`
 		[ $tx_fdd = 0 ] && clear_mem $start_hram_vir $size_hram
-		devmem $flag_addr w 0x1234abcd
+		./utils/memrw w 32 $flag_addr 0x1234abcd
 		
 		vspa_mbox send $rxcore $host_vspa_mbox_id $msb $lsb;
 		wait_for_flag_change $flag_addr 0x1234abcd
@@ -241,13 +242,11 @@ dump_via_hram_mlti_times()
 		fi
 		
 		if [ $mem = 0 ];then
-			dumpfile $start_hram_vir temp_dump.bin $size0
-			cat temp_dump.bin >> $dump_filename
+			dumpfile $start_hram_vir $dump_filename $size0
 		fi
 	done
 	[ $fast = 0 ] && echo 100%
 	if [ $mem = 0 ];then 
-		rm temp_dump.bin; 
 		echo Antenna $ant dumping done, size:$size, file:$dump_filename
 		[ $fast = 0 ] && { md5sum_check $ant $dump_filename; check_error_ant $ant; }
 	else 

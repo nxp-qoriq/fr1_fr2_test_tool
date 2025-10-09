@@ -18,9 +18,9 @@ print_usage()
 echo "usage: ./boot.sh <vspa_images_file_folder_name> [e200/m4_image_name] [obs983|obs1966] [lsdiv2] [hsdiv2]"
 echo "    vspa_images_file_folder_name: one of the vspa image folder names provided in test tool in which vspa images will be used for boot."
 echo "    e200/m4_image_name: e200 or m4 image filename in /lib/firmware/ which will be used for boot. If this is not specified, geul_e200_rudemo.elf will be used."
-echo "    obs983|obs1966:  enable observation channel on HSADC with sampling rate 1.9G or 983 Msps."
 echo "                     If users want to use their own e200 image, specify the file name here. Note that if users run TDD mode and use their own e200 image,"
 echo "                     their e200 must have the capability to configure TBGEN to control DCS to work in required TDD mode/pattern,"
+echo "    obs983|obs1966:  enable observation channel on HSADC with sampling rate 1.9G or 983 Msps."
 echo "    lsdiv2: 	divide LS DAC sampling rate by 2. valid only when DAC sampling rate is double of ADC sampling rate"
 echo "    hsdiv2: 	divide HS DAC&ADC sampling rate by 2. valid only when DAC/ADC sampling rate is 1.9Gsps"
 echo "    example: ./boot.sh MEvspa_images_LS.4T4R_100M_30K_491_245_TDDFDD		will boot VSPA with the images from this folder"
@@ -292,7 +292,7 @@ else
 	tag="\nNo. of LA12xx Modem Detected: $modem_num \nNext step: run ./channels_start.sh\n"
 fi
 boot_cmd_hist=0
-source ./boot_vspa_log.txt
+[ -f ./boot_vspa_log.txt ] && source ./boot_vspa_log.txt
 echo -e "boot_cmd_hist=\"$boot_cmd\"\nvspa_image_folder_name=$arg\nobs_sps=$obs_sps\n" > ./boot_vspa_log.txt
 rm backup_filter_coeff*.bin > /dev/null 2>&1  #remove leftover files from previous image
 [ "$boot_cmd_hist" != "$boot_cmd" ] && { echo Different boot from previous boot, remove runtime_config.txt; rm runtime_config.*  > /dev/null 2>&1; } #keep runtime config if boot arg is same, this will allow user app boot to use test tool commands for debugging
@@ -325,8 +325,8 @@ if [ $lshs1 = LS ];then
 elif [ $lshs1 = HS ];then
 	update_env_bandwidth_hs $(((bandwidth1_ori<<16)|bandwidth1)) $scs1 $(((dac1_sps+1)*1000/30720*30720)) $(((adc1_sps+1)*1000/30720*30720))
 fi
-echo -e "\nParameters configured by boot:\nBandwidth: $bandwidth Mhz, SCS $scs Khz\nDAC SPS:   $dac_sps MSPS\nADC SPS:   $adc_sps MSPS"
-[ $bandwidth1 -ne 0 ] && echo -e "\nParameters configured by boot:\nBandwidth: $bandwidth1 Mhz, SCS $scs1 Khz\nDAC SPS:   $dac1_sps MSPS\nADC SPS:   $adc1_sps MSPS"
+echo -e "\n$lshs Parameters configured by boot:\nBandwidth: $bandwidth Mhz, SCS $scs Khz\nDAC SPS:   $dac_sps MSPS\nADC SPS:   $adc_sps MSPS"
+[ $bandwidth1 -ne 0 ] && echo -e "\n$lshs1 Parameters configured by boot:\nBandwidth: $bandwidth1 Mhz, SCS $scs1 Khz\nDAC SPS:   $dac1_sps MSPS\nADC SPS:   $adc1_sps MSPS"
 echo -e "$tag"
 
 mkdir -p /usr/local/etc

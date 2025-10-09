@@ -33,7 +33,7 @@ swversion=0; swversion_allcore=0
 for ((i=0;i<NUM_CORES;i++))
 do
 		swverion_addr=$((modembase_phy+0x1000000+i*0x4000+4))
-		swverion_value=`./utils/devmem $swverion_addr w`
+		swverion_value=`./utils/memrw r 32 $swverion_addr`
 		if [ $((swverion_value>>16)) -eq $((0xdfef)) ];then
 			((swversion=swverion_value))
 			((swversion_allcore=swversion_allcore|swversion))

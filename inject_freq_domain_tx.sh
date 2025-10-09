@@ -67,8 +67,8 @@ if [ $((vspa_image_version)) -le $((0x456)) ];then
 	msb=`printf "0x%08x" $((0x0A112000 + (tid<<15)))`
 	inject_freq_domain_tx_stop $txcore $host_vspa_mbox_id $msb 0
 else
-	msb=`devmem $((test_tool_env_buf_struct_msg+txcore*8+0))`
-	lsb=`devmem $((test_tool_env_buf_struct_msg+txcore*8+4))`
+	msb=`./utils/memrw r 32 $((test_tool_env_buf_struct_msg+txcore*8+0))`
+	lsb=`./utils/memrw r 32 $((test_tool_env_buf_struct_msg+txcore*8+4))`
 	vspa_mbox_ifsend $txcore $host_vspa_mbox_id $msb $lsb  #send buf struct msg to restore tx symbol buffer
 fi
 echo -e "Injecting freq domain waveform on ant $ant has stopped. Sending from TX symbol buffers.\n"

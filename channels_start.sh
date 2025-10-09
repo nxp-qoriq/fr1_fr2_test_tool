@@ -86,8 +86,8 @@ measure_tbgen_clock_end()
 enable_hsadc_fdd()
 {
 	get_hsadc_outof_low_power_mode
-	./utils/devmem $((modembase_phy+0x1124450)) w 0x100
-	./utils/devmem $((modembase_phy+0x11244a0)) w 0x100
+	./utils/memrw w 32 $((modembase_phy+0x1124450)) 0x100
+	./utils/memrw w 32 $((modembase_phy+0x11244a0)) 0x100
 }
 
 stop_dcs_fdd()
@@ -108,7 +108,7 @@ one_dfe_core=$INVALID_CORE
 swversion_allcore=0
 for ((i=0;i<NUM_CORES;i++))
 do
-	swversion=`./utils/devmem $((modembase_phy+0x1000000+i*0x4000+4)) w`
+	swversion=`./utils/memrw r 32 $((modembase_phy+0x1000000+i*0x4000+4))`
 	((swversion_iden=swversion>>16))
 	if [ $((swversion_iden)) -eq $((0xDFEF)) ];then
 		((swversion_allcore=swversion_allcore|swversion))
@@ -271,7 +271,7 @@ if [ $size_inject -ne 0 ];then
 fi
 
 if [ $vspa_dev_type = LA9310 ];then
-m4_version=`devmem $hif_vir`
+m4_version=`./utils/memrw r 32 $hif_vir`
 m4_version=`HEX $(( ((m4_version&0xFFFF)<<4)|((m4_version>>16)&0xF) ))`
 required_m4_version=0x00041
 if [ $((m4_version)) -lt $((required_m4_version)) ];then
@@ -282,7 +282,7 @@ cpe=1                      #DFE on LA9310 is UE/CPE by default
 [ -f /usr/bin/dpdk-dfe_app ] || { echo "***ERROR: missing /usr/bin/dpdk-dfe_app. You are using old BSP, upgrade to BSP 0.4 or above, or build /usr/bin/dpdk-dfe_app by yourself."; channels_start_fail; }
 fi
 
-./utils/devmem $test_tool_env_cell_state w $cell_state #set cell state to env
+./utils/memrw w 32 $test_tool_env_cell_state $cell_state #set cell state to env
 
 if [ $cell_state = $CELL_STATE_SEARCH ];then
 	[ $cpe = 0 ] && { echo ***ERROR: Basestation mode does not support cell search; channels_start_fail; }
@@ -341,9 +341,9 @@ do
 done
 echo
 
-lsdiv2=`./utils/devmem $test_tool_env_lsdiv2`
-hsdiv2=`./utils/devmem $test_tool_env_hsdiv2`
-bwdiv=`./utils/devmem $test_tool_env_bwdiv`
+lsdiv2=`./utils/memrw r 32 $test_tool_env_lsdiv2`
+hsdiv2=`./utils/memrw r 32 $test_tool_env_hsdiv2`
+bwdiv=`./utils/memrw r 32 $test_tool_env_bwdiv`
 
 
 
@@ -429,7 +429,7 @@ if [ $flag_dfe_initialized = 0 ];then   #restart handling
 	./utils/memset $test_tool_env_tx_scaling_input $NUM_ANTS 100  #set only at first time start
 	./utils/memset $test_tool_env_tx_scaling_output $NUM_ANTS 100
 	./utils/memset $test_tool_env_rx_scaling $NUM_ANTS 100
-	boot_flag=`./utils/devmem $test_tool_env_boot_vspa_ind`
+	boot_flag=`./utils/memrw r 32 $test_tool_env_boot_vspa_ind`
 	if [ $((boot_flag)) -ne $((0x1234abcd)) ];then
 		str="***WARNING: VSPA images were not booted by ./boot_vspa.sh, critical issues may occur during test.\n              Suggest to always boot VSPA images with ./boot_vspa.sh"
 		echo -e "$str"; warning_list="$warning_list$str\n"
@@ -445,7 +445,7 @@ elif [ $((txrestart|rxrestart)) -eq 0 ];then
 	fi
 else
 	echostr="Restarting VSPA cores."
-	tx_fdd_pre=`./utils/devmem $test_tool_env_fdd_mode_pre` #get previous fdd mode.
+	tx_fdd_pre=`./utils/memrw r 32 $test_tool_env_fdd_mode_pre` #get previous fdd mode.
 	
 	if ([ $((tx_fdd_pre)) = 0 ] && [ $vspa_dev_type = LA9310 ]);then
 		dpdk-dfe_app -c "tdd stop"  #stop TDD first if previous mode is TDD, and do not restart vspa
@@ -453,7 +453,7 @@ else
 	for ((i=0;i<NUM_CORES;i++)) #restart cores
 	do
 		if [ $((dfe_core[i])) -eq 1 ];then
-			swversion=`./utils/devmem $((modembase_phy+0x1000000+i*0x4000+4)) w`
+			swversion=`./utils/memrw r 32 $((modembase_phy+0x1000000+i*0x4000+4))`
 			if [ $(((swversion>>12)&1)) -eq 1 ];then
 				echostr="${echostr} $i "   #restart each core if it's initialized
 				dfe_mode_msb=$((`./utils/memrw r 32 $((test_tool_env_dfe_mode_msg+i*8+0))` | 0x00300000))  #set restart bits
@@ -463,7 +463,7 @@ else
 				sleep 0.1
 				[ $msg_recv_flag = 0 ] && vspa_mbox_ifrecv $i $host_vspa_mbox_id
 				([ $msg_recv_flag = 0 ] || ([ $((msg_recv_msb32&0xFF000000)) -ne $((0x0F000000)) ] && [ $((msg_recv_msb32)) -ne $((0xF1000000)) ])) && { echo "***ERROR: VSPA core $i did not respond to restart msg."; channels_start_fail; }
-				flag_dfe_initialized=$(((`./utils/devmem $((modembase_phy+0x1000000+i*0x4000+4)) w` >>12)&1))
+				flag_dfe_initialized=$(((`./utils/memrw r 32 $((modembase_phy+0x1000000+i*0x4000+4))` >>12)&1))
 				[ $flag_dfe_initialized -ne 0 ] && { echo -e "***ERROR: VSPA core $i restart failure, can not enter initialization stage\n"; channels_start_fail; }
 				echo Core $i restarted from initialized stage to expected un-initialized state.
 				[ $dbg = 1 ] && { ./utils/view_vspa_reg.sh $((slave_core[i])) dma; ./utils/view_vspa_reg.sh $((slave_core[i])) axiq; }
@@ -530,7 +530,7 @@ fi
 #echo PCI Outbound Window 3 is already configured by BSP as below:
 # 
 #fi
-#./utils/devmem5 r 0x1b400900 0x1b40091f w 
+#./utils/loadmem null 0x1b400900 -r 32 
 #fi
 
 
@@ -556,7 +556,7 @@ fi
 
 
 #build TDD pattern msg from config.dat
-./utils/devmem $test_tool_env_fdd_mode_pre w $((tx_fdd|dcsfdd))  #keep current fdd mode to env
+./utils/memrw w 32 $test_tool_env_fdd_mode_pre $((tx_fdd|dcsfdd))  #keep current fdd mode to env
 
 dpd_model_get_para
 if [ $((dpd_model_id)) -eq 7 ]; then
@@ -798,7 +798,7 @@ one_enabled_dfe_core=0
 						if [ $no_wv_load = 0 ];then
 						[ $fast = 0 ] && print_msg="${print_msg}Loading Input waveform file $invecfile $numload times to address $invec_addr_vir1 with size $invecsize for ant$txant\n"
 						loadfile $invec_addr_vir1 $invecfile $loadsize
-						echo "./utils/bin2mem -a $invec_addr_vir1 -f $invecfile" >> ./command_init.sh
+						echo "./utils/loadmem $invecfile $invec_addr_vir1 $loadsize" >> ./command_init.sh
 						fi
 						invec_addr_vir1=`printf 0x%x $((invec_addr_vir1+loadsize))`
 					done
@@ -1042,7 +1042,7 @@ one_enabled_dfe_core=0
 
 		
 		#check vspa initialized status
-		swversion=`./utils/devmem $((modembase_phy+0x1000000+core*0x4000+4)) w`
+		swversion=`./utils/memrw r 32 $((modembase_phy+0x1000000+core*0x4000+4))`
 		((flag_dfe_initialized=(swversion>>12)&1))
 		if [ $flag_dfe_initialized = 0 ];then
 			echo -e "$print_msg"
@@ -1098,7 +1098,7 @@ one_enabled_dfe_core=0
 	echo -e "invecfile_ori=(${invecfile_ori[@]}); invecfile_cur=(${invecfile_cur[@]}); invecsize_exp=(${invecsize_exp[@]})\ndcs_enable=(${dcs_enable[@]}); ant_enable=(${ant_enable[@]})" >> ./runtime_config.txt
 	echo -e "test_vector_on_hram=$test_vector_on_hram; next_HRAMaddr_phy=$next_HRAMaddr_phy\naddr_tx_test_vector=$addr_tx_test_vector; size_tx_test_vector=$size_tx_test_vector; addr_tx_wv=(${addr_tx_wv[@]})\naddr_inject=$addr_inject; size_inject=$size_inject; addr_dump=$addr_dump; addr_dump_vir=$addr_dump_vir; size_dump=$size_dump; end_ddr=$end_ddr " >> ./runtime_config.txt
 
-	./utils/devmem $test_tool_env_boot_vspa_ind w 0 #channels already started here, clear the vspa boot flag.
+	./utils/memrw w 32 $test_tool_env_boot_vspa_ind 0 #channels already started here, clear the vspa boot flag.
 	
 	for((ant=0;ant<NUM_ANTS;ant++))
 	do
@@ -1446,15 +1446,15 @@ else #LA12xx
 		fi
 		
 		one_enabled_dcsid_ctrl_reg=$(get_tdd_ctrl ${TAG_LSHS[$one_enabled_dcsid_by_l1c]} $((one_enabled_dcsid_by_l1c%4)) )
-		one_enabled_dcsid_ctrl_reg_v=`./utils/devmem $one_enabled_dcsid_ctrl_reg`
+		one_enabled_dcsid_ctrl_reg_v=`./utils/memrw r 32 $one_enabled_dcsid_ctrl_reg`
 		wait_count=1000
 		while ([ $((one_enabled_dcsid_ctrl_reg_v&1)) -eq 0 ] && [ $wait_count -ne 0 ])
 		do
-			one_enabled_dcsid_ctrl_reg_v=`./utils/devmem $one_enabled_dcsid_ctrl_reg`
+			one_enabled_dcsid_ctrl_reg_v=`./utils/memrw r 32 $one_enabled_dcsid_ctrl_reg`
 			wait_count=$((wait_count-1))
 			[ $wait_count -eq 0 ] && { echo Timeout waiting e200 L1C TDD logic to enable DCS.; channels_start_fail; }
 		done
-		l1c_startoffset=$(( (`./utils/devmem $((one_enabled_dcsid_ctrl_reg+4))`<<32) | `./utils/devmem $((one_enabled_dcsid_ctrl_reg+8))`))
+		l1c_startoffset=$(( (`./utils/memrw r 32 $((one_enabled_dcsid_ctrl_reg+4))`<<32) | `./utils/memrw r 32 $((one_enabled_dcsid_ctrl_reg+8))`))
 		echo "l1c will start from TBGEN master counter offset $(printf 0x%x $l1c_startoffset)"
 		echo Waiting till tbgen start for l1c...; wait_till_tbgen_tick ${TAG_LSHS[$one_enabled_dcsid_by_l1c]} $((l1c_startoffset+1*tbgen1_freq))
 

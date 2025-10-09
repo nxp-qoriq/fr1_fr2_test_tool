@@ -98,16 +98,17 @@ else
 fi
 echo Clearing memory from $addr_vir with size $size_file...
 clear_mem $addr_vir $size_file
-dumpfile $addr_vir temp.bin $size_file
-tempmd5sum=`md5sum temp.bin`
+[ -f $filename ] && rm $filename
+dumpfile $addr_vir $filename $size_file
+tempmd5sum=`md5sum $filename`
 tempmd5sum=${tempmd5sum:0:32}
-rm temp.bin
+
 msb=`printf "0x%08x" $msb`
 lsb=`printf "0x%08x" $lsb`
 vspa_mbox_ifsend $core $host_vspa_mbox_id $msb $lsb
 echo vspa_mbox send $core $host_vspa_mbox_id $msb $lsb
 sleep 0.1
-dumpfile $addr_vir $filename $size_file
+[ -f $filename ] && rm $filename; dumpfile $addr_vir $filename $size_file
 echo Antenna $ant done: Dumped to address $addr_vir with size $size_file, file: $filename
 
 #check dump data correctness
@@ -115,7 +116,7 @@ checksum=`md5sum $filename`
 checksum=${checksum:0:32}
 echo md5checksum: $checksum
 if [ $tempmd5sum = $checksum ];then
-	echo -e "***WARNING: The dump data are all zero\n"
+	echo -e "***WARNING: The dump data are all zero. TX frequency domain dump may not be supported by VSPA.\n"
 fi
 
 check_known_waveform $checksum

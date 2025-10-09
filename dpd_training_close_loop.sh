@@ -252,8 +252,8 @@ do
 		fi
 
 		if [ $mem = 0 ];then
-			dumpfile $dpdo_dump_addr_host $ref_file $dpdo_size
-			dumpfile $feedback_dump_addr_host $srx_file $feedback_size
+			[ -f $ref_file ] && rm $ref_file; dumpfile $dpdo_dump_addr_host $ref_file $dpdo_size
+			[ -f $srx_file ] && rm $srx_file; dumpfile $feedback_dump_addr_host $srx_file $feedback_size
 		fi
 		
 		if [ $SYNC == NULL ];then

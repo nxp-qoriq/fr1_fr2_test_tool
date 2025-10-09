@@ -26,11 +26,11 @@ fi
 
 if [ $vspa_dev_type = LA9310 ];then
 	phytimer_base=$((modembase_phy+0x1020000))
-	tx_allowed_reg_value=`devmem $((phytimer_base+0x5c))`
-	rx0_allowed_reg_value=`devmem $((phytimer_base+0x0c))`
-	rx1_allowed_reg_value=`devmem $((phytimer_base+0x14))`
-	rx2_allowed_reg_value=`devmem $((phytimer_base+0x1c))`
-	rx3_allowed_reg_value=`devmem $((phytimer_base+0x24))`
+	tx_allowed_reg_value=`./utils/memrw r 32 $((phytimer_base+0x5c))`
+	rx0_allowed_reg_value=`./utils/memrw r 32 $((phytimer_base+0x0c))`
+	rx1_allowed_reg_value=`./utils/memrw r 32 $((phytimer_base+0x14))`
+	rx2_allowed_reg_value=`./utils/memrw r 32 $((phytimer_base+0x1c))`
+	rx3_allowed_reg_value=`./utils/memrw r 32 $((phytimer_base+0x24))`
 	highlow=("LOW " HIGH)
 	((tx_high=tx_allowed_reg_value>>31))
 	((rx0_high=rx0_allowed_reg_value>>31))
@@ -50,21 +50,21 @@ tbgen_base=($((modembase_phy+0x1120000)) $((modembase_phy+0x1124000)))
 
 tbgen_master_counter_read()
 {
-	echo tbgen1 master counter $(printf 0x%x `devmem $((tbgen_base[0]+0x6F0))`)$(printf %08x `devmem $((tbgen_base[0]+0x6F4))`)
-	echo tbgen2 master counter $(printf 0x%x `devmem $((tbgen_base[1]+0x6F0))`)$(printf %08x `devmem $((tbgen_base[1]+0x6F4))`)
+	echo tbgen1 master counter $(printf 0x%x `./utils/memrw r 32 $((tbgen_base[0]+0x6F0))`)$(printf %08x `./utils/memrw r 32 $((tbgen_base[0]+0x6F4))`)
+	echo tbgen2 master counter $(printf 0x%x `./utils/memrw r 32 $((tbgen_base[1]+0x6F0))`)$(printf %08x `./utils/memrw r 32 $((tbgen_base[1]+0x6F4))`)
 }
 
 tbgen_reg_read()  #$1:0 or 1 for tbgen0/1
 {
 	for ((i=0;i<0x30;i+=4))
 	do
-		echo `printf %08x $((tbgen_base[$1]+i))`: $(printf %08x `devmem $((tbgen_base[$1]+i))`)
+		echo `printf %08x $((tbgen_base[$1]+i))`: $(printf %08x `./utils/memrw r 32 $((tbgen_base[$1]+i))`)
 	done
 }
 
 if [ $# -ge 1 ] && [ $1 = reset ];then
-devmem $((tbgen_base[0]+8)) w 1
-devmem $((tbgen_base[1]+8)) w 1
+./utils/memrw w 32 $((tbgen_base[0]+8)) 1
+./utils/memrw w 32 $((tbgen_base[1]+8)) 1
 fi
 tbgen_master_counter_read
 echo TBGEN1 REGISTERS:
@@ -86,26 +86,26 @@ get_counter()
 	if [ $1 = vspa ]; then 
 		tmr_msb_addr=$(( modembase_phy + 0x01000000 + $2*0x4000 + 0x98 ))
 		tmr_lsb_addr=$(( tmr_msb_addr + 4 ))
-		tmr_msb=`devmem $tmr_msb_addr w`
-		tmr_lsb=`devmem $tmr_lsb_addr w`
+		tmr_msb=`./utils/memrw r 32 $tmr_msb_addr`
+		tmr_lsb=`./utils/memrw r 32 $tmr_lsb_addr`
 		if [ $((tmr_msb&0x80000000)) -eq 0 ];then
-			devmem $tmr_msb_addr w 0x80000000
-			devmem $tmr_lsb_addr w 0 #if timer not enabled, enable it
-			tmr_msb=`devmem $tmr_msb_addr w`
-			tmr_lsb=`devmem $tmr_lsb_addr w`
+			./utils/memrw w 32 $tmr_msb_addr 0x80000000
+			./utils/memrw w 32 $tmr_lsb_addr 0 #if timer not enabled, enable it
+			tmr_msb=`./utils/memrw r 32 $tmr_msb_addr`
+			tmr_lsb=`./utils/memrw r 32 $tmr_lsb_addr`
 			[ $((tmr_msb&0x80000000)) -eq 0 ] && { echo ***ERROR: VSPA core $2 cycle count timer enabling failed.; exit 1; }
 		fi
 		tmr_msb=$((tmr_msb&0xFFFF))
 	elif [ $1 = tbgen1 ]; then 
 		tmr_msb_addr=$(( modembase_phy + 0x01000000 + 0x1206F0 ))
 		tmr_lsb_addr=$(( tmr_msb_addr + 4 ))
-		tmr_msb=`devmem $tmr_msb_addr w`
-		tmr_lsb=`devmem $tmr_lsb_addr w`
+		tmr_msb=`./utils/memrw r 32 $tmr_msb_addr`
+		tmr_lsb=`./utils/memrw r 32 $tmr_lsb_addr`
 	elif [ $1 = tbgen2 ]; then 
 		tmr_msb_addr=$(( modembase_phy + 0x01000000 + 0x1246F0 ))
 		tmr_lsb_addr=$(( tmr_msb_addr + 4 ))
-		tmr_msb=`devmem $tmr_msb_addr w`
-		tmr_lsb=`devmem $tmr_lsb_addr w`
+		tmr_msb=`./utils/memrw r 32 $tmr_msb_addr`
+		tmr_lsb=`./utils/memrw r 32 $tmr_lsb_addr`
 	else
 		echo get_counter: Unsupported counter type $1; exit 1; 
 	fi

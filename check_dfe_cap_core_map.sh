@@ -255,12 +255,6 @@ vspa_mbox()
 	fi
 }
 
-
-devmem()
-{
-	./utils/devmem $@
-}
-
 print_addr_mapping()
 {
 	echo -e "\nAddress Mapping:             Host View       Modem View"
@@ -472,15 +466,15 @@ pattern=(${pattern0[@]})
 default_waveform_filename=(0 0)  #first is TDD, 2nd is FDD
 
 if [ $fr1 = 1 ];then
-	bandwidthT4x=`./utils/devmem $test_tool_env_bw_ls`
-	scs=`./utils/devmem $test_tool_env_scs_ls`; scs=$((scs))
-	txdcs=`./utils/devmem $test_tool_env_txdcs_sps_ls`; txdcs=$((txdcs))
-	rxdcs=`./utils/devmem $test_tool_env_rxdcs_sps_ls`; rxdcs=$((rxdcs))
+	bandwidthT4x=`./utils/memrw r 32 $test_tool_env_bw_ls`
+	scs=`./utils/memrw r 32 $test_tool_env_scs_ls`; scs=$((scs))
+	txdcs=`./utils/memrw r 32 $test_tool_env_txdcs_sps_ls`; txdcs=$((txdcs))
+	rxdcs=`./utils/memrw r 32 $test_tool_env_rxdcs_sps_ls`; rxdcs=$((rxdcs))
 elif [ $fr2 = 1 ];then
-	bandwidthT4x=`./utils/devmem $test_tool_env_bw_hs`
-	scs=`./utils/devmem $test_tool_env_scs_hs`; scs=$((scs))
-	txdcs=`./utils/devmem $test_tool_env_txdcs_sps_hs`; txdcs=$((txdcs))
-	rxdcs=`./utils/devmem $test_tool_env_rxdcs_sps_hs`; rxdcs=$((rxdcs))
+	bandwidthT4x=`./utils/memrw r 32 $test_tool_env_bw_hs`
+	scs=`./utils/memrw r 32 $test_tool_env_scs_hs`; scs=$((scs))
+	txdcs=`./utils/memrw r 32 $test_tool_env_txdcs_sps_hs`; txdcs=$((txdcs))
+	rxdcs=`./utils/memrw r 32 $test_tool_env_rxdcs_sps_hs`; rxdcs=$((rxdcs))
 fi
 
 bandwidth=$((bandwidthT4x&0x7FFF)); 
@@ -573,7 +567,7 @@ fi
 
 POINTS_FFT=$((2<<`echo $max_sym_size | awk '{ printf("%d\n",log($1-1)/log(2)); }'`))
 
-local cell_state=`./utils/devmem $test_tool_env_cell_state`
+local cell_state=`./utils/memrw r 32 $test_tool_env_cell_state`
 [ $((cell_state)) = $CELL_STATE_SEARCH ] && pattern=(20 0 0 0 0 0)
 
 if ([ $nrb -ne 0 ] && [ $nrb -lt $((max_sym_size/12)) ]);then
@@ -747,7 +741,7 @@ loadfile() #$1 is address, $2 is filename, $3 is size (optional)
 	fi
 	
 	mem_addr_check_host_view $1 $size_bytes
-	./utils/loadfile $2 $1 $size_bytes
+	./utils/loadmem $2 $1 $size_bytes
 	return 0
 }
 
@@ -762,17 +756,14 @@ dumpfile()
 	mem_addr_check_host_view $1 $3
 	
 	local lsize=$(($3))
-	if [ $(($lsize%1024)) -ne 0 ];then		arg_c="-c 4"
-	else									arg_c=""
-	fi
 	
 	if ([ $lsize -ne 0 ] && [ $lsize -le $((ddr_size)) ]);then     # 0<size<=128MB
-		local log=`./utils/bin2mem -f $2 -a $1 $arg_c -r $lsize`; echo ./utils/bin2mem -f $2 -a $1 $arg_c -r $lsize >> ./command_list.sh
+		local log=`./utils/loadmem $2 $1 -r $lsize`; echo ./utils/loadmem $2 $1 -r $lsize >> ./command_list.sh
 	else
 		echo Dumping from address $1 size $lsize which is out of valid range. Continue dumping \(Y/N\)?
 		read keyin
 		if ([ $keyin = Y ] || [ $keyin = y ]);then
-			local log=`./utils/bin2mem -f $2 -a $1 $arg_c -r $lsize`; echo ./utils/bin2mem -f $2 -a $1 $arg_c -r $lsize >> ./command_list.sh
+			local log=`./utils/loadmem $2 $1 -r $lsize`; echo ./utils/loadmem $2 $1 -r $lsize >> ./command_list.sh
 		else
 			echo Aborted.
 			echo
@@ -919,7 +910,7 @@ memcpy()    #memcpy source dest size
 	local i=0;
 	for ((i=0;i<size;i+=4))
 	do
-		./utils/devmem $((dst+i)) w `./utils/devmem $((src+i)) w`
+		./utils/memrw w 32 $((dst+i)) `./utils/memrw r 32 $((src+i))`
 	done
 }
 
@@ -1006,9 +997,9 @@ mailbox_msg_send_dpd_passthrough()  #$1=txcore, $2=tid
 move_coeff()
 {
 	local addr=$1; srcLidx=$2; local srcCoefidx=$3; local dstLidx=$4; local destCoefidx=$5; 
-	local a0i=`./utils/devmem $((addr+128*srcLidx+srcCoefidx*8))`;	local a0q=`./utils/devmem $((addr+128*srcLidx+srcCoefidx*8+4))`
-	./utils/devmem $((addr+128*dstLidx+destCoefidx*8)) w $a0i;	./utils/devmem $((addr+128*dstLidx+destCoefidx*8+4)) w $a0q
-	./utils/devmem $((addr+128*srcLidx+srcCoefidx*8)) w 0;		./utils/devmem $((addr+128*srcLidx+srcCoefidx*8+4)) w 0;
+	local a0i=`./utils/memrw r 32 $((addr+128*srcLidx+srcCoefidx*8))`;	local a0q=`./utils/memrw r 32 $((addr+128*srcLidx+srcCoefidx*8+4))`
+	./utils/memrw w 32 $((addr+128*dstLidx+destCoefidx*8)) $a0i $((addr+128*dstLidx+destCoefidx*8+4)) $a0q
+	./utils/memrw w 32 $((addr+128*srcLidx+srcCoefidx*8)) 0 $((addr+128*srcLidx+srcCoefidx*8+4)) 0;
 }
 
 update_dpd_coeff()
@@ -1041,11 +1032,11 @@ update_dpd_coeff()
 
 wait_for_flag_change() #$1 is the address, $2 is the flag value.this function waits until the flag value in the address is changed to any other value.
 {
-	flag_value=`./utils/devmem $1 w`
+	flag_value=`./utils/memrw r 32 $1`
 	counter=500
 	while [ $((flag_value)) -eq $(($2)) ]
 	do
-		flag_value=`./utils/devmem $1 w`
+		flag_value=`./utils/memrw r 32 $1`
 		((counter--))
 		[ $counter -eq 0 ] && { echo -e "***ERROR: VSPA timeout\n"; exit 1; }
 	done
@@ -1057,7 +1048,7 @@ dump_time_domain_tx_1time() #$1=txcore, $2=tid, $3=addr LA view, $4=addr host vi
 	echo Using memory from $addr_vir size $dump_size as intermediate buffer for dumping...
 	[ $tx_fdd = 0 ] && clear_mem $addr_vir $dump_size
 	local flag_addr=$((addr_vir+dump_size-4))
-	devmem $flag_addr w 0x1234abcd
+	./utils/memrw w 32 $flag_addr 0x1234abcd
 
 	local msb=$((0x0A100000 + ((obs&1)<<22) + ($2<<15) + (dump_type<<12) + (1<<8) + offset ))
 	local lsb=$((((dump_size/32768)<<20)|(addr_la>>12)))
@@ -1073,7 +1064,7 @@ dump_time_domain_rx_1time() #$1=txcore, $2=tid, $3=addr LA view, $4=addr host vi
 	echo Using memory from $addr_vir size $dump_size as intermediate buffer for dumping...
 	[ $rx_fdd = 0 ] && clear_mem $addr_vir $dump_size
 	local flag_addr=$((addr_vir+dump_size-4))
-	devmem $flag_addr w 0x1234abcd
+	./utils/memrw w 32 $flag_addr 0x1234abcd
 
 	local log=`vspa_mbox_ifsend $1 $host_vspa_mbox_id $((0x0A180000 + ($2<<15) + (dcm<<13) + (1<<8) + offset )) $((((dump_size/32768)<<20)|(addr_la>>12)))`
 
@@ -1101,7 +1092,7 @@ sync_dump_time_domain_1time() #using globles: sync_dump_txrx() sync_dump_ant() s
 		str="$str $core_id $host_vspa_mbox_id `HEX $msb32` `HEX $lsb32`"
 		
 		local flag_addr[i]=$((addr_host+sync_dump_size[i]-4))
-		devmem $((flag_addr[i])) w 0x1234abcd
+		./utils/memrw w 32 $((flag_addr[i])) 0x1234abcd
 	done
 	
 	local log=`vspa_mbox_ifsend $str`; echo vspa_mbox_ifsend $str
@@ -1158,7 +1149,7 @@ mem_test()
 {
 	local core=$1; test_addr=$2; local test_size=$(($3&0xFFFFFFFE))   #make it even, required by VSPA DMA
 	local readwrite=$4   #0 read, 1 write
-	[ $readwrite = 1 ] && { local vir=`phy2vir $test_addr`; ./utils/devmem $vir w 0; }
+	[ $readwrite = 1 ] && { local vir=`phy2vir $test_addr`; ./utils/memrw w 32 $vir 0; }
 
 	vspa_mbox_ifsend $core $host_vspa_mbox_id $((0x60000000+(readwrite<<16)+(test_size&0xFFFF))) $((test_addr>>12))
 	[ $msg_recv_flag = 0 ] && vspa_mbox_ifrecv $core $host_vspa_mbox_id
@@ -1173,7 +1164,7 @@ mem_test()
 	cycle3chan=$((msg_recv_lsb32))
 	
 	if [ $readwrite = 1 ];then
-		local dma_data=`./utils/devmem $vir w`
+		local dma_data=`./utils/memrw r 32 $vir`
 		if [ $((dma_data)) -ne $((0x1234abcd)) ];then
 			echo -e "***ERROR: DMA copy data wrong. Addr modem ivew = $test_addr, addr host view = $vir, data:$dma_data, expected data:0x1234abcd"
 			echo -e "Please check address mapping, if it is wrong please update the address mapping in config.dat\n"
@@ -1459,8 +1450,8 @@ if ([ $((vspa_image_version)) -le $((0x450)) ] || [ $vspa_dev_type = LA12xx ]);t
 else
 	#this is to restore TX sym buf struct
 	local txcore=$1
-	msb=`devmem $((test_tool_env_buf_struct_msg+txcore*8+0))`
-	lsb=`devmem $((test_tool_env_buf_struct_msg+txcore*8+4))`
+	msb=`./utils/memrw r 32 $((test_tool_env_buf_struct_msg+txcore*8+0))`
+	lsb=`./utils/memrw r 32 $((test_tool_env_buf_struct_msg+txcore*8+4))`
 	[ $((vspa_image_version)) -ge $((0x500)) ] && msb=$((msb&0xFFF00000))
 	vspa_mbox_ifsend $txcore $host_vspa_mbox_id $msb $lsb; [ $msg_recv_flag = 0 ] && vspa_mbox_ifrecv $txcore $host_vspa_mbox_id
 fi
@@ -1473,8 +1464,8 @@ dump_freq_domain_rx() #$1=core, $2=mailbox, $3=msb, $4=lsb
 	#this is to restore RX sym buf struct
 	local rxcore=$1
 	if [ $((vspa_image_version)) -ge $((0x500)) ];then
-	msb=`devmem $((test_tool_env_buf_struct_msg+rxcore*8+0))`
-	lsb=`devmem $((test_tool_env_buf_struct_msg+rxcore*8+4))`
+	msb=`./utils/memrw r 32 $((test_tool_env_buf_struct_msg+rxcore*8+0))`
+	lsb=`./utils/memrw r 32 $((test_tool_env_buf_struct_msg+rxcore*8+4))`
 	lsb=$((lsb&0xFFF00000))
 	vspa_mbox_ifsend $rxcore $host_vspa_mbox_id $msb $lsb; [ $msg_recv_flag = 0 ] && vspa_mbox_ifrecv $rxcore $host_vspa_mbox_id
 	fi
@@ -1494,15 +1485,15 @@ send_timing_offset_cmd()  #$1=core.  $2=rx, 0:tx, 1:rx. $3=advance, 0:delay, 1:a
 
 dfe_mode_stop_rx2host()
 {
-	local msb=`devmem $((test_tool_env_dfe_mode_msg+txcore*8+0))`
-	local lsb=`devmem $((test_tool_env_dfe_mode_msg+txcore*8+4))`
+	local msb=`./utils/memrw r 32 $((test_tool_env_dfe_mode_msg+txcore*8+0))`
+	local lsb=`./utils/memrw r 32 $((test_tool_env_dfe_mode_msg+txcore*8+4))`
 	msb=$((msb|DFE_MODE_NO_RX_SYM_TO_HOST))
 	vspa_mbox_ifsend $txcore $host_vspa_mbox_id $msb $lsb; [ $msg_recv_flag = 0 ] && vspa_mbox_ifrecv $txcore $host_vspa_mbox_id
 }
 dfe_mode_restore()
 {
-	local msb=`devmem $((test_tool_env_dfe_mode_msg+txcore*8+0))`
-	local lsb=`devmem $((test_tool_env_dfe_mode_msg+txcore*8+4))`
+	local msb=`./utils/memrw r 32 $((test_tool_env_dfe_mode_msg+txcore*8+0))`
+	local lsb=`./utils/memrw r 32 $((test_tool_env_dfe_mode_msg+txcore*8+4))`
 	vspa_mbox_ifsend $txcore $host_vspa_mbox_id $msb $lsb; [ $msg_recv_flag = 0 ] && vspa_mbox_ifrecv $txcore $host_vspa_mbox_id
 }
 

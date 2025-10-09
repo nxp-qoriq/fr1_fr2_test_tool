@@ -18,7 +18,7 @@ print_usage()
 	echo "  sample:            A sample is a HEX format 32-bit IQ value with leading 0x. If sample is specified, the value of all the REs will be set to this sample value"
 	echo "  -lh:               only send left half of the total bandwidth."
 	echo "  -rh:               only send right half of the total bandwidth."
-	echo "  idx=a:b:           only keep specified range of REs, other REs cleared to 0"
+	echo "  idx=a:b:           only keep specified range of REs, other REs cleared to 0. idx range is from -nRE/2 to nRE/2-1, nRE stands for total num of RE in current bandwidth"
 	echo "example:  ./update_test_vector.sh 0 a.bin                will update test vector to a.bin on ant 0"
 	echo "example:  ./update_test_vector.sh 0 a.bin idx=-120:119   will update test vector to a.bin on ant 0 and only keep 240 REs"
 	echo
