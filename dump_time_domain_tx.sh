@@ -407,6 +407,7 @@ dump_via_hram_mlti_times()
 	[ -f $dump_filename ] && rm $dump_filename
 	dump_type=0; [ $dpdo = 1 ] && dump_type=1; [ $((dpdo*obs)) -ne 0 ] && dump_type=3
 	([ $dump_type -ne 0 ] && [ $num_loop -gt 1 ]) && { echo ***Error: DPDO dump does not support multiple times dump.; exit 1; }
+	flag_addr=`get_dump_done_flag_addr $txcore $addr_ant_tx_dump`
 	echo -n Dumping in progress, waiting...
 	for ((i=0;i<$(($num_loop));i++))
 	do
@@ -418,11 +419,11 @@ dump_via_hram_mlti_times()
 		msb=$((0x0A100000 + (tid<<15) + (dump_type<<12) + (offset_granul<<8) + i))
 		lsb=$(( ((size0/32/1024)<<20) + (addr_phy>>12) ))
 		lsb=$(printf 0x%x $lsb)
-		flag_addr=$((addr_vir+size0-4))
+		
 		[ $tx_fdd = 0 ] && clear_mem $addr_vir $size_hram
-		./utils/memrw w 32 $flag_addr 0x1234abcd
+		./utils/memrw w 16 $flag_addr 0
 		vspa_mbox send $txcore $host_vspa_mbox_id $msb $lsb
-		wait_for_flag_change $flag_addr 0x1234abcd
+		wait_for_flag_change $flag_addr 0
 
 		if [ $mem = 0 ];then
 			dumpfile $addr_vir $dump_filename $size1   #dumpfile will append data to file

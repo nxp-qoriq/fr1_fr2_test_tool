@@ -215,7 +215,7 @@ dump_via_hram_mlti_times()
 	((start_hram_phy=HRAMaddr_phy+6*1024*1024-size_hram))
 	[ $fast = 0 ] && echo Using HRAM size $size_hram starting from $start_hram_vir as intermediate buffer for dumping...
 	
-	flag_addr=`printf "0x%x" $((start_hram_vir+size_hram-4))`
+	flag_addr=`get_dump_done_flag_addr $rxcore $addr_ant_rx_dump`
 	((num_chunks=size_32KB_aligned/size_hram))
 	((size_left=size_32KB_aligned-num_chunks*size_hram))
 	[ $size_left = 0 ] && { ((num_loop=num_chunks)); size_left=$size_hram; } || ((num_loop=num_chunks+1))
@@ -231,10 +231,10 @@ dump_via_hram_mlti_times()
 		[ $fast = 0 ] && echo -n "$(($i*100/num_loop))%"
 		msb=`printf "0x%08x" $((0x0A180000 + (tid<<15) + (dcm<<13) + (offset_granul<<8) + i))`
 		[ $tx_fdd = 0 ] && clear_mem $start_hram_vir $size_hram
-		./utils/memrw w 32 $flag_addr 0x1234abcd
+		./utils/memrw w 16 $flag_addr 0
 		
 		vspa_mbox send $rxcore $host_vspa_mbox_id $msb $lsb;
-		wait_for_flag_change $flag_addr 0x1234abcd
+		wait_for_flag_change $flag_addr 0
 
 		size0=$size_hram
 		if [ $((i)) -eq $((num_loop-1)) ];then

@@ -1,7 +1,7 @@
 ;*********************************************************************************
 ;*StarCore Linker it3a-ld.exe version 3.0.315 - 2022.01.12 Advanced Accelerating Architectures
 ;*
-;*Compilation date : Tue Sep 23 15:33:43 2025
+;*Compilation date : Mon Oct 13 14:11:26 2025
 ;*File Name : C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core0.map
 ;*Invocation line: C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\bin\it3a-ld.exe -o C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/geul-vspa0.eld -Map C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core0.map -LC:/0_dsp/Projects_VSPA/DFE_Ref/lib -llib_DFE_Ref_vspa3.elb -c C:/0_dsp/Projects_VSPA/DFE_Ref/LCF/LA1224_sp.lcf -arch vspa3 -core_type=sp -au_count 16 .\source_shared\DFE_func_rx.eln .\source_shared\DFE_func_tx.eln .\source_shared\DFE_init.eln .\source_shared\boot.eln .\source_shared\debug.eln .\source_shared\dump_inject.eln .\source_shared\global_var.eln .\source_shared\host_vspa_msg.eln .\source_shared\inter_core_msg.eln .\source_shared\main_pair_coreA.eln .\source_shared\main_pair_coreB.eln .\source_shared\main_unused_core.eln .\source_shared\pair_para.eln .\source_shared\startup_vspa3_modified.eln .\source_shared\kernel_FFT\ifft_cp.eln .\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln .\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln .\source_shared\SINAD\sinad.eln .\source_proj_specific\main_PHY_RX_core.eln .\source_proj_specific\main_PHY_TX_core.eln -start-reread-lib C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\libc99_gen_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\libm_gen_au16_sp.elb -end-reread-lib
 ;*There are one or more errors in this application: 0x40000000
@@ -103,8 +103,8 @@
 ;*		GLOBAL  	       456         	       456    	         0       	_dma_start                    	.\source_shared\DFE_init.eln
 ;*		GLOBAL  	       496         	       496    	         0       	_dma_start_2xfr               	.\source_shared\DFE_init.eln
 ;*MODULE: .\source_shared\dump_inject.eln
-;*		GLOBAL  	       824         	       824    	         0       	_dump_inject_data_1block      	.\source_shared\dump_inject.eln
-;*		GLOBAL  	       512         	       512    	         0       	_get_dpdout_dest_addr         	.\source_shared\dump_inject.eln
+;*		GLOBAL  	       736         	       736    	         0       	_dump_inject_data_1block      	.\source_shared\dump_inject.eln
+;*		GLOBAL  	       384         	       384    	         0       	_get_dpdout_dest_addr         	.\source_shared\dump_inject.eln
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: .\source_shared\dump_inject.eln
 ;*MODULE: .\source_shared\host_vspa_msg.eln
 ;*		GLOBAL  	        56         	        56    	         0       	_channel_restart              	.\source_shared\host_vspa_msg.eln
@@ -130,9 +130,9 @@
 ;*		GLOBAL  	       680         	       680    	         0       	_Ant_buffer_tx_check_status   	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*		GLOBAL  	       200         	       200    	         0       	_tx_error_handling            	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*		GLOBAL  	       144         	       144    	         0       	_Ant_buffer_tx_axiq_enable    	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*		GLOBAL  	      1192         	      1192    	         0       	_Ant_buffer_tx_write_complete 	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*		GLOBAL  	       664         	       664    	         0       	_Ant_buffer_tx_dma_feed       	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*		GLOBAL  	      1112         	      1112    	         0       	_Ant_buffer_tx_apply_buffer   	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*		GLOBAL  	      1336         	      1336    	         0       	_Ant_buffer_tx_write_complete 	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*		GLOBAL  	       816         	       816    	         0       	_Ant_buffer_tx_dma_feed       	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*		GLOBAL  	      1248         	      1248    	         0       	_Ant_buffer_tx_apply_buffer   	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: .\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*MODULE: .\source_shared\SINAD\sinad.eln
 ;*		GLOBAL  	       264         	       264    	         0       	_fr2_rx_bitrev_b1_b1          	.\source_shared\SINAD\sinad.eln
@@ -149,6 +149,11 @@
 ;*		GLOBAL  	       120         	       120    	         0       	_convert_half_to_hfix         	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
 ;*		GLOBAL  	       136         	       136    	         0       	_mpy_f32_f16_vs               	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
 ;*		GLOBAL  	       160         	       160    	         0       	_IQ_control_f32_asm           	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec_opt.eln)
+;*		GLOBAL  	       336         	       336    	         0       	_mixer_qec_asm                	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec_opt.eln)
+;*		GLOBAL  	       336         	       336    	         0       	_qec_mixer_asm                	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec_opt.eln)
+;*		GLOBAL  	       216         	       216    	         0       	_qec_opt_asm                  	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec_opt.eln)
+;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec_opt.eln)
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_rsp_vmult_asm.eln)
 ;*		GLOBAL  	       128         	       128    	         0       	_chp_chf_rsp_vmult_asm        	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_rsp_vmult_asm.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_rsp_vmult_asm.eln)
@@ -290,7 +295,7 @@
 ;*		GLOBAL  	        80         	        80    	         0       	___cmp64_eq                   	C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
 ;*		GLOBAL  	       128         	       128    	         0       	___cmp64_ge                   	C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
-;*TOTAL CODE: 19104 BYTES REMOVED
+;*TOTAL CODE: 19904 BYTES REMOVED
 ;*********************************************************************************
 ;*************************CALL TREE FOR FUNCTIONS*********************************
 ;*********************************************************************************
@@ -427,16 +432,19 @@
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*				GLOBAL  	_dump_inject_data_1block	DEFINED ON MODULE	.\source_shared\dump_inject.eln
 ;*				GLOBAL  	_vecclr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
+;*				GLOBAL  	_mixer_qec_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec_opt.eln)
 ;*				GLOBAL  	_mem_clr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*		GLOBAL 	_Ant_buffer_tx_dma_feed	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*				GLOBAL  	_dump_inject_data_1block	DEFINED ON MODULE	.\source_shared\dump_inject.eln
 ;*				GLOBAL  	_vecclr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
+;*				GLOBAL  	_mixer_qec_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec_opt.eln)
 ;*				GLOBAL  	_mem_clr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*		GLOBAL 	_Ant_buffer_tx_apply_buffer	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*				GLOBAL  	_dump_inject_data_1block	DEFINED ON MODULE	.\source_shared\dump_inject.eln
 ;*				GLOBAL  	_vecclr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
+;*				GLOBAL  	_mixer_qec_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec_opt.eln)
 ;*				GLOBAL  	_mem_clr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*MODULE: .\source_shared\SINAD\sinad.eln
 ;*		GLOBAL 	_fr2_rx_bitrev_b1_b1
@@ -465,6 +473,10 @@
 ;*		GLOBAL 	_mpy_f32_f16_vs
 ;*		GLOBAL 	_delay_cycles
 ;*		GLOBAL 	_IQ_control_f32_asm
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec_opt.eln)
+;*		GLOBAL 	_mixer_qec_asm
+;*		GLOBAL 	_qec_mixer_asm
+;*		GLOBAL 	_qec_opt_asm
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_rsp_vmult_asm.eln)
 ;*		GLOBAL 	_chp_chf_rsp_vmult_asm
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(txWindowing.eln)
@@ -924,6 +936,10 @@
 0x000012c0           0          _memcpy_both_circ (run_address 0x000012c0)
 0x000012c0         248          _mem_clr_circ (run_address 0x000012c0)
 0x000012d8         224          _mem_clr (run_address 0x000012d8)
+0x000013b8           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec_opt.eln))
+0x000013b8           0          _qec_opt_asm (run_address 0x000013b8)
+0x000013b8           0          _mixer_qec_asm (run_address 0x000013b8)
+0x000013b8           0          _qec_mixer_asm (run_address 0x000013b8)
 0x000013b8         240      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sinad_rsp_chp_sumsq_asm.eln))
 0x000013b8           0          _sinad_rsp_chp_sumsq_circ_asm (run_address 0x000013b8)
 0x000014a8           0          _sinad_rsp_chp_sumsq_line_asm (run_address 0x000014a8)

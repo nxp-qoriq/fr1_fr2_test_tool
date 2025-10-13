@@ -98,6 +98,8 @@ ext_log_buf_size=$((ext_log_buf_base+4))
 ant_core_map_hi=$((ext_log_buf_size+4))
 ant_core_map_lo=$((ant_core_map_hi+4))
 addr_DFE_qec_params_opt_tx=$((COREB_STATUS_BASE+0x84))
+addr_ant_tx_dump=$((COREB_STATUS_BASE+0x88))
+addr_ant_rx_dump=$((COREB_STATUS_BASE+0x8c))
 rx_inject_addr=$((COREB_STATUS_BASE+0x9c))
 rx_inject_size=$((COREB_STATUS_BASE+0xa0))
 peak_cycle_count=$((COREB_STATUS_BASE+0xb8))
@@ -1038,29 +1040,39 @@ update_dpd_coeff()
 
 wait_for_flag_change() #$1 is the address, $2 is the flag value.this function waits until the flag value in the address is changed to any other value.
 {
-	flag_value=`./utils/memrw r 32 $1`
+	flag_value=`./utils/memrw r 16 $1`
 	counter=500
 	while [ $((flag_value)) -eq $(($2)) ]
 	do
-		flag_value=`./utils/memrw r 32 $1`
+		flag_value=`./utils/memrw r 16 $1`
 		((counter--))
 		[ $counter -eq 0 ] && { echo -e "***ERROR: VSPA timeout\n"; exit 1; }
 	done
 }
+
+get_dump_done_flag_addr()  #$1=master core, $2 dump struct pointer
+{
+	local core=$1; local score=${slave_core[core]}
+	local dump_struct_addr=`get_wordvalue_from_vspa $score $2`
+	local dump_done_flag_addr=$(( $(get_vspa_dmem_base $score) + $dump_struct_addr + 2)) #flag is at offset 2 of struct base, short
+	echo $dump_done_flag_addr
+}
+
 dump_time_domain_tx_1time() #$1=txcore, $2=tid, $3=addr LA view, $4=addr host view, $5=dump size, $6=dpdo $7=obs $8=offset
 {
 	local core=$1; local addr_la=$3; local addr_vir=$4; local dump_size=$5; local dpdo=$6; local obs=$7; local offset=$8
 	local dump_type=0; [ $dpdo = 1 ] && dump_type=1; [ $((dpdo*obs)) -ne 0 ] && dump_type=3
 	echo Using memory from $addr_vir size $dump_size as intermediate buffer for dumping...
 	[ $tx_fdd = 0 ] && clear_mem $addr_vir $dump_size
-	local flag_addr=$((addr_vir+dump_size-4))
-	./utils/memrw w 32 $flag_addr 0x1234abcd
+	
+	local flag_addr=`get_dump_done_flag_addr $core $addr_ant_tx_dump`
+	./utils/memrw w 16 $flag_addr 0 #clear flag to 0 before dumping
 
 	local msb=$((0x0A100000 + ((obs&1)<<22) + ($2<<15) + (dump_type<<12) + (1<<8) + offset ))
 	local lsb=$((((dump_size/32768)<<20)|(addr_la>>12)))
-	echo vspa_mbox_ifsend $1 $host_vspa_mbox_id `HEX $msb` `HEX $lsb`
-	local log=`vspa_mbox_ifsend $1 $host_vspa_mbox_id $msb $lsb`
-	wait_for_flag_change $flag_addr 0x1234abcd
+	echo vspa_mbox_ifsend $core $host_vspa_mbox_id `HEX $msb` `HEX $lsb`
+	local log=`vspa_mbox_ifsend $core $host_vspa_mbox_id $msb $lsb`
+	wait_for_flag_change $flag_addr 0
 	[ "${log:0:8}" = "***ERROR" ] && { echo $log; return 1; }
 	return 0
 }
@@ -1069,18 +1081,19 @@ dump_time_domain_rx_1time() #$1=txcore, $2=tid, $3=addr LA view, $4=addr host vi
 	local core=$1; local addr_la=$3; local addr_vir=$4; local dump_size=$5; local dcm=$6; local offset=$7
 	echo Using memory from $addr_vir size $dump_size as intermediate buffer for dumping...
 	[ $rx_fdd = 0 ] && clear_mem $addr_vir $dump_size
-	local flag_addr=$((addr_vir+dump_size-4))
-	./utils/memrw w 32 $flag_addr 0x1234abcd
+	
+	local flag_addr=`get_dump_done_flag_addr $core $addr_ant_rx_dump`
+	./utils/memrw w 16 $flag_addr 0
 
 	local log=`vspa_mbox_ifsend $1 $host_vspa_mbox_id $((0x0A180000 + ($2<<15) + (dcm<<13) + (1<<8) + offset )) $((((dump_size/32768)<<20)|(addr_la>>12)))`
 
-	wait_for_flag_change $flag_addr 0x1234abcd	
+	wait_for_flag_change $flag_addr 0	
 	[ "${log:0:8}" = "***ERROR" ] && { echo $log; return 1; }
 	return 0
 }
 sync_dump_time_domain_1time() #using globles: sync_dump_txrx() sync_dump_ant() sync_dump_addr_la() sync_dump_size() sync_dump_offset() sync_dump_dpdout_dcm()
 {
-	local i; local core_id; local trid; local msb32   #size is total size for all synced dump antennas
+	local i; local core_id; local trid; local msb32; local dump_struct_pointer;   #size is total size for all synced dump antennas
 	local str=""
 	local flag_addr=(0 0 0 0 0 0 0 0)
 	for ((i=0;i<${#sync_dump_txrx[@]};i++))
@@ -1088,24 +1101,26 @@ sync_dump_time_domain_1time() #using globles: sync_dump_txrx() sync_dump_ant() s
 		local addr_host=`phy2vir ${sync_dump_addr_la[i]}`
 		[ $rx_fdd = 0 ] && clear_mem $addr_host ${sync_dump_size[i]}
 		if [ ${sync_dump_txrx[i]} = 0 ];then
+			dump_struct_pointer=$addr_ant_tx_dump
 			core_id=${anttx[${sync_dump_ant[i]}]}; trid=${tidant[${sync_dump_ant[i]}]}
 			msb32=$((0x0A100000 + (trid<<15) + sync_dump_dpdout_dcm[i]*(0x2000>>sync_dump_dpdout_dcm[i]) + (1<<8) + sync_dump_offset[i] ))
 		else
+			dump_struct_pointer=$addr_ant_rx_dump
 			core_id=${antrx[${sync_dump_ant[i]}]}; trid=${ridant[${sync_dump_ant[i]}]}
 			msb32=$((0x0A180000 + (trid<<15) + (sync_dump_dpdout_dcm[i]<<13) + (1<<8) + sync_dump_offset[i] ))
 		fi
 		local lsb32=$((((sync_dump_size[i]/32768)<<20)|(${sync_dump_addr_la[i]}>>12)))
 		str="$str $core_id $host_vspa_mbox_id `HEX $msb32` `HEX $lsb32`"
 		
-		local flag_addr[i]=$((addr_host+sync_dump_size[i]-4))
-		./utils/memrw w 32 $((flag_addr[i])) 0x1234abcd
+		local flag_addr[i]=`get_dump_done_flag_addr $core_id $dump_struct_pointer`
+		./utils/memrw w 16 $((flag_addr[i])) 0
 	done
 	
 	local log=`vspa_mbox_ifsend $str`; echo vspa_mbox_ifsend $str
 
 	for ((i=0;i<${#sync_dump_txrx[@]};i++))
 	do
-		wait_for_flag_change $((flag_addr[i])) 0x1234abcd	
+		wait_for_flag_change $((flag_addr[i])) 0	
 	done
 	[ "${log:0:8}" = "***ERROR" ] && { echo $log; exit 1; }
 }
