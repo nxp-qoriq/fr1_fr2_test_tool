@@ -37,7 +37,6 @@ get_ts_rxallowed_first_enabled() #$1=core id
 #printing capability and core mapping info
 prodtype=("Vspa-Vspa symbol interface with 2 Symbols Buffer on VSPA DMEM" "Host-Vspa symbol interface with up to 28 Symbols Buffer") #(ISC RU)
 tag_running=("STOPPED     " "RUNNING     " "UN-CHECKED  " "RUNNING-IDLE")
-tag_idle=("" IDLE)
 ant_running_tx=(2 2 2 2 2 2)
 ant_running_rx=(2 2 2 2 2 2)
 num_running_chan_tx=0
@@ -537,6 +536,9 @@ if [ $((tx_fdd&rx_fdd)) = 0 ];then
 fi
 
 TAG_IQSWAP=("         " "IQSWAPPED")
+TAG_LOOPBACK=("" "LOOPBACK TXDAC->RXADC")
+TAG_RLOOPBACK_FREQ=("" "REVERSE LOOPBACK RX->TX FREQ DOMAIN")
+TAG_RLOOPBACK_TIME=("" "REVERSE LOOPBACK RX->TX TIME DOMAIN")
 if [ $((num_T_LS_enabled+num_T_HS_enabled)) -ne 0 ];then
 echo -e "\nAnt Mapping TX:\nant_id dcs_id                status            scaling_factor(input/ouput)"
 for((i=0;i<$NUM_ANTS;i++))
@@ -549,9 +551,10 @@ do
 		scaling_factor_output=$((`./utils/memrw r 32 $((test_tool_env_tx_scaling_output+i*4))`))
 		scaling_off=$((scaling_factor_output>>31)); scaling_factor_output=$((scaling_factor_output&0x7FFFFFFF))
 		idle_flag=`get_wordvalue_from_vspa ${anttx[$i]} $CONFIG_TX_SINGLE_TONE_AMP`
-		[ $((ant_running_tx[i])) -eq 1 ] && [ $((idle_flag)) -eq 1 ] && ant_running_tx[i]=3 || idle_flag=0
+		([ $((ant_running_tx[i])) -eq 1 ] && [ $((idle_flag)) -eq 1 ] && [ $rloopback_time -eq 0 ]) && ant_running_tx[i]=3 || idle_flag=0
 		[ $((scaling_off|idle_flag)) = 1 ] && tag_scaling=OFF || tag_scaling="$scaling_factor_input/$scaling_factor_output"
-		echo "$i      $tag0 $tag1 ${TAG_IQSWAP[iqswap_tx[dcsid]]}  ${tag_running[ant_running_tx[i]]}      $tag_scaling"
+		[ $i -ge $NUM_ANTS_LS ] && cur_loopback=$loopback || cur_loopback=0
+		echo "$i      $tag0 $tag1 ${TAG_IQSWAP[iqswap_tx[dcsid]]}  ${tag_running[ant_running_tx[i]]}      $tag_scaling    ${TAG_LOOPBACK[cur_loopback]}  ${TAG_RLOOPBACK_FREQ[rloopback_freq]}  ${TAG_RLOOPBACK_TIME[rloopback_time]}"
 	fi
 done
 fi
@@ -565,7 +568,8 @@ do
 		tag0="${ant_map_rx[$i]}"
 		dcsid=${ant_map_rx[$i]}
 		tag1=${TAG_RXDCSID[dcsid]}
-		echo "$i      $tag0 $tag1 ${TAG_IQSWAP[iqswap_rx[dcsid]]}  ${tag_running[ant_running_rx[i]]}      $scaling_factor"
+		[ $i -ge $NUM_ANTS_LS ] && cur_loopback=$loopback || cur_loopback=0
+		echo "$i      $tag0 $tag1 ${TAG_IQSWAP[iqswap_rx[dcsid]]}  ${tag_running[ant_running_rx[i]]}      $scaling_factor        ${TAG_LOOPBACK[cur_loopback]}  ${TAG_RLOOPBACK_FREQ[rloopback_freq]}  ${TAG_RLOOPBACK_TIME[rloopback_time]}"
 	fi
 done
 fi

@@ -103,6 +103,12 @@ rx_inject_size=$((COREB_STATUS_BASE+0xa0))
 peak_cycle_count=$((COREB_STATUS_BASE+0xb8))
 min_cycle_count=$((COREB_STATUS_BASE+0xba))
 obs_dump_addr=$((COREB_STATUS_BASE+0xd4))
+tx_timedomain_inject_addr=$((COREB_STATUS_BASE+0xd8))
+tx_timedomain_inject_size=$((COREB_STATUS_BASE+0xdc))
+tx_timedomain_inject_flag=$((COREB_STATUS_BASE+0xe0))  #16bit
+rx_timedomain_dump_flag=$((COREB_STATUS_BASE+0xe2))  #16bit
+rx_timedomain_dump_addr=$((COREB_STATUS_BASE+0xe4))
+rx_timedomain_dump_size=$((COREB_STATUS_BASE+0xe8))
 
 host_vspa_mbox_id=0
 tag_tddfdd=(TDD FDD)

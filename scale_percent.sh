@@ -126,8 +126,13 @@ elif [ $auto = 1 ];then
 	fi
 	
 	#calculate power from tx dump
-	dump_size=$((axiqsps_tx[ant]*4*20)) ; host_addr=`phy2vir $addr_dump`
-	log=`dump_time_domain_tx_1time $txcore $tid $addr_dump $host_addr $dump_size 0 0 0`
+	if [ $((ant)) -lt $NUM_ANTS_LS ]; then
+		dump_size=$((axiqsps_tx[ant]*4*20)); la_addr=$addr_dump; host_addr=`phy2vir $la_addr` #dump 20ms
+	else
+		dump_size=$((axiqsps_tx[ant]*4/2));  la_addr=$next_HRAMaddr_phy; host_addr=`phy2vir $la_addr`  #dump 0.5ms data to avoid FR2 overrun
+		[ $((HRAMaddr_phy+HRAM_size-next_HRAMaddr_phy)) -lt $dump_size ] && { echo ***ERROR: HRAM size is not enough for ant data dump for power calculation.; exit 1; } 
+	fi
+	log=`dump_time_domain_tx_1time $txcore $tid $la_addr $host_addr $dump_size 0 0 0`
 	log=`./utils/power $host_addr 0 $((dump_size/4))`
 	eval "$log"
 	

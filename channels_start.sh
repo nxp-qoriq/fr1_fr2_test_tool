@@ -33,7 +33,7 @@ channels_start_fail()
 print_usage()
 {
 echo
-echo "usage ./channels_start.sh [ant_id] [txonly|rxonly] [sinad] [option8] [comp] [nl1c] [dcsx] [txdcsx] [rxdcsx] [0.5ms|1ms|2ms|5ms|10ms|20ms|40ms] [HRAM] [cpe|gnb] [mimo] [file] [nre=M|nrb=N] [search] [norx2host] [lphy|dfe] [hshake|txhshake|rxhshake] [nextlog] [pattern=X] [hwdcm|nhwdcm] [rt]"
+echo "usage ./channels_start.sh [ant_id] [txonly|rxonly] [sinad] [option8] [comp] [nl1c] [dcsx] [txdcsx] [rxdcsx] [0.5ms|1ms|2ms|5ms|10ms|20ms|40ms] [HRAM] [cpe|gnb] [mimo] [file] [nre=M|nrb=N] [search] [rx2host] [lb|rlbf|rlbt] [lphy|dfe] [hshake|txhshake|rxhshake] [nextlog] [pattern=X] [hwdcm|nhwdcm] [rt]"
 echo "  ant_id: start specified antenna. If ant_id not specified, start all antennas/channels defined in config.dat"
 echo "  txonly: start antennas with TX only, RX will be disabled."
 echo "  rxonly: start antennas with RX only, TX will be disabled."
@@ -41,6 +41,9 @@ echo "  sinad:  for sinad test, in this test, only single tone will be used."
 echo "  option8: test time domain waveform, iFFT/FFT will be bypassed."
 echo "  comp:   test eCPRI compression/decompression enabled."
 echo "  nl1c:   No NXP L1C, in this case users should use their own software to enable DCS after running channels_start.sh"
+echo "  rx2host:   enable RX symbols sent to host RX symbol buffer. disabled by default in order to allow dumping which will occupy PCI bandwidth in RX direction"
+echo "  lb:   LA12xx internal digital loopback from DAC to ADC. Only valid in HSDCS"
+echo "  rlbf:   reverse loopback from RX frequency domain to TX frequency Domain. In RF view, signal sent from RX antenna to baseband is looped back to TX antenna."
 echo "  dcsx:   specified DCS channel to be tested. x=0-5. can specify multiple DCS channels."
 echo "  txdcsx: specified DCS channel to be tested for TX only. x=0-5. can specify multiple DCS channels."
 echo "  rxdcsx: specified DCS channel to be tested for RX only. x=0-5. can specify multiple DCS channels."
@@ -170,6 +173,7 @@ wvpd=0; sym_buf_onchip=0
 rxinj_file=""
 size_dump=0; size_inject=0
 rt=0
+rloopback_freq=0; rloopback_time=0
 
 arg_parse()
 {
@@ -187,6 +191,8 @@ arg_parse()
 	elif [ $arg = idle ]; then							idle=1
 	elif ([ $arg = sinad ] || [ $arg = SINAD ]); then		idle=1; sinad=1
 	elif ([ $arg = loopback ] || [ $arg = lb ]); then		loopback=1
+	elif [ $arg = rlbf ]; then								rloopback_freq=1
+	elif [ $arg = rlbt ]; then								rloopback_time=1
 	elif [ $arg = option8 ]; then							option8_cfg=1
 	elif [ $arg = comp ]; then							ecpri_comp_decomp_enable=1
 	elif [ $arg = nl1c ]; then							use_nxp_l1c=0
@@ -224,7 +230,6 @@ arg_parse()
 	elif ([ $arg = HRAM ] || [ $arg = hram ]); then			test_vector_on_hram=1
 	elif ([ $arg = cpe ] || [ $arg = CPE ] || [ $arg = UE ] || [ $arg = ue ]); then	cpe=1
 	elif [ $arg = search ]; then							cell_state=$CELL_STATE_SEARCH
-	elif [ $arg = norx2host ]; then						norx2host=1
 	elif [ $arg = rx2host ]; then							norx2host=0
 	elif [ $arg = lphy ]; then							lphy=1; use_nxp_l1c=0
 	elif [ $arg = dfe ]; then							dfe_only=1
@@ -246,6 +251,9 @@ for i in "$@"
 do
 	arg_parse $i
 done
+
+[ $rloopback_freq = 1 ] && norx2host=0
+[ $rloopback_time = 1 ] && { idle=1; hwdcm=0; arg_nhwdcm=1; }   #DAC ADC sampling rate should be same for reverse loopback time domain, freq domain processing set to idle
 
 source ./boot_vspa_log.txt
 echo "$vspa_image_folder_name" | grep ADvspa_images_LS.4T4R_100M_30K_491_245_TDDFDD_ISC
@@ -620,7 +628,7 @@ bbsps_tx=(${ANTS_ARR_INIT[@]});      bbsps_rx=(${ANTS_ARR_INIT[@]})
 axiqsps_tx=(${ANTS_ARR_INIT[@]});    axiqsps_rx=(${ANTS_ARR_INIT[@]})
 pci_bw_req=(${ANTS_ARR_INIT[@]})
 sym_size_per_ant=(${ANTS_ARR_INIT[@]}); max_sym_size_per_ant=(${ANTS_ARR_INIT[@]})
-upsampling_ratio_per_ant=(${ANTS_ARR_INIT[@]});
+upsampling_ratio_per_ant=(${ANTS_ARR_INIT[@]}); block_size_per_ant=(${ANTS_ARR_INIT[@]})
 
 trace_log_buf_base=`HEX $ddr_malloc_cur`
 trace_log_buf_size_per_core=$((128*1024))
@@ -723,6 +731,7 @@ one_enabled_dfe_core=0
 			sym_size_per_ant[txant]=$sym_size
 			max_sym_size_per_ant[txant]=$max_sym_size
 			upsampling_ratio_per_ant[txant]=$upsampling_ratio
+			block_size_per_ant[txant]=$block_size
 			if [ $((txant2)) -ne $((0xF)) ];then
 			option8_tx[$txant2]=$option8
 			bbsps_tx[txant2]=$baseband_txsps
@@ -1084,7 +1093,7 @@ one_enabled_dfe_core=0
 	fi
 	
 	
-	echo "num_errors=0; first_error=0" > runtime_config.txt
+	echo "loopback=$loopback; rloopback_time=$rloopback_time; rloopback_freq=$rloopback_freq; num_errors=0; first_error=0" > runtime_config.txt
 	echo "ant_remap=$ant_remap; ant_map_tx=(${ant_map_tx[@]}); ant_map_rx=(${ant_map_rx[@]})" >> ./runtime_config.txt
 	echo -e "DCSchan=(${DCSchan[@]})\ndfe_core=(${dfe_core[@]}); slave_core=(${slave_core[@]}); one_dfe_core=$one_dfe_core\ntest_tool_name=$test_tool_name; test_tool_version=$test_tool_version; vspa_image_version=$vspa_image_version; revision=$revision; ver_min=$ver_min; ver_maj=$ver_maj\niqswap_tx=(${iqswap_tx[@]}); iqswap_rx=(${iqswap_rx[@]}); MAX_NUM_1R_IN_CORE=$MAX_NUM_1R_IN_CORE" >> ./runtime_config.txt
 	echo -e "anttx=(${anttx[@]}); antrx=(${antrx[@]}); coretx_tr0=(${coretx_tr0[@]}); corerx_tr0=(${corerx_tr0[@]})\ncoretx_tr1=(${coretx_tr1[@]}); corerx_tr1=(${corerx_tr1[@]});" >> ./runtime_config.txt
@@ -1095,7 +1104,7 @@ one_enabled_dfe_core=0
 	echo "celltrack_extbuf_base=$celltrack_extbuf_base; celltrack_extbuf_size=$celltrack_extbuf_size; obs_buffer_phy=$obs_buffer_phy; obs_buffer_size=$obs_buffer_size" >> ./runtime_config.txt
 	echo -e "dcsfdd=$dcsfdd; hwdcm=$hwdcm; lsdiv2=$lsdiv2; hsdiv2=$hsdiv2; bwdiv=$bwdiv; pci_bw_req_total=$pci_bw_req_total; pci_bw_req=(${pci_bw_req[@]})\nnum_T_LS_enabled=$num_T_LS_enabled; num_R_LS_enabled=$num_R_LS_enabled; num_T_HS_enabled=$num_T_HS_enabled; num_R_HS_enabled=$num_R_HS_enabled" >> ./runtime_config.txt
 	echo -e "one_enabled_dfe_core=$one_enabled_dfe_core; option8_tx=(${option8_tx[@]}); option8_rx=(${option8_rx[@]})\nsym_size_per_ant=(${sym_size_per_ant[@]}); max_sym_size_per_ant=(${max_sym_size_per_ant[@]}); upsampling_ratio_per_ant=(${upsampling_ratio_per_ant[@]}); bbsps_tx=(${bbsps_tx[@]}); bbsps_rx=(${bbsps_rx[@]}); axiqsps_tx=(${axiqsps_tx[@]}); axiqsps_rx=(${axiqsps_rx[@]}); sinad_enable_arr=(${sinad_enable_arr[@]})" >> ./runtime_config.txt
-	echo -e "invecfile_ori=(${invecfile_ori[@]}); invecfile_cur=(${invecfile_cur[@]}); invecsize_exp=(${invecsize_exp[@]})\ndcs_enable=(${dcs_enable[@]}); ant_enable=(${ant_enable[@]})" >> ./runtime_config.txt
+	echo -e "invecfile_ori=(${invecfile_ori[@]}); invecfile_cur=(${invecfile_cur[@]}); invecsize_exp=(${invecsize_exp[@]})\ndcs_enable=(${dcs_enable[@]}); ant_enable=(${ant_enable[@]}); block_size_per_ant=(${block_size_per_ant[@]})" >> ./runtime_config.txt
 	echo -e "test_vector_on_hram=$test_vector_on_hram; next_HRAMaddr_phy=$next_HRAMaddr_phy\naddr_tx_test_vector=$addr_tx_test_vector; size_tx_test_vector=$size_tx_test_vector; addr_tx_wv=(${addr_tx_wv[@]})\naddr_inject=$addr_inject; size_inject=$size_inject; addr_dump=$addr_dump; addr_dump_vir=$addr_dump_vir; size_dump=$size_dump; end_ddr=$end_ddr " >> ./runtime_config.txt
 
 	./utils/memrw w 32 $test_tool_env_boot_vspa_ind 0 #channels already started here, clear the vspa boot flag.
@@ -1114,6 +1123,20 @@ one_enabled_dfe_core=0
 			[ $((pnswap_rx_I[ant_map_rx[ant]] | pnswap_rx_Q[ant_map_rx[ant]])) = 1 ] && ./update_qec_coeff_rx.sh $ant dis
 			rx_scaling=`./utils/memrw r 32 $((test_tool_env_rx_scaling+ant*4))`
 			[ $((rx_scaling)) -ne 100 ] && log=`./scale_percent.sh rx $ant 100`
+		fi
+		if [ $((ant_enable[ant]&BITMASK_ANT_ENABLE_TRX)) -eq $((BITMASK_ANT_ENABLE_TRX)) ];then
+			txcore=${anttx[$ant]}; txscore=${slave_core[txcore]}
+			rxcore=${antrx[$ant]}; rxscore=${slave_core[rxcore]}
+			if [ $rloopback_freq = 1 ];then
+				set_wordvalue_to_vspa $rxcore $rx_sym_buf_base_dump `get_wordvalue_from_vspa $txcore $tx_sym_buf_base_inject`
+				set_wordvalue_to_vspa $rxcore $rx_num_sym_in_buff_dump `get_wordvalue_from_vspa $txcore $tx_num_sym_in_buf_inject`
+			fi
+			if [ $rloopback_time = 1 ];then
+				./inject_time_domain_tx.sh $ant 
+				set_wordvalue_to_vspa $rxscore $rx_timedomain_dump_addr `get_wordvalue_from_vspa $txscore $tx_timedomain_inject_addr`
+				set_wordvalue_to_vspa $rxscore $rx_timedomain_dump_size `get_wordvalue_from_vspa $txscore $tx_timedomain_inject_size`
+				set_hwordvalue_to_vspa $rxscore $rx_timedomain_dump_flag `get_hwordvalue_from_vspa $txscore $tx_timedomain_inject_flag`
+			fi
 		fi
 	done
 	

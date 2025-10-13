@@ -230,8 +230,6 @@ else
 	obs_sps=0
 fi
 
-echo Booting VSPA images $arg + $malt_firmware_pathname
-
 if [ $flag_la93 = 1 ];then
 	log=`lsmod | grep la9310shiva`
 	if [ "$log" != "" ];then
@@ -270,7 +268,7 @@ if [ $flag_la93 = 1 ];then
 	[ $? -ne 0 ] && { echo -e "***ERROR: Failure in insmod $boot_tool, need reboot."; exit 1; }
 
 	sleep 1
-	tag="\nNext step: run ./channels_start.sh\n"
+	tag="\nVSPA image used: $arg\nm4   image used: $malt_firmware_pathname\nNext step: run ./channels_start.sh\n"
 else
 	while [ 1 ];
 	do
@@ -289,7 +287,7 @@ else
 	done
 	var=$(cat /sys/yami/yami_status |grep -A3 "Devices Detected" |grep "="|cut -d"=" -f2|tr -d ' '|head -1)
 	modem_num=$((var))
-	tag="\nNo. of LA12xx Modem Detected: $modem_num \nNext step: run ./channels_start.sh\n"
+	tag="\nNo. of LA12xx Modem Detected: $modem_num\nVSPA image used: $arg\ne200 image used: $malt_firmware_pathname\nNext step: run ./channels_start.sh\n"
 fi
 boot_cmd_hist=0
 [ -f ./boot_vspa_log.txt ] && source ./boot_vspa_log.txt
