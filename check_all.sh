@@ -307,7 +307,11 @@ else
 	tag_from_file="from HighPHY"
 fi
 
-if [ $single_tone_stat = 1 ];then
+txinj_addr=`get_wordvalue_from_vspa $score $tx_timedomain_inject_addr`
+txinj_size=`get_wordvalue_from_vspa $score $tx_timedomain_inject_size`
+if [ $((txinj_size)) -ne 0 ];then
+echo "***               TX MODE:   Time domain inject, addr $txinj_addr size $txinj_size"
+elif [ $single_tone_stat = 1 ];then
 echo "***               TX MODE:   Single Tone"
 elif [ $((`get_vspa_ip_reg_value $core $IP_DFE_MODE_HI` & DFE_MODE_OPTION8)) -ne 0 ];then
 echo -e "***               TX MODE:   Time Domain waveform $baseband_txsps KSPS $tag_from_file"
@@ -317,7 +321,18 @@ fi
 
 fi
 
-
+if [ $tag != TX ]; then
+rxinj_addr=`get_wordvalue_from_vspa $score $rx_inject_addr`
+rxinj_size=`get_wordvalue_from_vspa $score $rx_inject_size`
+rx_single_tone_amp=`get_wordvalue_from_vspa $score $CONFIG_RX_SINGLE_TONE_AMP`
+if [ $((rxinj_size)) -ne 0 ];then
+echo "***               RX MODE:   Time domain inject, addr $rxinj_addr size $rxinj_size"
+elif [ $((rx_single_tone_amp)) -ne 0 ];then
+echo "***               RX MODE:   Single Tone"
+else
+echo "***               RX MODE:   NORMAL (Receiving data from ADC)"
+fi
+fi
 
 
 if [ $vspa_dev_type = LA12xx ];then

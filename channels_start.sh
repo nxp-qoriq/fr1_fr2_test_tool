@@ -264,18 +264,19 @@ fi
 echo "$vspa_image_folder_name" | grep MEvspa_images_LS.1T1R.T4x_25M_60K_122_122_TDDFDD_LA93
 [ $? = 0 ] && { echo Current VSPA image supports DFE only, set DFE mode.; dfe_only=1; sym_buf_onchip=1; }
 
+size_inject_rx=0
 if [ "$rxinj_file" != "" ];then
 if [ $((vspa_image_version)) -ge $((0x482)) ];then
-	size_inject=$(stat --format=%s $rxinj_file)
+	size_inject_rx=$(stat --format=%s $rxinj_file)
 else
 	echo ***ERROR: RX injection is not supported in version older than v482; channels_start_fail;
 fi
 fi
 
-addr_inject=$ddr_malloc_cur
-ddr_malloc_cur=`printf 0x%x $((ddr_malloc_cur + size_inject))`
-if [ $size_inject -ne 0 ];then
-	loadfile `phy2vir $addr_inject` $rxinj_file
+addr_inject_rx=$ddr_malloc_cur
+ddr_malloc_cur=`printf 0x%x $((ddr_malloc_cur + size_inject_rx))`
+if [ $size_inject_rx -ne 0 ];then
+	loadfile `phy2vir $addr_inject_rx` $rxinj_file
 fi
 
 if [ $vspa_dev_type = LA9310 ];then
@@ -691,7 +692,7 @@ fi
 
 
 tv_malloc_cur=$((next_HRAMaddr_phy*test_vector_on_hram+ddr_malloc_cur*(1-test_vector_on_hram)))
-addr_tx_test_vector=$tv_malloc_cur; #addr_dump=0
+addr_tx_test_vector=$tv_malloc_cur;
 addr_tx_wv=(${ANTS_ARR_INIT[@]})
 invec_addr_cur_backup=0; invecsize_backup=0; invecfile_backup=0
 print_msg=""
@@ -1025,10 +1026,13 @@ one_enabled_dfe_core=0
 		fi
 		fi
 		
-		if [ $size_inject -ne 0 ];then
+		if ([ $size_inject_rx -ne 0 ] && [ $((dfe_mode_msb&(1<<23))) -eq 0 ]);then
 			score=$((slave_core[core]))
-			set_wordvalue_to_vspa $score $rx_inject_addr $addr_inject
-			set_wordvalue_to_vspa $score $rx_inject_size $size_inject
+			block_size_axiq=$((block_size*downsampling_ratio))
+			size_inject_rx=$((size_inject_rx/block_size_axiq*block_size_axiq)) #align inject size to block size.
+			set_wordvalue_to_vspa $score $rx_inject_addr $addr_inject_rx
+			set_wordvalue_to_vspa $score $rx_inject_size $size_inject_rx
+			echo RX time domain inject configured for ant $rxant from address `HEX $addr_inject_rx` size $size_inject_rx
 		fi
 		
 		#send 2nd init msg: DFE MODE
@@ -1086,6 +1090,7 @@ one_enabled_dfe_core=0
 	addr_dump=$ddr_malloc_cur; addr_dump_vir=`phy2vir $addr_dump`
 	ddr_malloc_cur=`printf 0x%x $((ddr_malloc_cur + size_dump))` 
 	end_ddr=$ddr_malloc_cur
+	addr_inject_tx=$addr_dump; size_inject_tx=0;
 	
 	if [ $((end_ddr)) -gt $((ddr_phy+ddr_size)) ];then
 		str="***WARNING: DDR size larger than available. Size needed `printf "0x%x" $((end_ddr-ddr_phy))`, size available `printf "0x%x" $ddr_size`"
@@ -1105,7 +1110,7 @@ one_enabled_dfe_core=0
 	echo -e "dcsfdd=$dcsfdd; hwdcm=$hwdcm; lsdiv2=$lsdiv2; hsdiv2=$hsdiv2; bwdiv=$bwdiv; pci_bw_req_total=$pci_bw_req_total; pci_bw_req=(${pci_bw_req[@]})\nnum_T_LS_enabled=$num_T_LS_enabled; num_R_LS_enabled=$num_R_LS_enabled; num_T_HS_enabled=$num_T_HS_enabled; num_R_HS_enabled=$num_R_HS_enabled" >> ./runtime_config.txt
 	echo -e "one_enabled_dfe_core=$one_enabled_dfe_core; option8_tx=(${option8_tx[@]}); option8_rx=(${option8_rx[@]})\nsym_size_per_ant=(${sym_size_per_ant[@]}); max_sym_size_per_ant=(${max_sym_size_per_ant[@]}); upsampling_ratio_per_ant=(${upsampling_ratio_per_ant[@]}); bbsps_tx=(${bbsps_tx[@]}); bbsps_rx=(${bbsps_rx[@]}); axiqsps_tx=(${axiqsps_tx[@]}); axiqsps_rx=(${axiqsps_rx[@]}); sinad_enable_arr=(${sinad_enable_arr[@]})" >> ./runtime_config.txt
 	echo -e "invecfile_ori=(${invecfile_ori[@]}); invecfile_cur=(${invecfile_cur[@]}); invecsize_exp=(${invecsize_exp[@]})\ndcs_enable=(${dcs_enable[@]}); ant_enable=(${ant_enable[@]}); block_size_per_ant=(${block_size_per_ant[@]})" >> ./runtime_config.txt
-	echo -e "test_vector_on_hram=$test_vector_on_hram; next_HRAMaddr_phy=$next_HRAMaddr_phy\naddr_tx_test_vector=$addr_tx_test_vector; size_tx_test_vector=$size_tx_test_vector; addr_tx_wv=(${addr_tx_wv[@]})\naddr_inject=$addr_inject; size_inject=$size_inject; addr_dump=$addr_dump; addr_dump_vir=$addr_dump_vir; size_dump=$size_dump; end_ddr=$end_ddr " >> ./runtime_config.txt
+	echo -e "test_vector_on_hram=$test_vector_on_hram; next_HRAMaddr_phy=$next_HRAMaddr_phy\naddr_tx_test_vector=$addr_tx_test_vector; size_tx_test_vector=$size_tx_test_vector; addr_tx_wv=(${addr_tx_wv[@]})\naddr_inject_rx=$addr_inject_rx; addr_inject_tx=$addr_inject_tx; size_inject_tx=$size_inject_tx; size_inject_rx=$size_inject_rx; addr_dump=$addr_dump; addr_dump_vir=$addr_dump_vir; size_dump=$size_dump; end_ddr=$end_ddr " >> ./runtime_config.txt
 
 	./utils/memrw w 32 $test_tool_env_boot_vspa_ind 0 #channels already started here, clear the vspa boot flag.
 	
@@ -1130,12 +1135,17 @@ one_enabled_dfe_core=0
 			if [ $rloopback_freq = 1 ];then
 				set_wordvalue_to_vspa $rxcore $rx_sym_buf_base_dump `get_wordvalue_from_vspa $txcore $tx_sym_buf_base_inject`
 				set_wordvalue_to_vspa $rxcore $rx_num_sym_in_buff_dump `get_wordvalue_from_vspa $txcore $tx_num_sym_in_buf_inject`
+				echo Reverse loopback freq domain, loopback delay is ${input_waveform_len[tx_fdd]} ms.
 			fi
 			if [ $rloopback_time = 1 ];then
+				if [ ${axiqsps_tx[ant]} -ne ${axiqsps_rx[ant]} ];then
+					echo -e "***ERROR: TX DAC and RX ADC sampling rate is different, failed to configure reverse loopback time domain."
+					[ ${axiqsps_tx[ant]} -eq $((axiqsps_rx[ant]*2)) ] && echo -e "Try ./boot_vspa.sh lsdiv2 to set same TX/RX sampling rate."
+					channels_start_fail
+				fi
 				./inject_time_domain_tx.sh $ant 
 				set_wordvalue_to_vspa $rxscore $rx_timedomain_dump_addr `get_wordvalue_from_vspa $txscore $tx_timedomain_inject_addr`
 				set_wordvalue_to_vspa $rxscore $rx_timedomain_dump_size `get_wordvalue_from_vspa $txscore $tx_timedomain_inject_size`
-				set_hwordvalue_to_vspa $rxscore $rx_timedomain_dump_flag `get_hwordvalue_from_vspa $txscore $tx_timedomain_inject_flag`
 			fi
 		fi
 	done

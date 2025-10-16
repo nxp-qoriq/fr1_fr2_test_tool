@@ -65,7 +65,7 @@ get_chan_para $ant $txcore
 #[ $tx_timedomain_dump_inject_enable = 0 ] && { echo "***ERROR: Current version of VSPA image doesn't support this feature."; echo; exit 1; }
 
 msb=`printf "0x%08x" $((0x0A200000 + (tid<<15)))`
-status=`get_hwordvalue_from_vspa $txscore $tx_timedomain_inject_flag`
+status=`get_wordvalue_from_vspa $txscore $tx_timedomain_inject_size`
 
 if [ $stop_inject = 1 ];then
 	#msb=`printf "0x%08x" $((0x0A202000 + (tid<<15)))`
@@ -75,7 +75,7 @@ if [ $stop_inject = 1 ];then
 		echo -e "***ERROR: Current ant $ant time domain inject not enabled, unable to stop it.\n"
 		exit 1
 	else
-		set_hwordvalue_to_vspa $txscore $tx_timedomain_inject_flag 0
+		set_wordvalue_to_vspa $txscore $tx_timedomain_inject_size 0
 		echo Time domain inject on ant $ant successfully stopped.
 		exit 1
 	fi
@@ -126,9 +126,9 @@ if [ $via_hram = 0 ];then
 		((filesize=num_half_ms*size_half_ms))
 	fi
 	malloc_for_inject $filesize
-	addr_phy=$addr_inject
+	addr_phy=$malloced_addr
 	addr_vir=`phy2vir $addr_phy`
-	echo Injecting size is set to $filesize, $tag from DDR.
+	echo TX time domain inject size is set to $filesize, $tag from DDR.
 else
 	addr_phy=$next_HRAMaddr_phy
 	addr_vir=$((HRAMaddr_vir+next_HRAMaddr_phy-HRAMaddr_phy))
@@ -137,9 +137,9 @@ else
 		num_half_ms=$((available_hram_size/size_half_ms)); tag=$num_half_ms*0.5ms
 		[ $num_half_ms = 0 ] && { echo -e "\n***ERROR: Available HRAM size $available_hram_size is too small to hold 0.5ms size $size_half_ms.\n"; exit 1; } 
 		((filesize=num_half_ms*size_half_ms))
-		echo Injecting size is set to $filesize, $num_half_ms*0.5ms from HRAM.
+		echo TX time domain inject size is set to $filesize, $num_half_ms*0.5ms from HRAM.
 	else
-		echo Injecting size is set to $filesize, $tag from HRAM.
+		echo TX time domain inject size is set to $filesize, $tag from HRAM.
 	fi
 	
 	next_HRAMaddr_phy=$(printf 0x%x $((addr_phy+filesize)))
@@ -177,8 +177,6 @@ fi
 
 set_wordvalue_to_vspa $txscore $tx_timedomain_inject_addr $addr_phy
 set_wordvalue_to_vspa $txscore $tx_timedomain_inject_size $filesize
-set_hwordvalue_to_vspa $txscore $tx_timedomain_inject_flag 1
-echo -e "TX time domain inject $tag for antenna $ant from address `HEX $addr_vir` size $filesize\n"
 
 check_error_ant $ant
 if [ $((num_errors)) -ne 0 ];then
@@ -190,6 +188,11 @@ if [ $((num_errors)) -ne 0 ];then
 	echo And remember to stop injecting previous antenna before injecting another antenna!!!
 	exit 1
 else
-	echo -e "SUCCESS! Will keep injecting until stop injecting command is issued.\n"
+	if [ $rloopback_time = 0 ];then
+		echo -e "SUCCESS! TX time domain inject $tag for antenna $ant from address `HEX $addr_vir` size $filesize\n"
+	else
+		echo -e "SUCCESS! Reverse loopback time domain for antenna $ant from address `HEX $addr_vir` size $filesize"
+		echo -e "The loopback delay is $((filesize/4)) sample at ${axiqsps_tx[ant]} Ksps, ~$((filesize/4*1000/axiqsps_tx[ant])) us\n"
+	fi
 fi
 exit 0

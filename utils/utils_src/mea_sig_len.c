@@ -120,16 +120,21 @@ int main(int argc, char *argv[])
 	addr_dst = mmap_addr_dst + phys_addr_dst - phys_addr_dst_aligned;
 	addr_cap = mmap_addr_cap + phys_addr_cap - phys_addr_cap_aligned;
 
-	unsigned int sig_v_ori = (*addr_src)&bitmask;
 	unsigned int sig_v_new, sig_curr;
 	unsigned long clock_hi=addr_dst[0], clock_lo=addr_dst[1];
 	unsigned long clock_cur, clock_pre=((clock_hi&0xFFFF)<<32)+clock_lo;
-	unsigned long i=0,total=0;
+	unsigned long i,total;
 	
 	if(mea_end)
 		printf("Measuring last %d events or sig changes... \n", NUM_MEASURE_ENTRIES);
 	else
 		printf("Measuring beginning %d events or sig changes...\n", NUM_MEASURE_ENTRIES);
+	
+	record[0][0] = *addr_src;//sig_v_new;
+	record[0][1] = addr_dst[0];
+	record[0][2] = *addr_cap;
+	i=1; total=1;  //initial value to first record
+	unsigned int sig_v_ori = record[0][0]&bitmask;
 	
 	while(1)
 	{
@@ -206,6 +211,8 @@ mea_end:
 		}
 		printf("\nEntry %3d: captured_value 0x%08x, trig_value 0x%08x, timestamp 0x%08x\n", ncount, record[ncount][2], record[ncount][0], record[ncount][1]);
 	}
+	if(total==1)
+		printf("No triggering happened, Entry 0 is the initial value.\n");
 	close(devmem_fd);
 	return 0;
 }

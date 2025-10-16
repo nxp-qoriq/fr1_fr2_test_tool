@@ -1,7 +1,7 @@
 ;*********************************************************************************
 ;*StarCore Linker it3a-ld.exe version 3.0.315 - 2022.01.12 Advanced Accelerating Architectures
 ;*
-;*Compilation date : Mon Oct 13 14:11:04 2025
+;*Compilation date : Thu Oct 16 16:57:59 2025
 ;*File Name : C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core2.map
 ;*Invocation line: C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\bin\it3a-ld.exe -o C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/geul-vspa2.eld -Map C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core2.map -LC:/0_dsp/Projects_VSPA/DFE_Ref/lib -llib_DFE_Ref_vspa3.elb -c C:/0_dsp/Projects_VSPA/DFE_Ref/LCF/LA1224_sp.lcf -arch vspa3 -core_type=sp -au_count 16 .\source_shared\DFE_func_rx.eln .\source_shared\DFE_func_tx.eln .\source_shared\DFE_init.eln .\source_shared\boot.eln .\source_shared\debug.eln .\source_shared\dump_inject.eln .\source_shared\global_var.eln .\source_shared\host_vspa_msg.eln .\source_shared\inter_core_msg.eln .\source_shared\main_pair_coreA.eln .\source_shared\main_pair_coreB.eln .\source_shared\main_unused_core.eln .\source_shared\pair_para.eln .\source_shared\startup_vspa3_modified.eln .\source_shared\kernel_FFT\ifft_cp.eln .\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln .\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln .\source_shared\SINAD\sinad.eln .\source_proj_specific\main_PHY_RX_core.eln .\source_proj_specific\main_PHY_TX_core.eln -start-reread-lib C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\libc99_gen_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\libm_gen_au16_sp.elb -end-reread-lib
 ;*There are one or more errors in this application: 0x40000000
@@ -127,12 +127,12 @@
 ;*		GLOBAL  	      1392         	      1392    	         0       	_Ant_buffer_tx_init           	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*		GLOBAL  	        56         	        56    	         0       	_get_tx_allowed_status        	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*		GLOBAL  	       400         	       400    	         0       	_Ant_buffer_tx_dma_check      	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*		GLOBAL  	       680         	       680    	         0       	_Ant_buffer_tx_check_status   	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*		GLOBAL  	       640         	       640    	         0       	_Ant_buffer_tx_check_status   	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*		GLOBAL  	       200         	       200    	         0       	_tx_error_handling            	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*		GLOBAL  	       144         	       144    	         0       	_Ant_buffer_tx_axiq_enable    	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*		GLOBAL  	      1336         	      1336    	         0       	_Ant_buffer_tx_write_complete 	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*		GLOBAL  	       816         	       816    	         0       	_Ant_buffer_tx_dma_feed       	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*		GLOBAL  	      1248         	      1248    	         0       	_Ant_buffer_tx_apply_buffer   	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*		GLOBAL  	      1304         	      1304    	         0       	_Ant_buffer_tx_write_complete 	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*		GLOBAL  	       792         	       792    	         0       	_Ant_buffer_tx_dma_feed       	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*		GLOBAL  	      1232         	      1232    	         0       	_Ant_buffer_tx_apply_buffer   	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: .\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*MODULE: .\source_shared\SINAD\sinad.eln
 ;*		GLOBAL  	       264         	       264    	         0       	_fr2_rx_bitrev_b1_b1          	.\source_shared\SINAD\sinad.eln

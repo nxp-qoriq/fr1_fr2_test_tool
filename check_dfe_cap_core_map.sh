@@ -107,10 +107,8 @@ min_cycle_count=$((COREB_STATUS_BASE+0xba))
 obs_dump_addr=$((COREB_STATUS_BASE+0xd4))
 tx_timedomain_inject_addr=$((COREB_STATUS_BASE+0xd8))
 tx_timedomain_inject_size=$((COREB_STATUS_BASE+0xdc))
-tx_timedomain_inject_flag=$((COREB_STATUS_BASE+0xe0))  #16bit
-rx_timedomain_dump_flag=$((COREB_STATUS_BASE+0xe2))  #16bit
-rx_timedomain_dump_addr=$((COREB_STATUS_BASE+0xe4))
-rx_timedomain_dump_size=$((COREB_STATUS_BASE+0xe8))
+rx_timedomain_dump_addr=$((COREB_STATUS_BASE+0xe0))
+rx_timedomain_dump_size=$((COREB_STATUS_BASE+0xe4))
 
 host_vspa_mbox_id=0
 tag_tddfdd=(TDD FDD)
@@ -701,13 +699,12 @@ local size=`size_align $1 4096`
 if [ $size_dump -lt $size ];then
 	local inc=$((size-size_dump))
 	end_ddr=$((end_ddr+inc))
-	addr_inject=$((addr_inject+inc))
 	size_dump=$size
 	if [ $((end_ddr)) -gt $((ddr_phy+ddr_size)) ];then
 		((num_warnings++))
 		echo "***WARNING $num_warnings: DDR size larger than available. Size needed `printf "0x%x" $((end_ddr-ddr_phy))`, size available `printf "0x%x" $ddr_size`"
 	fi
-	echo "end_ddr=$end_ddr; addr_inject=$addr_inject; size_dump=$size_dump"  >> ./runtime_config.txt
+	echo "end_ddr=$end_ddr; size_dump=$size_dump"  >> ./runtime_config.txt
 fi
 }
 
@@ -791,17 +788,16 @@ clear_mem()
 
 malloc_for_inject()  #$1=size for inject
 {
-local size=`size_align $1 4096`
-if [ $size_inject -lt $size ];then
-	local inc=$((size-size_inject))
-	end_ddr=$((end_ddr+inc))
-	size_inject=$size
+	local size=`size_align $1 4096`
+	malloced_addr=$((addr_inject_tx+size_inject_tx))
+	size_inject_tx=$((size_inject_tx+size))
+	addr_dump=$((addr_dump+size))
+	end_ddr=$((end_ddr+size))
 	if [ $((end_ddr)) -gt $((ddr_phy+ddr_size)) ];then
 		((num_warnings++))
 		echo "***WARNING $num_warnings: DDR size larger than available. Size needed `printf "0x%x" $((end_ddr-ddr_phy))`, size available `printf "0x%x" $ddr_size`"
 	fi
-	echo "end_ddr=$end_ddr; size_inject=$size_inject"  >> ./runtime_config.txt
-fi
+	echo "size_inject_tx=$size_inject_tx; addr_dump=$addr_dump; end_ddr=$end_ddr"  >> ./runtime_config.txt
 }
 
 print_ddr_usage()
@@ -816,8 +812,9 @@ print_ddr_usage()
 	echo "addr_obs_buffer              `phy2vir $obs_buffer_phy` -- `printf "0x%x" $obs_buffer_phy`, size `printf "0x%x" $obs_buffer_size`"
 	fi
 	echo "addr_tx_test_vector          `phy2vir $addr_tx_test_vector` -- `printf "0x%x" $addr_tx_test_vector`, size `printf "0x%x" $size_tx_test_vector`"
+	echo "addr_inject_rx               `phy2vir $addr_inject_rx` -- `printf "0x%x" $addr_inject_rx`, size `printf "0x%x" $size_inject_rx`"
+	echo "addr_inject_tx               `phy2vir $addr_inject_tx` -- `printf "0x%x" $addr_inject_tx`, size `printf "0x%x" $size_inject_tx`"
 	echo "addr_dump                    `phy2vir $addr_dump` -- `printf "0x%x" $addr_dump`, size `printf "0x%x" $size_dump`"
-	echo "addr_inject                  `phy2vir $addr_inject` -- `printf "0x%x" $addr_inject`, size `printf "0x%x" $size_inject`"
 	echo "End address                  `phy2vir $end_ddr` -- `printf "0x%x" $end_ddr`"
 	echo "total size used              `printf "0x%x" $((end_ddr-ddr_phy))`, available size `printf "0x%x" $ddr_size`"
 	echo
