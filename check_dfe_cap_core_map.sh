@@ -264,11 +264,11 @@ vspa_mbox()
 print_addr_mapping()
 {
 	echo -e "\nAddress Mapping:             Host View       Modem View"
-	echo "ddr                          $ddr_vir -- $ddr_phy, size $ddr_size"
-	echo "PEB                          $PEBaddr_vir -- $PEBaddr_phy" 
-	echo "HRAM                         $HRAMaddr_vir -- $HRAMaddr_phy" 
-	echo "FRAM                         $FRAMaddr_vir -- $FRAMaddr_phy" 
-	echo "VSPA DMEM                    $VDRAMaddr_vir -- $VDRAMaddr_phy"
+	echo "ddr                          $ddr_vir -- `HEX $ddr_phy`, size $ddr_size"
+	echo "PEB                          $PEBaddr_vir -- `HEX $PEBaddr_phy`" 
+	echo "HRAM                         $HRAMaddr_vir -- `HEX $HRAMaddr_phy`" 
+	echo "FRAM                         $FRAMaddr_vir -- `HEX $FRAMaddr_phy`" 
+	echo "VSPA DMEM                    $VDRAMaddr_vir -- `HEX $VDRAMaddr_phy`"
 	echo "modembase_phy CCSR           $modembase_phy"
 }
 
@@ -1473,20 +1473,6 @@ else
 	[ $((vspa_image_version)) -ge $((0x500)) ] && msb=$((msb&0xFFF00000))
 	vspa_mbox_ifsend $txcore $host_vspa_mbox_id $msb $lsb; [ $msg_recv_flag = 0 ] && vspa_mbox_ifrecv $txcore $host_vspa_mbox_id
 fi
-}
-
-dump_freq_domain_rx() #$1=core, $2=mailbox, $3=msb, $4=lsb
-{
-	vspa_mbox_ifsend $1 $2 $3 $4
-	sleep 0.1
-	#this is to restore RX sym buf struct
-	local rxcore=$1
-	if [ $((vspa_image_version)) -ge $((0x500)) ];then
-	msb=`./utils/memrw r 32 $((test_tool_env_buf_struct_msg+rxcore*8+0))`
-	lsb=`./utils/memrw r 32 $((test_tool_env_buf_struct_msg+rxcore*8+4))`
-	lsb=$((lsb&0xFFF00000))
-	vspa_mbox_ifsend $rxcore $host_vspa_mbox_id $msb $lsb; [ $msg_recv_flag = 0 ] && vspa_mbox_ifrecv $rxcore $host_vspa_mbox_id
-	fi
 }
 
 send_celltrack_cmd() #$1=core, $2=ssb_period, $3=ssb_sym_id, $4=ssb_re_offset, $5=NID2, $6=NID1

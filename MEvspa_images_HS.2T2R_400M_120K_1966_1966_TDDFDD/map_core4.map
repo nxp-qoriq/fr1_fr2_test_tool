@@ -1,7 +1,7 @@
 ;*********************************************************************************
 ;*StarCore Linker it3a-ld.exe version 3.0.315 - 2022.01.12 Advanced Accelerating Architectures
 ;*
-;*Compilation date : Thu Oct 16 16:56:57 2025
+;*Compilation date : Fri Oct 17 15:43:54 2025
 ;*File Name : C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core4.map
 ;*Invocation line: C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\bin\it3a-ld.exe -o C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/geul-vspa4.eld -Map C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core4.map -LC:/0_dsp/Projects_VSPA/DFE_Ref/lib -llib_DFE_Ref_vspa3.elb -c C:/0_dsp/Projects_VSPA/DFE_Ref/LCF/LA1224_sp.lcf -arch vspa3 -core_type=sp -au_count 16 .\source_shared\DFE_func_rx.eln .\source_shared\DFE_func_tx.eln .\source_shared\DFE_init.eln .\source_shared\boot.eln .\source_shared\debug.eln .\source_shared\dump_inject.eln .\source_shared\global_var.eln .\source_shared\host_vspa_msg.eln .\source_shared\inter_core_msg.eln .\source_shared\main_pair_coreA.eln .\source_shared\main_pair_coreB.eln .\source_shared\main_unused_core.eln .\source_shared\pair_para.eln .\source_shared\startup_vspa3_modified.eln .\source_shared\kernel_FFT\ifft_cp.eln .\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln .\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln .\source_shared\SINAD\sinad.eln .\source_proj_specific\main_PHY_RX_core.eln .\source_proj_specific\main_PHY_TX_core.eln -start-reread-lib C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\libc99_gen_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\libm_gen_au16_sp.elb -end-reread-lib
 ;*There are one or more errors in this application: 0x40000000
@@ -86,7 +86,7 @@
 ;*		GLOBAL  	        80         	        80    	         0       	_tx_ppln_stop                 	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	      1032         	      1032    	         0       	_tx_sym_counter_update        	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	        96         	        96    	         0       	_get_available_size_for_ifft_out	.\source_shared\DFE_func_tx.eln
-;*		GLOBAL  	      2600         	      2600    	         0       	_PHY_DFE_interf_tx_check_dma_start	.\source_shared\DFE_func_tx.eln
+;*		GLOBAL  	      2720         	      2720    	         0       	_PHY_DFE_interf_tx_check_dma_start	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	      1520         	      1520    	         0       	_tx_sym_ready_processing      	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	       328         	       328    	         0       	_advance_tx_sym_idx           	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	      1688         	      1688    	         0       	_tx_processing_symbol_level   	.\source_shared\DFE_func_tx.eln
@@ -314,7 +314,7 @@
 ;*		GLOBAL  	        80         	        80    	         0       	___cmp64_eq                   	C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
 ;*		GLOBAL  	       128         	       128    	         0       	___cmp64_ge                   	C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
-;*TOTAL CODE: 31008 BYTES REMOVED
+;*TOTAL CODE: 31128 BYTES REMOVED
 ;*********************************************************************************
 ;*************************CALL TREE FOR FUNCTIONS*********************************
 ;*********************************************************************************

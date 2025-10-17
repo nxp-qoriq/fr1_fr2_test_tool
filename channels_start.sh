@@ -174,6 +174,7 @@ rxinj_file=""
 size_dump=0; size_inject=0
 rt=0
 rloopback_freq=0; rloopback_time=0
+no_wv_load=0
 
 arg_parse()
 {
@@ -252,8 +253,8 @@ do
 	arg_parse $i
 done
 
-[ $rloopback_freq = 1 ] && norx2host=0
-[ $rloopback_time = 1 ] && { idle=1; hwdcm=0; arg_nhwdcm=1; }   #DAC ADC sampling rate should be same for reverse loopback time domain, freq domain processing set to idle
+[ $rloopback_freq = 1 ] && { norx2host=0; no_wv_load=1; }
+[ $rloopback_time = 1 ] && { idle=1; hwdcm=0; arg_nhwdcm=1; no_wv_load=1; }   #DAC ADC sampling rate should be same for reverse loopback time domain, freq domain processing set to idle
 
 source ./boot_vspa_log.txt
 echo "$vspa_image_folder_name" | grep ADvspa_images_LS.4T4R_100M_30K_491_245_TDDFDD_ISC
@@ -697,7 +698,7 @@ addr_tx_wv=(${ANTS_ARR_INIT[@]})
 invec_addr_cur_backup=0; invecsize_backup=0; invecfile_backup=0
 print_msg=""
 one_enabled_dfe_core=0
-[ $((sinad+dfe_only+rt)) -ne 0 ] && no_wv_load=1 || no_wv_load=0
+[ $((sinad+dfe_only+rt)) -ne 0 ] && no_wv_load=1
 
 	for ((core=0;core<NUM_CORES;core++))
 	do

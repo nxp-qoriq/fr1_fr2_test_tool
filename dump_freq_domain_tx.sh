@@ -24,6 +24,7 @@ c11a3f0674475ed4fec43da39cc8b5e9 "Default TM3.1 400Mhz 120Khz TDD"
 6146b49c090b4f97a761edaeb6919a06 "Default TM3.1 400Mhz 120Khz FDD"
 29c00381b08f947d7241679268668655 "Default TM3.1_200MHz_60kHz_FDD_fd_20ms"
 8a5b6d26d0acaea2827736ceb292a04a "Default TM3.1_200MHz_60kHz_TDD_fd_20ms"
+5c36b38aa0d7aeedc52fe6dc8484ff88 "1.9Gsps RX single tone 10Mhz 1% scale 10ms freq domain dump"
 0 )  #the last element must be a 0 for end of list flag
 
 print_tx_dump_check_correct()
@@ -69,6 +70,7 @@ do
 	arg_parse $i
 done
 
+[ $fr1_used = 0 ] && ant=$(((ant%2)+4))
 [ $((vspa_image_version)) -lt $((0x500)) ] && { echo -e "***ERROR: VSPA image version older than 5.0 does not support TX freq domain dump.\n"; exit 1; }
 check_ant_enable_tx $ant; core=${anttx[$ant]}; trid=${tidant[$ant]}; cmd=0x0A0F0000;
 get_chan_para $ant $core
@@ -109,12 +111,12 @@ vspa_mbox_ifsend $core $host_vspa_mbox_id $msb $lsb
 echo vspa_mbox send $core $host_vspa_mbox_id $msb $lsb
 sleep 0.1
 [ -f $filename ] && rm $filename; dumpfile $addr_vir $filename $size_file
-echo Antenna $ant done: Dumped to address $addr_vir with size $size_file, file: $filename
+echo Ant $ant dump done, to address $addr_vir size $size_file, file:$filename
 
 #check dump data correctness
 checksum=`md5sum $filename`
 checksum=${checksum:0:32}
-echo md5checksum: $checksum
+echo md5sum: $checksum
 if [ $tempmd5sum = $checksum ];then
 	echo -e "***WARNING: The dump data are all zero. TX frequency domain dump may not be supported by VSPA.\n"
 fi

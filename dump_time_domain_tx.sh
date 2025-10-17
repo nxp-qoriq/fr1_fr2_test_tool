@@ -240,6 +240,9 @@ e89c198ca42c9d5fc5ce907dd996908c "Two Singletones 120Khz 40% + 240Khz 40% scale 
 45e6fd10be3dd571e49b34256b539552 "Default TM3.1 800Mhz 480Khz FDD 10ms option8 2x16 taps filter 20ms timedomain dump waveform." 
 48351f6a1fb78a58897f8b7b0c30cdf6 "20Mhz SCS30 61Msps LA9310 input with increasing counters FDD option8 dump"
 9919537dbb63e5d037f7a4525086f783 "20Mhz SCS30 61Msps LA12xx input with increasing counters FDD option8 dump"
+3944f053e152d29f40536481dc9d54d6 "1.9Gsps RX single tone 9960000Hz 1% scale freq domain loopback 10ms buffer time domain 20ms dump"
+098a5f81c79df2c1bee6b085aade5aee "1.9Gsps RX single tone 10Mhz 25% scale time domain loopback time domain 20ms dump"
+e23c41dc7c830f5c42d4b0ddcb5f095d "1.9Gsps RX single tone 10Mhz 25% scale option8 0.5ms buffer loopback time domain 20ms dump"
 0)
 
 ant=0
@@ -442,8 +445,8 @@ if [ $dump_via_hram = 1 ];then
 else 							dump_1time
 fi
 [ $fast = 0 ] && echo -e "$str"
-if [ $mem = 0 ];then		echo -e "Antenna $ant dumping done, size:$size, address:$addr_vir, file:$dump_filename\n"
-else						echo -e "Antenna $ant dumping done, size:$size, address:$addr_vir, sampling rate:$sps\n"
+if [ $mem = 0 ];then		echo -e "An $ant dump done, to address:$addr_vir size:$size, file:$dump_filename\n"
+else						echo -e "An $ant dump done, to address:$addr_vir size:$size, sampling rate:$sps\n"
 fi
 
 [ $fast = 1 ] && exit

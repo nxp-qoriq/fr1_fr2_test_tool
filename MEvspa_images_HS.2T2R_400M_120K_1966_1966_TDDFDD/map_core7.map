@@ -1,7 +1,7 @@
 ;*********************************************************************************
 ;*StarCore Linker it3a-ld.exe version 3.0.315 - 2022.01.12 Advanced Accelerating Architectures
 ;*
-;*Compilation date : Thu Oct 16 16:57:11 2025
+;*Compilation date : Fri Oct 17 15:43:21 2025
 ;*File Name : C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core7.map
 ;*Invocation line: C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\bin\it3a-ld.exe -o C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/geul-vspa7.eld -Map C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core7.map -LC:/0_dsp/Projects_VSPA/DFE_Ref/lib -llib_DFE_Ref_vspa3.elb -c C:/0_dsp/Projects_VSPA/DFE_Ref/LCF/LA1224_sp.lcf -arch vspa3 -core_type=sp -au_count 16 .\source_shared\DFE_func_rx.eln .\source_shared\DFE_func_tx.eln .\source_shared\DFE_init.eln .\source_shared\boot.eln .\source_shared\debug.eln .\source_shared\dump_inject.eln .\source_shared\global_var.eln .\source_shared\host_vspa_msg.eln .\source_shared\inter_core_msg.eln .\source_shared\main_pair_coreA.eln .\source_shared\main_pair_coreB.eln .\source_shared\main_unused_core.eln .\source_shared\pair_para.eln .\source_shared\startup_vspa3_modified.eln .\source_shared\kernel_FFT\ifft_cp.eln .\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln .\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln .\source_shared\SINAD\sinad.eln -start-reread-lib C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\libc99_gen_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\libm_gen_au16_sp.elb -end-reread-lib
 ;*********************************************************************************
@@ -70,11 +70,12 @@
 ;*		GLOBAL  	       736         	       736    	         0       	_rx_processing_symbol_level   	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	        64         	        64    	         0       	_get_valid_size_for_fft_in    	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	        48         	        48    	         0       	_convert_2implement           	.\source_shared\DFE_func_rx.eln
+;*		GLOBAL  	       240         	       240    	         0       	_get_rx_sym_buf_addr          	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	       240         	       240    	         0       	_get_rx_dump_sym_buf_addr     	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	       544         	       544    	         0       	_check_rx_sym_start           	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	        72         	        72    	         0       	_ack_phy_rx_buf_available     	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	       144         	       144    	         0       	_PHY_DFE_interf_rx_check_dma_finish	.\source_shared\DFE_func_rx.eln
-;*		GLOBAL  	      2216         	      2216    	         0       	_PHY_DFE_interf_rx_check_dma_start	.\source_shared\DFE_func_rx.eln
+;*		GLOBAL  	      2320         	      2320    	         0       	_PHY_DFE_interf_rx_check_dma_start	.\source_shared\DFE_func_rx.eln
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: .\source_shared\DFE_func_rx.eln
 ;*MODULE: .\source_shared\DFE_init.eln
 ;*		GLOBAL  	        24         	        24    	         0       	_init_coreB                   	.\source_shared\DFE_init.eln
@@ -320,7 +321,7 @@
 ;*		GLOBAL  	        80         	        80    	         0       	___cmp64_eq                   	C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
 ;*		GLOBAL  	       128         	       128    	         0       	___cmp64_ge                   	C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
-;*TOTAL CODE: 38136 BYTES REMOVED
+;*TOTAL CODE: 38240 BYTES REMOVED
 ;*********************************************************************************
 ;*************************CALL TREE FOR FUNCTIONS*********************************
 ;*********************************************************************************
@@ -351,6 +352,7 @@
 ;*				GLOBAL  	_rx_sym_ready_processing	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL 	_get_valid_size_for_fft_in
 ;*		GLOBAL 	_convert_2implement
+;*		GLOBAL 	_get_rx_sym_buf_addr
 ;*		GLOBAL 	_get_rx_dump_sym_buf_addr
 ;*		GLOBAL 	_check_rx_sym_start	calls the following functions:
 ;*				GLOBAL  	_vecclr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
@@ -1058,6 +1060,9 @@
 0x00000a80           0      Section: .text(.\source_shared\DFE_func_rx.eln)
 0x00000a80           0          _get_rx_dump_sym_buf_addr (run_address 0x00000a80)
 0x00000a80                      F_get_rx_dump_sym_buf_addr_end (run_address 0x00000a80)
+0x00000a80           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00000a80           0          _get_rx_sym_buf_addr (run_address 0x00000a80)
+0x00000a80                      F_get_rx_sym_buf_addr_end (run_address 0x00000a80)
 0x00000a80           0      Section: .text(.\source_shared\DFE_func_rx.eln)
 0x00000a80           0          _get_valid_size_for_fft_in (run_address 0x00000a80)
 0x00000a80                      F_get_valid_size_for_fft_in_end (run_address 0x00000a80)

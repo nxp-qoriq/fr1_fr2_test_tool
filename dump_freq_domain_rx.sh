@@ -72,6 +72,7 @@ f94fa084e3169ebc0565dc1561339e36 "Singletone 30Khz 245Msps FDD RX freq domain wi
 bf1f7ea2972cafa00389b89c251a2ca1 "Singletone 30Khz 245Msps TDD RX freq domain with phase compensation dump"
 0461196b4f0cde6a86ccc85bab58f32a "Singletone 30Khz 245Msps TDD RX freq domain"
 662b8867818fd5fd5c99cde4faa85dc0 "20Mhz 30Khz TM3.3 FDD TX loopbacked to RX reference"
+5c36b38aa0d7aeedc52fe6dc8484ff88 "1.9Gsps RX single tone 10Mhz 1% scale 10ms freq domain dump"
 0 )  #the last element must be a 0 for end of list flag
 
 print_usage()
@@ -192,7 +193,8 @@ filenamesym=0
 
 msb=`printf "0x%08x" $((msb + (rid<<15) + (keep_dumping<<14) ))`
 lsb=`printf "0x%08x" $(((nsym<<20)+(addr_phy>>12)))`
-dump_freq_domain_rx $rxcore $host_vspa_mbox_id $msb $lsb
+vspa_mbox_ifsend $rxcore $host_vspa_mbox_id $msb $lsb
+sleep 0.1
 
 if [ $mem = 0 ];then
 
@@ -200,14 +202,14 @@ if [ $filenamesym != 0 ];then
 	sym_buf_size=`size_align $((sym_size*4)) 128`
 	[ -f $filenamesym ] && rm $filenamesym
 	dumpfile $addr_vir $filenamesym $((nsym*sym_buf_size))
-	echo Antenna $dcsid dump done, from address $addr_vir, size:$((nsym*sym_buf_size)), file:$filenamesym
+	echo Ant $dcsid dump done, to address $addr_vir, size:$((nsym*sym_buf_size)), file:$filenamesym
 	check_error_ant $dcsid
 	exit 0;
 fi
 
 filename=$filename0\_ant$dcsid.bin
 [ -f $filename ] && rm $filename; dumpfile $addr_vir $filename $size_file
-echo Antenna $dcsid dump done, from address $addr_vir, size:$size_file, file:$filename
+echo Ant $dcsid dump done, to address $addr_vir, size:$size_file, file:$filename
 
 if [ $num_32KB -ne 0 ];then
 if [ $((option8_rx[dcsid])) -eq 1 ];then
@@ -217,14 +219,14 @@ else
 fi
 [ -f $filename1 ] && rm $filename1
 dumpfile $addr_vir $filename1 $((num_32KB*32768))
-echo Antenna $dcsid dump done, from address $addr_vir, size:$((num_32KB*32768)), file:$filename1
+echo Ant $dcsid dump done, to address $addr_vir size:$((num_32KB*32768)), file:$filename1
 fi
 
 if [ $fast = 0 ];then
 	#check dump data correctness
 	checksum=`md5sum $filename`
 	checksum=${checksum:0:32}
-	echo md5sum $checksum
+	echo md5sum: $checksum
 
 	check_known_waveform $checksum
 
@@ -235,9 +237,9 @@ fi
 
 else
 if [ $filenamesym != 0 ];then
-echo Antenna $ant dump done to address $addr_vir, size $((nsym*sym_buf_size)), $nsym symbols
+echo Ant $ant dump done, to address $addr_vir size $((nsym*sym_buf_size)), $nsym symbols
 else
-echo Antenna $ant dump done to address $addr_vir, size $size_file, time len $tag\ms $tagmux
+echo Ant $ant dump done, to address $addr_vir size $size_file, time len $tag\ms $tagmux
 fi
 fi
 
