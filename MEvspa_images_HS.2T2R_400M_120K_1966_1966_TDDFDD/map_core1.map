@@ -1,7 +1,7 @@
 ;*********************************************************************************
 ;*StarCore Linker it3a-ld.exe version 3.0.315 - 2022.01.12 Advanced Accelerating Architectures
 ;*
-;*Compilation date : Fri Oct 17 15:43:08 2025
+;*Compilation date : Tue Oct 28 12:11:55 2025
 ;*File Name : C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core1.map
 ;*Invocation line: C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\bin\it3a-ld.exe -o C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/geul-vspa1.eld -Map C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core1.map -LC:/0_dsp/Projects_VSPA/DFE_Ref/lib -llib_DFE_Ref_vspa3.elb -c C:/0_dsp/Projects_VSPA/DFE_Ref/LCF/LA1224_sp.lcf -arch vspa3 -core_type=sp -au_count 16 .\source_shared\DFE_func_rx.eln .\source_shared\DFE_func_tx.eln .\source_shared\DFE_init.eln .\source_shared\boot.eln .\source_shared\debug.eln .\source_shared\dump_inject.eln .\source_shared\global_var.eln .\source_shared\host_vspa_msg.eln .\source_shared\inter_core_msg.eln .\source_shared\main_pair_coreA.eln .\source_shared\main_pair_coreB.eln .\source_shared\main_unused_core.eln .\source_shared\pair_para.eln .\source_shared\startup_vspa3_modified.eln .\source_shared\kernel_FFT\ifft_cp.eln .\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln .\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln .\source_shared\SINAD\sinad.eln -start-reread-lib C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\libc99_gen_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\libm_gen_au16_sp.elb -end-reread-lib
 ;*********************************************************************************
@@ -33,8 +33,6 @@
 ;*		GLOBAL  	        64         	        64    	         0       	_real_window                  	.\source_shared\global_var.eln
 ;*		GLOBAL  	        64         	        64    	         0       	_dbg                          	.\source_shared\global_var.eln
 ;*MODULE: .\source_shared\host_vspa_msg.eln
-;*		GLOBAL  	        16         	        16    	         0       	_axi_flag_msg_response        	.\source_shared\host_vspa_msg.eln
-;*		GLOBAL  	        16         	        16    	         0       	_axi_flag_msg_response1       	.\source_shared\host_vspa_msg.eln
 ;*		GLOBAL  	         1         	         1    	         0       	_seq_id                       	.\source_shared\host_vspa_msg.eln
 ;*MODULE: .\source_shared\inter_core_msg.eln
 ;*		GLOBAL  	        64         	        64    	         0       	_data_table_rx_block          	.\source_shared\inter_core_msg.eln
@@ -85,8 +83,8 @@
 ;*		GLOBAL  	       456         	       456    	         0       	_dma_start                    	.\source_shared\DFE_init.eln
 ;*		GLOBAL  	       496         	       496    	         0       	_dma_start_2xfr               	.\source_shared\DFE_init.eln
 ;*MODULE: .\source_shared\dump_inject.eln
-;*		GLOBAL  	       736         	       736    	         0       	_dump_inject_data_1block      	.\source_shared\dump_inject.eln
-;*		GLOBAL  	       384         	       384    	         0       	_get_dpdout_dest_addr         	.\source_shared\dump_inject.eln
+;*		GLOBAL  	       608         	       608    	         0       	_dump_inject_data_1block      	.\source_shared\dump_inject.eln
+;*		GLOBAL  	       368         	       368    	         0       	_get_dpdout_dest_addr         	.\source_shared\dump_inject.eln
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: .\source_shared\dump_inject.eln
 ;*MODULE: .\source_shared\host_vspa_msg.eln
 ;*		GLOBAL  	        56         	        56    	         0       	_channel_restart              	.\source_shared\host_vspa_msg.eln
@@ -272,7 +270,7 @@
 ;*		GLOBAL  	        80         	        80    	         0       	___cmp64_eq                   	C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
 ;*		GLOBAL  	       128         	       128    	         0       	___cmp64_ge                   	C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
-;*TOTAL CODE: 18564 BYTES REMOVED
+;*TOTAL CODE: 18436 BYTES REMOVED
 ;*********************************************************************************
 ;*************************CALL TREE FOR FUNCTIONS*********************************
 ;*********************************************************************************
@@ -696,11 +694,11 @@
 ; 0x00000100  VCPU_DataReserveSize
 ; 0x00000800  StackSize
 ; 0x00004000  IPPU_PRAMSize
-; 0x00004700  __bss_end
-; 0x00004700  __data_start
-; 0x00004a80  __data_end
-; 0x00004a80  __end
-; 0x00004a80  _end
+; 0x00004680  __bss_end
+; 0x00004680  __data_start
+; 0x00004a00  __data_end
+; 0x00004a00  __end
+; 0x00004a00  _end
 ; 0x0001f700  VCPU_DRAMSize
 ; 0x0001f800  StackStart
 ; 0x0001f800  __stack
@@ -723,8 +721,8 @@
 ;    r-x |0x00000000..0x0001ffff|  memory .vpram (131072 bytes)
 ;*********************************************************************************
 ;		 Address space with id 1:
-;    rw- |0x00000000..0x00004a7f|  memory .vdram (19072 bytes)
-;        |0x00004a80..0x0001f7ff|  memory free space  (109952 bytes)
+;    rw- |0x00000000..0x000049ff|  memory .vdram (18944 bytes)
+;        |0x00004a00..0x0001f7ff|  memory free space  (110080 bytes)
 ;    rw- |0x0001f800..0x0001ffff|  memory memory_stack_and_heap (2048 bytes)
 ;    rw- |0x00020000..0x0004ffff|  memory .idram (196608 bytes)
 ;*********************************************************************************
@@ -735,7 +733,7 @@
 ;    Value        Size  Symbol
 ; ========  ==========  ==================================================
 ;*********************************************************************************
-0x00000000       19072  Section: .vdram (Segment: .vdram)
+0x00000000       18944  Section: .vdram (Segment: .vdram)
 ;*********************************************************************************
 0x00000000         768      Section: .vbss0(.\source_shared\global_var.eln)
 0x00000000         768          _dfe_ctrl (run_address 0x00000000)
@@ -775,51 +773,47 @@
 0x00004594           4          _ddr_addr (run_address 0x00004594)
 0x00004598           0      Section: .bss(.\source_shared\host_vspa_msg.eln)
 0x00004598           0          _seq_id (run_address 0x00004598)
-0x000045c0          64      Section: .bss(.\source_shared\host_vspa_msg.eln)
-0x000045c0           0          _axi_flag_msg_response1 (run_address 0x000045c0)
-0x00004600          64      Section: .bss(.\source_shared\host_vspa_msg.eln)
-0x00004600           0          _axi_flag_msg_response (run_address 0x00004600)
-0x00004640           0      Section: .bss(.\source_shared\inter_core_msg.eln)
-0x00004640           0          _data_table_rx_block (run_address 0x00004640)
-0x00004640           0      Section: .bss(.\source_shared\inter_core_msg.eln)
-0x00004640           0          _addr_table_rx_block (run_address 0x00004640)
-0x00004640          64      Section: .bss(.\source_shared\inter_core_msg.eln)
-0x00004640          64          _data_table (run_address 0x00004640)
-0x00004680          64      Section: .bss(.\source_shared\inter_core_msg.eln)
-0x00004680          64          _addr_table (run_address 0x00004680)
-0x00004700           0      Section: .bss(.\source_shared\main_pair_coreA.eln)
-0x00004700           0          _qec_scratch (run_address 0x00004700)
-0x00004700           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
-0x00004700           0          _snr_params (run_address 0x00004700)
-0x00004700           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
-0x00004700           0          _clk_cycles (run_address 0x00004700)
-0x00004700           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
-0x00004700           0          _clk_overhead (run_address 0x00004700)
-0x00004700           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
-0x00004700           0          _clk_end (run_address 0x00004700)
-0x00004700           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
-0x00004700           0          _clk_start (run_address 0x00004700)
-0x00004700           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
-0x00004700           0          _sinad (run_address 0x00004700)
-0x00004700           0      Section: .rodata(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_8192.eln))
-0x00004700           0      Section: .data(.\source_shared\dump_inject.eln)
-0x00004700           0          _ant_rx_dump (run_address 0x00004700)
-0x00004700         128      Section: .data(.\source_shared\global_var.eln)
-0x00004700           0          _real_window (run_address 0x00004700)
-0x00004780          64      Section: .data(.\source_shared\main_pair_coreB.eln)
-0x00004780           0          _axi_flag_slot_pattern_ack (run_address 0x00004780)
-0x000047c0           8      Section: .data(.\source_shared\startup_vspa3_modified.eln)
-0x000047c0           4          ___entry (run_address 0x000047c0)
-0x000047c8           0      Section: .data(.\source_shared\SINAD\sinad.eln)
-0x000047c8           0          _bitrev_rpc_arg (run_address 0x000047c8)
-0x00004800         128      Section: .data_aligned(.\source_shared\global_var.eln)
-0x00004800           0          _phcom_coeff_tx (run_address 0x00004800)
-0x00004880         512      Section: .data_aligned(.\source_shared\global_var.eln)
-0x00004880         448          _phcom_coeff_rx (run_address 0x00004880)
-0x00004a80           0      Section: .data_aligned(.\source_shared\global_var.eln)
-0x00004a80           0          _DFE_qec_params_opt_tx (run_address 0x00004a80)
-0x00004a80           0      Section: .data_aligned(.\source_shared\global_var.eln)
-0x00004a80           0          _DFE_qec_params_opt_rx (run_address 0x00004a80)
+0x000045c0           0      Section: .bss(.\source_shared\inter_core_msg.eln)
+0x000045c0           0          _data_table_rx_block (run_address 0x000045c0)
+0x000045c0           0      Section: .bss(.\source_shared\inter_core_msg.eln)
+0x000045c0           0          _addr_table_rx_block (run_address 0x000045c0)
+0x000045c0          64      Section: .bss(.\source_shared\inter_core_msg.eln)
+0x000045c0          64          _data_table (run_address 0x000045c0)
+0x00004600          64      Section: .bss(.\source_shared\inter_core_msg.eln)
+0x00004600          64          _addr_table (run_address 0x00004600)
+0x00004680           0      Section: .bss(.\source_shared\main_pair_coreA.eln)
+0x00004680           0          _qec_scratch (run_address 0x00004680)
+0x00004680           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
+0x00004680           0          _snr_params (run_address 0x00004680)
+0x00004680           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
+0x00004680           0          _clk_cycles (run_address 0x00004680)
+0x00004680           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
+0x00004680           0          _clk_overhead (run_address 0x00004680)
+0x00004680           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
+0x00004680           0          _clk_end (run_address 0x00004680)
+0x00004680           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
+0x00004680           0          _clk_start (run_address 0x00004680)
+0x00004680           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
+0x00004680           0          _sinad (run_address 0x00004680)
+0x00004680           0      Section: .rodata(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_8192.eln))
+0x00004680           0      Section: .data(.\source_shared\dump_inject.eln)
+0x00004680           0          _ant_rx_dump (run_address 0x00004680)
+0x00004680         128      Section: .data(.\source_shared\global_var.eln)
+0x00004680           0          _real_window (run_address 0x00004680)
+0x00004700          64      Section: .data(.\source_shared\main_pair_coreB.eln)
+0x00004700           0          _axi_flag_slot_pattern_ack (run_address 0x00004700)
+0x00004740           8      Section: .data(.\source_shared\startup_vspa3_modified.eln)
+0x00004740           4          ___entry (run_address 0x00004740)
+0x00004748           0      Section: .data(.\source_shared\SINAD\sinad.eln)
+0x00004748           0          _bitrev_rpc_arg (run_address 0x00004748)
+0x00004780         128      Section: .data_aligned(.\source_shared\global_var.eln)
+0x00004780           0          _phcom_coeff_tx (run_address 0x00004780)
+0x00004800         512      Section: .data_aligned(.\source_shared\global_var.eln)
+0x00004800         448          _phcom_coeff_rx (run_address 0x00004800)
+0x00004a00           0      Section: .data_aligned(.\source_shared\global_var.eln)
+0x00004a00           0          _DFE_qec_params_opt_tx (run_address 0x00004a00)
+0x00004a00           0      Section: .data_aligned(.\source_shared\global_var.eln)
+0x00004a00           0          _DFE_qec_params_opt_rx (run_address 0x00004a00)
 ;*********************************************************************************
 0x00000000         388  Section: .ipram (Segment: .ipram)
 ;*********************************************************************************
