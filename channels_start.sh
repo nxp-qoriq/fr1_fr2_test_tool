@@ -264,6 +264,8 @@ if [ $? = 0 ];then
 fi
 echo "$vspa_image_folder_name" | grep MEvspa_images_LS.1T1R.T4x_25M_60K_122_122_TDDFDD_LA93
 [ $? = 0 ] && { echo Current VSPA image supports DFE only, set DFE mode.; dfe_only=1; sym_buf_onchip=1; }
+echo "$vspa_image_folder_name" | grep MEvspa_images_HS.1T1R_1600M_120K_1966_1966_TDDFDD
+[ $? = 0 ] && { hwdcm=0; arg_nhwdcm=1; test_vector_on_hram=1; input_waveform_len[0]=0.5; input_waveform_len[1]=0.5; }
 
 size_inject_rx=0
 if [ "$rxinj_file" != "" ];then
@@ -1469,7 +1471,7 @@ else #LA12xx
 				trx_enable=${dcs_enable[$dcsid]}
 				[ $trx_enable -eq 0 ] && continue
 				if ([ $((trx_enable & BITMASK_ANT_ENABLE_TX)) -ne 0 ] || [ $rx_fdd = 0 ]);then
-					str="$***WARNING: Current L1C does not support TDD on LS+HS concurrently. Only LS TDD will be enabled. HSDCS$((dcsid-4)) will be configured as FDD.\n"
+					str="***WARNING: Current L1C does not support TDD on LS+HS concurrently. Only LS TDD will be enabled. HSDCS$((dcsid-4)) will be configured as FDD.\n"
 					echo -e "$str";
 					warning_list="$warning_list$str\n"
 				fi

@@ -431,8 +431,8 @@ if [ $cfr_pass -ne 0 ];then
 	((cfr_pass++))
 fi
 up1=$((($cap_lsb >> 4) & 0xF))
-if [ $up1 -eq 0 ]; then				up1=128
-elif [ $up1 -eq $((0xF)) ]; then	up1=64
+#if [ $up1 -eq 0 ]; then				up1=128
+if [ $up1 -eq $((0xF)) ]; then	up1=64
 elif [ $up1 -eq $((0xE)) ]; then	up1=32
 elif [ $up1 -eq $((0xD)) ]; then	up1=48
 elif [ $up1 -le $((0x5)) ]; then	up1=0
@@ -557,7 +557,8 @@ elif [ $scs -eq 60 ];then
 	fi
 
 elif [ $scs -eq 120 ];then
-	if [ $bandwidth_ori -eq 800 ];then		max_sym_size_ori=$((3168*2))
+	if [ $bandwidth_ori -eq 1600 ];then		max_sym_size_ori=$((3168*4))
+	elif [ $bandwidth_ori -eq 800 ];then		max_sym_size_ori=$((3168*2))
 	elif [ $bandwidth_ori -eq 400 ];then	max_sym_size_ori=3168
 	fi
 	
@@ -566,6 +567,9 @@ elif [ $scs -eq 120 ];then
 	elif [ $bandwidth -eq 800 ];then
 		max_sym_size=$((3168*2))
 		default_waveform_filename[1]=./test_vectors/TM3.1_800MHz_480kHz_FDD_option8.bin
+	elif [ $bandwidth -ge 1600 ];then
+		max_sym_size=$((3168*4))
+		default_waveform_filename[1]=./test_vectors/NR-FR2-TM3.1_1600MHz_480kHz_FDD_td_0p5ms_1966080000sps.bin
 	else
 		echo -e "Undefiend bandwidth $bandwidth\n"; exit 1;
 	fi

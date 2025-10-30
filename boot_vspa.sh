@@ -67,6 +67,7 @@ elif [ $arg = tddinfdd ];then									arg=ADvspa_images_LS.4T4R_100M_30K_491_245
 elif ([ $arg = LSISC ] || [ $arg = lsisc ]);then				arg=ADvspa_images_LS.4T4R_100M_30K_491_245_TDDFDD_ISC
 elif ([ $arg = HS ] || [ $arg = hs ]);then						arg=MEvspa_images_HS.2T2R_400M_120K_1966_1966_TDDFDD
 elif ([ $arg = HS800 ] || [ $arg = hs800 ]);then				arg=MEvspa_images_HS.1T1R_800M_120K_1966_1966_TDDFDD
+elif ([ $arg = HS1600 ] || [ $arg = hs1600 ]);then				arg=MEvspa_images_HS.1T1R_1600M_120K_1966_1966_TDDFDD
 elif ([ $arg = LSHS ] || [ $arg = lshs ]);then					arg=ADvspa_images_LS.2T2R_100M_30K_491_245_HS.2R_400M_120K_1966_1966_TDDFDD
 elif ([ $arg = SINAD ] || [ $arg = sinad ]);then				arg=MEvspa_images_LS.4T4R_100M_30K_491_245_HS.2T2R_400M_120K_1966_1966_TDDFDD_SINAD
 elif ([ $arg = SINAD983 ] || [ $arg = sinad983 ]);then			arg=MEvspa_images_LS.4T4R_100M_30K_245_245_HS.2T2R_400M_120K_983_983_TDDFDD_SINAD
