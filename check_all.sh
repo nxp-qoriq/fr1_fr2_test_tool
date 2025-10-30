@@ -53,9 +53,10 @@ warning_list=""
 print_capability()
 {
 echo "*****************************************************************************************************"
-echo "***                  DFE capability "
+echo "***                     DFE Capability "
 for ((i=0;i<2;i++))
 do
+echo "***-------------------------------------------------------------------------------------------------*"
 ant=$((i*NUM_ANTS_LS))
 ([ $((anttx[ant])) -ge $NUM_CORES ] && [ $((antrx[ant])) -ge $NUM_CORES ]) && continue
 get_chan_para $ant 0xFF; [ $? != 0 ] && { echo -e "***ERROR: Failure Getting channel parameters\n"; exit 1; }
@@ -147,7 +148,7 @@ dfe_mode_hi=`get_vspa_ip_reg_value $core $IP_DFE_MODE_HI`
 dfe_mode_hi_option8=$(((dfe_mode_hi>>DFE_MODE_OPTION8_IDX)&1))
 tagoption8=(OPTION7-2 OPTION8)
 
-echo "***************  ANT ID $ant: $tag on CORE$core$tag_score  ***********************************************"
+echo "***              ANT ID $ant: $tag on CORE$core$tag_score"
 
 local dcs_id_tx=${ant_map_tx[$ant]}; 
 local dcs_id_rx=${ant_map_rx[$ant]};

@@ -30,7 +30,7 @@ echo
 
 source ./check_dfe_cap_core_map.sh
 
-TARGET_INPUT_SCALING_LEVEL=50      #for auto scaling, after input scaling the sample level reaches this level at DAC, the rest is reserved for output scaling. percent
+TARGET_INPUT_SCALING_LEVEL=25      #for auto scaling, after input scaling the sample level reaches this level at DAC, the rest is reserved for output scaling. percent
 TARGET_DAC_SAMPLE_SCALE=85         #for auto scaling, the target highest sample scale reaches this level after input and output scaling. percent of full scale.
 ant=0
 factor=110
@@ -129,7 +129,7 @@ elif [ $auto = 1 ];then
 	if [ $((ant)) -lt $NUM_ANTS_LS ]; then
 		dump_size=$((axiqsps_tx[ant]*4*20)); la_addr=$addr_dump; host_addr=`phy2vir $la_addr` #dump 20ms
 	else
-		dump_size=$((axiqsps_tx[ant]*4/2));  la_addr=$next_HRAMaddr_phy; host_addr=`phy2vir $la_addr`  #dump 0.5ms data to avoid FR2 overrun
+		dump_size=$((axiqsps_tx[ant]*4/8));  la_addr=$next_HRAMaddr_phy; host_addr=`phy2vir $la_addr`  #dump 0.125ms data to avoid FR2 overrun
 		[ $((HRAMaddr_phy+HRAM_size-next_HRAMaddr_phy)) -lt $dump_size ] && { echo ***ERROR: HRAM size is not enough for ant data dump for power calculation.; exit 1; } 
 	fi
 	log=`dump_time_domain_tx_1time $txcore $tid $la_addr $host_addr $dump_size 0 0 0`
@@ -153,7 +153,7 @@ elif [ $auto = 1 ];then
 	max_IQ100=`echo $max_IQ | awk '{ abs_val = ($1 >= 0) ? $1 : -$1; printf("%d\n", abs_val*100); }'`
 	[ $max_IQ100 -lt 1 ] && { echo -e "***WARNING: Signal is too weak, max_IQ $max_IQ. Do not use auto scaling\n"; exit 1; }
 	[ $max_IQ100 -lt $TARGET_INPUT_SCALING_LEVEL ] && { input_scaling_factor=$((TARGET_INPUT_SCALING_LEVEL*100/max_IQ100)); max_IQ100=$TARGET_INPUT_SCALING_LEVEL; }
-	output_scaling_factor=$((TARGET_DAC_SAMPLE_SCALE*100/max_IQ100))
+	output_scaling_factor=$((TARGET_DAC_SAMPLE_SCALE*100/max_IQ100)); echo $TARGET_DAC_SAMPLE_SCALE $max_IQ100
 	
 	total_scaling_factor=$((input_scaling_factor*output_scaling_factor/100))
 	if [ $total_scaling_factor -gt $expected_scaling_factor ];then
