@@ -57,11 +57,15 @@ echo "***                     DFE Capability "
 for ((i=0;i<2;i++))
 do
 echo "***-------------------------------------------------------------------------------------------------*"
-ant=$((i*NUM_ANTS_LS))
-([ $((anttx[ant])) -ge $NUM_CORES ] && [ $((antrx[ant])) -ge $NUM_CORES ]) && continue
+local ant=$((i*NUM_ANTS_LS)); local txcore=${anttx[ant]}; local rxcore=${antrx[ant]}
+([ $((txcore)) -ge $NUM_CORES ] && [ $((rxcore)) -ge $NUM_CORES ]) && continue
 get_chan_para $ant 0xFF; [ $? != 0 ] && { echo -e "***ERROR: Failure Getting channel parameters\n"; exit 1; }
+local dfe_mode_hi=`get_vspa_ip_reg_value $txcore $IP_DFE_MODE_HI`
+local hshake_bypass_flag=$(((dfe_mode_hi>>DFE_MODE_TX_HANDSHAKE_BYPASS_IDX)&1))
+TAG_HSHAKE_BYPASS=("" "HANDSHAKE BYPASSED")
+
 echo "***                     FR$((i+1)) capabilities:"
-echo "***        Interface Type:   ${prodtype[$type_ru]}"
+echo "***        Interface Type:   ${prodtype[$type_ru]} ${TAG_HSHAKE_BYPASS[hshake_bypass_flag]}"
 [ $cfr_pass = 0 ] && status=NOT-SUPPORTED || status="SUPPORTED, num of PASS = $cfr_pass"
 echo "***                   CFR:   $status"
 
@@ -82,8 +86,7 @@ echo "***    up-sampling filter:   NOT-SUPPORTED"
 fi
 
 
-rxcore=${antrx[$ant]}
-downsampling_ratio=$((rxaxiq/baseband_rxsps))
+local downsampling_ratio=$((rxaxiq/baseband_rxsps))
 
 if [ $downsampling_ratio -gt 1 ];then
 echo "***  down-sampling filter:   $num_downsampling_taps taps, ${downsampling_ratio}x demcimation"
@@ -117,7 +120,7 @@ echo "***         CELL TRACKING:   ${supported[$celltrack_enable]}"
 echo "***     SINAD measurement:   ${supported[${sinad_enable_arr[ant]}]}"
 done
 
-echo "*** Channels running time:   hh:mm:ss `get_running_time $core`" #Current time: $(date "+%Y.%m.%d %H:%M")
+echo "*** Channels running time:   hh:mm:ss `get_running_time $txcore`" #Current time: $(date "+%Y.%m.%d %H:%M")
 
 echo "*****************************************************************************************************"
 }
@@ -314,7 +317,8 @@ if [ $((txinj_size)) -ne 0 ];then
 echo "***               TX MODE:   Time domain inject, addr $txinj_addr size $txinj_size"
 elif [ $single_tone_stat = 1 ];then
 echo "***               TX MODE:   Single Tone"
-elif [ $((`get_vspa_ip_reg_value $core $IP_DFE_MODE_HI` & DFE_MODE_OPTION8)) -ne 0 ];then
+#elif [ $((`get_vspa_ip_reg_value $core $IP_DFE_MODE_HI` & DFE_MODE_OPTION8)) -ne 0 ];then
+elif [ $((dfe_mode_hi_option8)) -ne 0 ];then
 echo -e "***               TX MODE:   Time Domain waveform $baseband_txsps KSPS $tag_from_file"
 else
 echo -e "***               TX MODE:   Freq domain waveform $tag_from_file"

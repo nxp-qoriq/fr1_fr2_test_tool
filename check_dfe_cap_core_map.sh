@@ -11,7 +11,7 @@
 
 source ./config.dat
 
-if ([ $0 != ./measure_dma_latency.sh ] && [ $0 != ./channels_start.sh ]);then
+if ([ $0 != ./measure_dma_latency.sh ] && [ $0 != ./channels_start.sh ] && [ $0 != ./debug_dump.sh ]);then
 [ $flag_runtime_config = 0 ] && { echo -e "***ERROR: Channels not started, run ./channels_start.sh\n"; exit 1; }
 fi
 

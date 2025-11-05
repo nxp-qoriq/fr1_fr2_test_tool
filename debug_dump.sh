@@ -12,7 +12,7 @@
 # ./debug_dump.sh [tag]
 #    tag:   dump VSPA DMEM and reg space with tag put in filename. If no argument specified, dump VSPA DMEM and reg space with tag=0
 
-source ./config.dat
+source ./check_dfe_cap_core_map.sh
 
 log_opcode_list=(
 0xFF000000 "Log Stopped"					
