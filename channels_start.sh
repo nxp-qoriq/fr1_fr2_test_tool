@@ -175,6 +175,7 @@ size_dump=0; size_inject=0
 rt=0
 rloopback_freq=0; rloopback_time=0
 no_wv_load=0
+n5g_ups=0
 
 arg_parse()
 {
@@ -207,6 +208,7 @@ arg_parse()
 	elif [ $arg = fast ]; then							fast=1
 	elif [ $arg = hwdcm ]; then							hwdcm=1; arg_hwdcm=1
 	elif [ $arg = nhwdcm ]; then						hwdcm=0; arg_nhwdcm=1
+	elif [ ${arg:0:4} = n5g= ]; then					n5g_ups=$(($(echo $arg | cut -d "=" -f2))); [ $((n5g_ups)) -ge 8 ] && { echo -e "***ERROR: n5g must be less than 8\n"; channels_start_fail; }
 	elif [ ${arg:0:4} = nre= ]; then					nre=$(($(echo $arg | cut -d "=" -f2))); nrb=$((nre/12)); [ $((nrb*12)) -ne $nre ] && { echo -e "***ERROR: nre must be multiple of 12\n"; channels_start_fail; }
 	elif [ ${arg:0:4} = nrb= ]; then					nrb=$(($(echo $arg | cut -d "=" -f2)))
 	elif [ ${arg:0:3} = nrb ]; then						nrb=$(($(echo $arg | cut -d "b" -f2)))
@@ -436,6 +438,8 @@ done
 
 get_chan_para $(((1-fr1_used)*4)) 0xFF; [ $? -ne 0 ] && channels_start_fail #get channel parameters
 
+[ $n5g -eq 1 ] && [ $((tx_fdd*rx_fdd)) -eq 0 ] && { echo "***ERROR: Current VSPA image only supports FDD."; channels_start_fail; }
+
 if [ $flag_dfe_initialized = 0 ];then   #restart handling
 	rxrestart=0; txrestart=0			#this is not a real restart, but just a first time start after boot.
 	./utils/memset $test_tool_env_tx_scaling_input $NUM_ANTS 100  #set only at first time start
@@ -642,16 +646,16 @@ ddr_malloc_cur=$((ddr_malloc_cur+trace_log_buf_size))
 
 sym_buf_size_in_queue=$((POINTS_FFT*4*baseband_upsampling_rate))
 
-num_sym_in_queue_tx=28
+num_sym_in_queue_tx=$((NUM_SYM_PER_SLOT*2))  #two slots by default
 tx_sym_queue_base=$ddr_malloc_cur
-tx_sym_queue_size=$((sym_buf_size_in_queue*num_sym_in_queue_tx/14*15))   #time domain size is 15/14 off FFT size because of CP
+tx_sym_queue_size=$((sym_buf_size_in_queue*num_sym_in_queue_tx/NUM_SYM_PER_SLOT*15))   #time domain size is 15/14 off FFT size because of CP
 ./utils/memset `phy2vir $tx_sym_queue_base` $((tx_sym_queue_size/4)) 0
 ddr_malloc_cur=`size_align $((ddr_malloc_cur+tx_sym_queue_size)) 4096`
 
 if [ $sym_buf_onchip = 0 ];then
-num_sym_in_queue_rx=28
+num_sym_in_queue_rx=$((NUM_SYM_PER_SLOT*2))
 rx_sym_queue_base=`HEX $ddr_malloc_cur`
-rx_sym_queue_size=$((sym_buf_size_in_queue*num_sym_in_queue_rx*(num_R_LS+num_R_HS)/14*15))
+rx_sym_queue_size=$((sym_buf_size_in_queue*num_sym_in_queue_rx*(num_R_LS+num_R_HS)/NUM_SYM_PER_SLOT*15))
 ./utils/memset `phy2vir $rx_sym_queue_base` $((rx_sym_queue_size/4)) 0
 ddr_malloc_cur=`size_align $((ddr_malloc_cur+rx_sym_queue_size)) 4096`
 
@@ -964,7 +968,7 @@ one_enabled_dfe_core=0
 		
 		if ([ $tx_fdd = 0 ] && [ $dcsfdd = 1 ] && [ $vspa_dev_type = LA9310 ]);then
 			if [ $((${#pattern[@]} % 6)) -eq 0 ];then
-			num_sym_in_slot=14
+			num_sym_in_slot=$NUM_SYM_PER_SLOT
 			for ((i=0;i<${#pattern[@]};i=i+6))
 			do
 				skip0=0
@@ -1038,6 +1042,9 @@ one_enabled_dfe_core=0
 			echo RX time domain inject configured for ant $rxant from address `HEX $addr_inject_rx` size $size_inject_rx
 		fi
 		
+		[ $n5g -eq 1 ] && set_wordvalue_to_vspa $txcore $n5g_config $n5g_ups
+
+		
 		#send 2nd init msg: DFE MODE
 		echo "./utils/vspa_mbox send $txcore $host_vspa_mbox_id $dfe_mode_msb $dfe_mode_lsb; ./utils/vspa_mbox recv $txcore $host_vspa_mbox_id" >> ./command_init.sh
 		vspa_mbox_ifsend $txcore $host_vspa_mbox_id $dfe_mode_msb $dfe_mode_lsb; [ $msg_recv_flag = 0 ] && vspa_mbox_ifrecv $txcore $host_vspa_mbox_id
@@ -1102,7 +1109,7 @@ one_enabled_dfe_core=0
 	
 	
 	echo "loopback=$loopback; rloopback_time=$rloopback_time; rloopback_freq=$rloopback_freq; num_errors=0; first_error=0" > runtime_config.txt
-	echo "ant_remap=$ant_remap; ant_map_tx=(${ant_map_tx[@]}); ant_map_rx=(${ant_map_rx[@]})" >> ./runtime_config.txt
+	echo "ant_remap=$ant_remap; ant_map_tx=(${ant_map_tx[@]}); ant_map_rx=(${ant_map_rx[@]}); n5g=$n5g; n5g_ups=$n5g_ups; NUM_SYM_PER_SLOT=$NUM_SYM_PER_SLOT" >> ./runtime_config.txt
 	echo -e "DCSchan=(${DCSchan[@]})\ndfe_core=(${dfe_core[@]}); slave_core=(${slave_core[@]}); one_dfe_core=$one_dfe_core\ntest_tool_name=$test_tool_name; test_tool_version=$test_tool_version; vspa_image_version=$vspa_image_version; revision=$revision; ver_min=$ver_min; ver_maj=$ver_maj\niqswap_tx=(${iqswap_tx[@]}); iqswap_rx=(${iqswap_rx[@]}); MAX_NUM_1R_IN_CORE=$MAX_NUM_1R_IN_CORE" >> ./runtime_config.txt
 	echo -e "anttx=(${anttx[@]}); antrx=(${antrx[@]}); coretx_tr0=(${coretx_tr0[@]}); corerx_tr0=(${corerx_tr0[@]})\ncoretx_tr1=(${coretx_tr1[@]}); corerx_tr1=(${corerx_tr1[@]});" >> ./runtime_config.txt
 	echo -e "fr1_used=$fr1_used; fr2_used=$fr2_used\nnum_T_LS=$num_T_LS; num_T_HS=$num_T_HS; num_R_LS=$num_R_LS; num_R_HS=$num_R_HS\ntidcore=(${tidcore[@]}); ridcore=(${ridcore[@]}); tidant=(${tidant[@]}); ridant=(${ridant[@]}); idle=$idle; sinad=$sinad " >> ./runtime_config.txt

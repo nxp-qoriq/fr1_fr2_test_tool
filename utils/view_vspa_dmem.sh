@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -76,8 +76,9 @@ echo ./utils/loadmem null $start_addr_host -r $size $bit_width
 ./utils/loadmem null $start_addr_host -r $size $bit_width | more
 
 start_addr_host=`phy2vir $ext_log_buf_phy`
-end_addr_host=`printf 0x%x $((start_addr_host+ext_log_buf_size-1))`
-echo Print log from external memory $start_addr_host size $ext_log_buf_size
+size=$ext_log_buf_size
+end_addr_host=`printf 0x%x $((start_addr_host+size-1))`
+echo Print log from external memory $start_addr_host size $size
 fi
 fi
 fi

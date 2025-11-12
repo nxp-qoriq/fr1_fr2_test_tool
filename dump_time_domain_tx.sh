@@ -405,7 +405,7 @@ dump_via_hram_mlti_times()
 	((num_chunks=size_32KB_aligned/size_hram))
 	((size_left=size_32KB_aligned-num_chunks*size_hram))
 	[ $size_left = 0 ] && { ((num_loop=num_chunks)); size_left=$size_hram; } || ((num_loop=num_chunks+1))
-	[ $num_loop -ge 64 ] &&  { echo ***Error: HRAM available size $size_hram too small, num of blocks exceeds 64.; exit 1; }
+	[ $num_loop -ge 64 ] &&  { echo ***Error: HRAM available size $size_hram too small, num of blocks $num_loop must be less than 64.; exit 1; }
 	
 	[ -f $dump_filename ] && rm $dump_filename
 	dump_type=0; [ $dpdo = 1 ] && dump_type=1; [ $((dpdo*obs)) -ne 0 ] && dump_type=3

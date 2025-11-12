@@ -109,6 +109,7 @@ tx_timedomain_inject_addr=$((COREB_STATUS_BASE+0xd8))
 tx_timedomain_inject_size=$((COREB_STATUS_BASE+0xdc))
 rx_timedomain_dump_addr=$((COREB_STATUS_BASE+0xe0))
 rx_timedomain_dump_size=$((COREB_STATUS_BASE+0xe4))
+n5g_config=$((COREB_STATUS_BASE+0xe8))
 
 host_vspa_mbox_id=0
 tag_tddfdd=(TDD FDD)
@@ -459,11 +460,12 @@ flag_obs=$(((cap_msb >> 10) & 0x1))
 option8=$((option8_cfg|((cap_msb>>11)&1)))
 dcsfdd=$(((cap_msb >> 12) & 0x1))
 rx_lpf_63taps_enable=$(((cap_msb >> 13) & 0x1))
+n5g=$((($cap_msb >> 20) & 0x1))
 arch_1R_2cores=$((($cap_msb >> 21) & 0x1))
 type_ru=$(((($cap_msb >> 22) & 0x1) | force_ru))
 arch_1T_2cores=$((($cap_msb >> 23) & 0x1))
 
-
+[ $n5g -eq 1 ] && { option8=1; NUM_SYM_PER_SLOT=15; } || NUM_SYM_PER_SLOT=14
 
 
 single_tone_stat=$((`get_wordvalue_from_vspa $core $CONFIG_TX_SINGLE_TONE_AMP` & 1))
@@ -493,7 +495,7 @@ baseband_upsampling_rate=1
 bandwidth_tx=$((bandwidth*baseband_upsampling_rate))
 baseband_txsps=$((1920*(1<<$(echo $bandwidth_tx | awk '{ printf("%d\n", log($1)/log(2)); }'))))
 [ $((T4x|T2x)) -eq 1 ] && { bandwidth_rx=$((bandwidth_tx*rxdcs/txdcs)); baseband_rxsps=$((baseband_txsps*rxdcs/txdcs)); } || { bandwidth_rx=$bandwidth_tx; baseband_rxsps=$baseband_txsps; }
-sym_num_1m=$((14*scs/15))
+sym_num_1m=$((NUM_SYM_PER_SLOT*scs/15))
 dpd_sps_ratio=$((txdcs/baseband_txsps))
 
 if [ $scs -eq 15 ];then
@@ -1538,28 +1540,28 @@ pattern_detect() #$1-addr, $2-num_samples_in_sym_buf, $3-num_samples_in_sym, $4-
 		fi
 		if [ ${#detected_pattern[@]} -eq 4 ];then
 			if [ $uecpe = 0 ];then
-				local num_dl_slot0=$((detected_pattern[0]/14))
-				local num_dl_sym0=$((detected_pattern[0]%14))
-				local num_ul_slot0=$((detected_pattern[1]/14))
-				local num_ul_sym0=$(((detected_pattern[1]%14)-2))  #assume two GP symbols
-				local num_dl_slot1=$((detected_pattern[2]/14))
-				local num_dl_sym1=$((detected_pattern[2]%14))
-				local num_ul_slot1=$((detected_pattern[3]/14))
-				local num_ul_sym1=$(((detected_pattern[3]%14)-2))  #assume two GP symbols
+				local num_dl_slot0=$((detected_pattern[0]/NUM_SYM_PER_SLOT))
+				local num_dl_sym0=$((detected_pattern[0]%NUM_SYM_PER_SLOT))
+				local num_ul_slot0=$((detected_pattern[1]/NUM_SYM_PER_SLOT))
+				local num_ul_sym0=$(((detected_pattern[1]%NUM_SYM_PER_SLOT)-2))  #assume two GP symbols
+				local num_dl_slot1=$((detected_pattern[2]/NUM_SYM_PER_SLOT))
+				local num_dl_sym1=$((detected_pattern[2]%NUM_SYM_PER_SLOT))
+				local num_ul_slot1=$((detected_pattern[3]/NUM_SYM_PER_SLOT))
+				local num_ul_sym1=$(((detected_pattern[3]%NUM_SYM_PER_SLOT)-2))  #assume two GP symbols
 			else
-				local num_ul_slot0=$((detected_pattern[1]/14))
-				local num_ul_sym0=$((detected_pattern[1]%14))
-				local num_dl_slot0=$((detected_pattern[0]/14))
-				local num_dl_sym0=$(((detected_pattern[0]%14)-2))  #assume two GP symbols
-				local num_ul_slot1=$((detected_pattern[3]/14))
-				local num_ul_sym1=$((detected_pattern[3]%14))
-				local num_dl_slot1=$((detected_pattern[2]/14))
-				local num_dl_sym1=$(((detected_pattern[2]%14)-2))  #assume two GP symbols
+				local num_ul_slot0=$((detected_pattern[1]/NUM_SYM_PER_SLOT))
+				local num_ul_sym0=$((detected_pattern[1]%NUM_SYM_PER_SLOT))
+				local num_dl_slot0=$((detected_pattern[0]/NUM_SYM_PER_SLOT))
+				local num_dl_sym0=$(((detected_pattern[0]%NUM_SYM_PER_SLOT)-2))  #assume two GP symbols
+				local num_ul_slot1=$((detected_pattern[3]/NUM_SYM_PER_SLOT))
+				local num_ul_sym1=$((detected_pattern[3]%NUM_SYM_PER_SLOT))
+				local num_dl_slot1=$((detected_pattern[2]/NUM_SYM_PER_SLOT))
+				local num_dl_sym1=$(((detected_pattern[2]%NUM_SYM_PER_SLOT)-2))  #assume two GP symbols
 			fi
 			detected_pattern=($num_dl_slot0 $num_dl_sym0 $num_ul_slot0 $num_ul_sym0 0 0 $num_dl_slot1 $num_dl_sym1 $num_ul_slot1 $num_ul_sym1 0 0)
 			break;
 		fi
-		([ $num_tx_sym -ge 140 ] || [ $num_nontx_sym -ge 140 ]) && { detected_pattern=(); break; }
+		([ $num_tx_sym -ge $((NUM_SYM_PER_SLOT*10)) ] || [ $num_nontx_sym -ge $((NUM_SYM_PER_SLOT*10)) ]) && { detected_pattern=(); break; }
 		((sym_idx++))
 	done
 }
@@ -1569,9 +1571,9 @@ get_num_sym_in_pattern()  #return value (total_num num_tx_sym num_rx_sym)
 	local i=0; local dl_num=0; local ul_num=0; local gp_num
 	for((i=0;i<${#pattern[@]};i=i+6))
 	do
-		((dl_num += pattern[0+i]*14+pattern[1+i]))
-		((ul_num += pattern[2+i]*14+pattern[3+i]))
-		((gp_num += ((14-pattern[1+i]-pattern[3+i])%14) + pattern[4+i]*14 + pattern[5+i]*14 ))
+		((dl_num += pattern[0+i]*NUM_SYM_PER_SLOT+pattern[1+i]))
+		((ul_num += pattern[2+i]*NUM_SYM_PER_SLOT+pattern[3+i]))
+		((gp_num += ((NUM_SYM_PER_SLOT-pattern[1+i]-pattern[3+i])%NUM_SYM_PER_SLOT) + pattern[4+i]*NUM_SYM_PER_SLOT + pattern[5+i]*NUM_SYM_PER_SLOT ))
 	done
 	if [ $cpe = 0 ];then
 		echo "($((dl_num+ul_num+gp_num)) $dl_num $ul_num)"
