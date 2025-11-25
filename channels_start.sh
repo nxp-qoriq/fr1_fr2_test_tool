@@ -813,7 +813,7 @@ one_enabled_dfe_core=0
 					for((i=0;i<numload;i++))
 					do
 						if [ $no_wv_load = 0 ];then
-						[ $fast = 0 ] && print_msg="${print_msg}Loading Input waveform file $invecfile $numload times to address $invec_addr_vir1 with size $invecsize for ant$txant\n"
+						[ $fast = 0 ] && print_msg="${print_msg}Loading Input waveform file $invecfile to address $invec_addr_vir1 with size $loadsize for ant$txant\n"
 						loadfile $invec_addr_vir1 $invecfile $loadsize
 						echo "./utils/loadmem $invecfile $invec_addr_vir1 $loadsize" >> ./command_init.sh
 						fi

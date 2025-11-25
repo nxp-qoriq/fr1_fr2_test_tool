@@ -48,6 +48,8 @@ void hvif_reset();
 uint64_t hvif_mbox_recv(uint32_t core_id, uint32_t mbox_id);
 uint64_t hvif_mbox_send(uint32_t core_id, uint32_t mbox_id, uint32_t msb32, uint32_t lsb32);
 
+void set_reverse_loopback(uint32_t tx_coreA_id, uint32_t rx_coreA_id, uint32_t addr, uint32_t size);
+
 /*********************************************************************
   handshake used for host to send or receive a symbol to/from VSPA DFE
   core_id:		VSPA core ID, starting from 0.

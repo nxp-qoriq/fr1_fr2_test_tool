@@ -1,5 +1,5 @@
 /*
-Copyright 2022-2024 NXP
+Copyright 2022-2025 NXP
 
 NXP Confidential. This software is owned or controlled by NXP and may only
 be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -20,8 +20,10 @@ install, activate or otherwise use the software.
 #include <sys/mman.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include "struct_defs.h"
 #include "antman_axiq.h"
+
+#define PCTRACE(x)	//printf(x)
 
 #define DUMP_INJECT_STOPPED						0x0000
 #define DUMP_INJECT_WAIT_MASK					0x0001
@@ -106,36 +108,7 @@ install, activate or otherwise use the software.
 
 #define LA9310
 
-#define MAX_NUM_1R_IN_CORE	2
-
-#define MAX_NUM_PATTERN_ENTRIES					4	//expanding the patterns to 20 slots, a common period for FR1 and FR2
-#define NUM_SLOTS_COMMON_PERIOD					20
-#define PATTERN_SIZE_SYMBOL_MASK				0xFF
-#define PATTERN_SIZE_SYMBOL_SKIP0_BITIDX		0
-#define PATTERN_SIZE_SYMBOL_BITIDX				8
-#define PATTERN_SIZE_SYMBOL_SKIP1_BITIDX		16
-#define PATTERN_SIZE_SYMBOL_SKIP1_MASK			(PATTERN_SIZE_SYMBOL_MASK<<PATTERN_SIZE_SYMBOL_SKIP1_BITIDX)
-//#define PATTERN_SIZE_STOP_BITIDX				30
-//#define PATTERN_SIZE_STOP_MASK					(1<<PATTERN_SIZE_STOP_BITIDX)
-#define PATTERN_SIZE_VALID_BITIDX				31
-#define PATTERN_SIZE_VALID_MASK					(1<<PATTERN_SIZE_VALID_BITIDX)
-#define GET_SKIP0(x)		(((x)>>PATTERN_SIZE_SYMBOL_SKIP0_BITIDX)&PATTERN_SIZE_SYMBOL_MASK)
-#define GET_NUM_SYMBOLS(x)	(((x)>>PATTERN_SIZE_SYMBOL_BITIDX)&PATTERN_SIZE_SYMBOL_MASK)
-#define GET_SKIP1(x)		(((x)>>PATTERN_SIZE_SYMBOL_SKIP1_BITIDX)&PATTERN_SIZE_SYMBOL_MASK)
-
-
-typedef struct tdd_pattern_entry_s
-{
-	unsigned short 	num_patterns;
-	unsigned short 	num_patterns_onetime;
-	unsigned int	tx_entry[MAX_NUM_PATTERN_ENTRIES];
-	unsigned int	ts_txallowed[MAX_NUM_PATTERN_ENTRIES];
-	unsigned int	rx_entry[MAX_NUM_PATTERN_ENTRIES];
-} struct_tdd_pattern_entry;
-
-
 #define KERNELS_DISABLE						((0x10))
-#define KERNELS_DISABLE_BITMASK_CFR			((1<<0))
 #define tx_mixer_freq_update				((0x1c))
 #define rx_mixer_freq_update				((tx_mixer_freq_update+4))
 #define tdd_pattern_entry					((rx_mixer_freq_update+MAX_NUM_1R_IN_CORE*4))
@@ -311,10 +284,11 @@ typedef struct tdd_pattern_entry_s
 uint32_t g_dev_la9310;
 uint32_t g_num_cores;
 uint32_t g_dfe_ref_la9310;
-uint32_t g_devmem_fd;						//demem_fd from external (g_devmem_fd = open("/dev/mem", O_RDWR);)
+uint32_t g_devmem_fd;					//demem_fd from external (g_devmem_fd = open("/dev/mem", O_RDWR);)
 uint64_t g_vspa_ccsr_vir;				//vspa register base virtual (mem mapped)
-uint64_t g_vspa_dmem_base_phy;         //vspa dmem base from host view
-uint64_t g_ddr_host_vspa_view_offset;  //DDR address host vspa view offset (DDR scratch buffer physical address host view minus vspa view)
+uint64_t g_vspa_dmem_base_phy;			//vspa dmem base from host view
+uint64_t g_vspa_dmem_base_vir;			//vspa dmem base from host view virtual (mem mapped)
+uint64_t g_ddr_host_vspa_view_offset;	//DDR address host vspa view offset (DDR scratch buffer physical address host view minus vspa view)
 
 //user configurable
 //test result: 3 will get underflow easier than 2 on LA9310 at 61Msps (TX AXIQ DMA + RX AXIQ DMA + RX sym DMA from TCM, cauing TX AXIQ underflow with config 3. changing to 2 works)
@@ -423,14 +397,6 @@ uint64_t g_ddr_host_vspa_view_offset;  //DDR address host vspa view offset (DDR 
 #define VCPU_DMEM_SIZE_LA9310		0x4000
 
 #define NUM_ANT_BUFFERS	2
-
-typedef struct buf_stat_td_s
-{
-	unsigned int buf_stat_size;
-	unsigned int buf_addr[MAX_NUM_1R_IN_CORE];
-	unsigned int offset_in_sframe;
-//	unsigned int sym_idx;
-} struct_buf_stat_td;
 
 typedef struct struct_antman_ctrl_tx_s
 {
@@ -616,31 +582,37 @@ void qec_para_convert(void* p_qec_para_converted, void* p_qec_para)
 
 uint64_t check_error_core(uint32_t core)
 {
+	PCTRACE("Into check_error_core\n");
+	
 	//check DMA error
 	uint32_t config_error = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_CFGERR_STAT);
 	if(config_error)
 	{
 		*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_CFGERR_STAT) = config_error; //clear config error status bits
+		PCTRACE("End check_error_core\n");
 		return (((uint64_t)(MSG_ID_ERROR_REPORT_MSG|(ERROR_REPORT_MSG_ERROR_TYPE_DMA_CONFIG_ERR<<16)))<<32)|config_error;
 	}
 	uint32_t transfer_error = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_XFRERR_STAT);
 	if(transfer_error)
 	{
 		*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_XFRERR_STAT) = transfer_error;
+		PCTRACE("End check_error_core\n");
 		return (((uint64_t)(MSG_ID_ERROR_REPORT_MSG|(ERROR_REPORT_MSG_ERROR_TYPE_DMA_TRANSFER_ERR<<16)))<<32)|transfer_error;
 	}
 	uint32_t ippu_error = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IPPUSTATUS);
 	if(ippu_error&(1<<27)) //cmd error
 	{
 		*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IPPURC) = 0x80000000;  //clear cmd error status bit
+		PCTRACE("End check_error_core\n");
 		return (((uint64_t)(MSG_ID_ERROR_REPORT_MSG|(ERROR_REPORT_MSG_ERROR_TYPE_IPPU_ERR<<16)))<<32)|ippu_error;
 	}
-	uint64_t vspa_dmem_base_vir = (uint64_t)mmap(NULL, 0x400000*8, PROT_READ | PROT_WRITE,	MAP_SHARED, g_devmem_fd, g_vspa_dmem_base_phy);
-	uint64_t dcs_error = *(uint64_t*)(vspa_dmem_base_vir+core*0x400000+error_info);
+	//uint64_t g_vspa_dmem_base_vir = (uint64_t)mmap(NULL, 0x400000*8, PROT_READ | PROT_WRITE,	MAP_SHARED, g_devmem_fd, g_vspa_dmem_base_phy);
+	uint64_t dcs_error = *(uint64_t*)(g_vspa_dmem_base_vir+core*0x400000+error_info);
 	if(dcs_error)
 	{
-		*(uint64_t*)(vspa_dmem_base_vir+core*0x400000+error_info) = 0; //clear the error
+		*(uint64_t*)(g_vspa_dmem_base_vir+core*0x400000+error_info) = 0; //clear the error
 	}
+	PCTRACE("End check_error_core\n");
 	return dcs_error;
 }	
 
@@ -673,7 +645,7 @@ void dmac_abort(unsigned int mask)
 	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_STAT_ABORT) = mask;
 }
 
-void Ant_buffer_tx_axiq_reset(unsigned int dcs_id, uint64_t vspa_dmem_base_vir)
+void Ant_buffer_tx_axiq_reset(unsigned int dcs_id, uint64_t g_vspa_dmem_base_vir)
 {
 	unsigned int core = 0;
 	struct_antman_ctrl_tx antman_ctrl_tx;
@@ -686,7 +658,7 @@ void Ant_buffer_tx_axiq_reset(unsigned int dcs_id, uint64_t vspa_dmem_base_vir)
 	antman_ctrl_tx.axiq_underflow_overflow_bitfield = AXIQ_STATUS_UNDERF_BITFIELD_TX0;
 	antman_ctrl_tx.axiq_control_fifo_rst_clr_err_bitfield = LS_AXIQ_CTL_TX0_CLEAR_ERROR_MASK;		
 	antman_ctrl_tx.buf_stat_ant_tx[0].buf_addr[0] = 0;
-	unsigned int addr_temp = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_circ_base);  //used for temp addr for vspa DMA VCPU addr
+	unsigned int addr_temp = *(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+tx_circ_base);  //used for temp addr for vspa DMA VCPU addr
 
 	unsigned int axiq_dma_chan = antman_ctrl_tx.axiq_dma_chan;
 
@@ -712,7 +684,7 @@ void Ant_buffer_tx_axiq_reset(unsigned int dcs_id, uint64_t vspa_dmem_base_vir)
 	gpo &= ~antman_ctrl_tx.axiq_control_fifo_rst_clr_err_bitfield;
 	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_tx.axiq_control_gpo*4) = gpo;
 }
-void Ant_buffer_rx_axiq_reset(unsigned int dcs_id, uint64_t vspa_dmem_base_vir)
+void Ant_buffer_rx_axiq_reset(unsigned int dcs_id, uint64_t g_vspa_dmem_base_vir)
 {
 	unsigned int core = 0;
 	struct_antman_ctrl_rx antman_ctrl_rx;
@@ -726,7 +698,7 @@ void Ant_buffer_rx_axiq_reset(unsigned int dcs_id, uint64_t vspa_dmem_base_vir)
 	antman_ctrl_rx.axiq_status_err_bitfield = 0xc<<(dcs_id*4);
 	antman_ctrl_rx.axiq_status_enable_bitfield = LS_AXIQ_STS_RX0_CH_EN_MASK<<(dcs_id*4);
 	antman_ctrl_rx.axiq_underflow_overflow_bitfield = 0xc<<(dcs_id*4);
-	unsigned int addr_temp = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_circ_base);  //used for temp addr for vspa DMA VCPU addr
+	unsigned int addr_temp = *(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+rx_circ_base);  //used for temp addr for vspa DMA VCPU addr
 
 	unsigned int axiq_dma_chan = antman_ctrl_rx.axiq_dma_chan;
 	dmac_abort(1<<axiq_dma_chan);
@@ -751,12 +723,12 @@ void Ant_buffer_rx_axiq_reset(unsigned int dcs_id, uint64_t vspa_dmem_base_vir)
 	gpo &= ~antman_ctrl_rx.axiq_control_fifo_rst_clr_err_bitfield;
 	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_rx.axiq_control_gpo*4) = gpo;
 }
-int Ant_buffer_tx_init(unsigned int dcs_id, unsigned int iq_swap, uint64_t vspa_dmem_base_vir)
+int Ant_buffer_tx_init(unsigned int dcs_id, unsigned int iq_swap, uint64_t g_vspa_dmem_base_vir)
 {
 	unsigned int core = 0;
 	unsigned int reg_value, reg_mask;
-	unsigned int v_addr_antman_tx = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+addr_antman_tx);
-	struct_antman_ctrl_tx* antman_ctrl_tx = (struct_antman_ctrl_tx*)(vspa_dmem_base_vir+core*0x400000+v_addr_antman_tx);
+	unsigned int v_addr_antman_tx = *(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+addr_antman_tx);
+	struct_antman_ctrl_tx* antman_ctrl_tx = (struct_antman_ctrl_tx*)(g_vspa_dmem_base_vir+core*0x400000+v_addr_antman_tx);
 #ifdef LA9310
 	antman_ctrl_tx->axiq_dma_chan = AXIQDMA_ID_TX0;
 	antman_ctrl_tx->axiq_fifo_addr = AXIQFIFO_ADDR_TX0+AXIQFIFO_OFFSET_THRESHOLD_TX;
@@ -917,11 +889,11 @@ int Ant_buffer_tx_init(unsigned int dcs_id, unsigned int iq_swap, uint64_t vspa_
 //	return error;
 	return 0;  //error just cleared, no need to check error here.  if there is error, it will be checked at runtime.
 }
-int Ant_buffer_rx_init(unsigned int dcs_ids, unsigned int ctrl_iqswap, uint64_t vspa_dmem_base_vir)
+int Ant_buffer_rx_init(unsigned int dcs_ids, unsigned int ctrl_iqswap, uint64_t g_vspa_dmem_base_vir)
 {
 	unsigned int core = 0;
-	unsigned int v_addr_antman_rx = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+addr_antman_rx);
-	struct_antman_ctrl_rx* antman_ctrl_rx = (struct_antman_ctrl_rx*)(vspa_dmem_base_vir+core*0x400000+v_addr_antman_rx);
+	unsigned int v_addr_antman_rx = *(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+addr_antman_rx);
+	struct_antman_ctrl_rx* antman_ctrl_rx = (struct_antman_ctrl_rx*)(g_vspa_dmem_base_vir+core*0x400000+v_addr_antman_rx);
 
 	unsigned int iq_swap = (ctrl_iqswap>>IQSWAP_BITIDX(0))&1;
 	unsigned int iq_swap2 = (ctrl_iqswap>>IQSWAP_BITIDX(1))&1;
@@ -1163,21 +1135,21 @@ uint64_t la9310_la12xx_dmem_write_for_mbox(unsigned int core, unsigned int mbox_
 		uint64_t dest;
 		unsigned int trid = (msb>>15)&1;
 		unsigned int rx = msb & (1<<14);
-		uint64_t vspa_dmem_base_vir = (uint64_t)mmap(NULL, 0x2000000, PROT_READ | PROT_WRITE,	MAP_SHARED, g_devmem_fd, g_vspa_dmem_base_phy);
+		//uint64_t g_vspa_dmem_base_vir = (uint64_t)mmap(NULL, 0x2000000, PROT_READ | PROT_WRITE,	MAP_SHARED, g_devmem_fd, g_vspa_dmem_base_phy);
 		core = ((*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+SWVERSION))>>13) & 7;	//signal scaling is on core A.
 
 		if(rx)
-			dest = (*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+addr_DFE_qec_params_opt_rx))<<7;
+			dest = (*(unsigned short*)(g_vspa_dmem_base_vir+core*0x400000+addr_DFE_qec_params_opt_rx))<<7;
 		else
-			dest = (*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+addr_DFE_qec_params_opt_tx))<<7;
+			dest = (*(unsigned short*)(g_vspa_dmem_base_vir+core*0x400000+addr_DFE_qec_params_opt_tx))<<7;
 
-		dest = (vspa_dmem_base_vir+core*0x400000+get_vspa_dmem_addr_offset_host_view(dest)+trid*128);
+		dest = (g_vspa_dmem_base_vir+core*0x400000+get_vspa_dmem_addr_offset_host_view(dest)+trid*128);
 		
 		short temp=lsb&0xFFFF;
 		int temp1 = float16_to_float32(temp);
 		float scaling_factor = *(float*)&temp1;
 		
-		unsigned int cap_lo = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+STATUS_CAP_LO);
+		unsigned int cap_lo = *(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+STATUS_CAP_LO);
 		unsigned int timing_skew_flag = (cap_lo >> 22) & 0x1;
 
 		if(timing_skew_flag == 0)
@@ -1247,7 +1219,7 @@ uint64_t la9310_la12xx_dmem_write_for_mbox(unsigned int core, unsigned int mbox_
 //return value: 0-success,  -1 fail (the msg not sent)
 uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, unsigned int msb, unsigned int lsb)
 {
-	uint64_t vspa_dmem_base_vir = (uint64_t)mmap(NULL, 0x2000000, PROT_READ | PROT_WRITE,	MAP_SHARED, g_devmem_fd, g_vspa_dmem_base_phy);
+	//uint64_t g_vspa_dmem_base_vir = (uint64_t)mmap(NULL, 0x2000000, PROT_READ | PROT_WRITE,	MAP_SHARED, g_devmem_fd, g_vspa_dmem_base_phy);
 	if( ((msb&0xFF000000)==MSG_ID_SYMBOL_BUFFER_STRUCT) || ((msb&0xFF000000)==MSG_ID_SYMBOL_BUFFER_STRUCT2) )   //buffer struct msg
 	{
 		unsigned int tx_sym_base, rx_sym_base, ack_msg;
@@ -1266,9 +1238,9 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		
 		if(tx_sym_base)
 		{
-			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_num_sym_in_buf) = get_max(1, ((lsb>>20)&0xF)*2);
-			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_sym_buf_base) = tx_sym_base;
-			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_sym_buff_size) = ((lsb>>24)&0xFF)*128;
+			*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+tx_num_sym_in_buf) = get_max(1, ((lsb>>20)&0xF)*2);
+			*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+tx_sym_buf_base) = tx_sym_base;
+			*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+tx_sym_buff_size) = ((lsb>>24)&0xFF)*128;
 		}
 		
 		if(rx_sym_base)
@@ -1276,11 +1248,11 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 			unsigned int rx_sym_num=get_max(1, ((msb>>20)&0xF)*2); 
 			unsigned int rx_sym_size=((lsb>>24)&0xFF)*128;
 
-			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_num_sym_in_buff) = rx_sym_num;
-			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_sym_buf_base) = rx_sym_base;
-			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_sym_buff_size) = rx_sym_size;
-			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_num_sym_in_buff+4) = rx_sym_num;
-			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_sym_buf_base+4) = rx_sym_base+rx_sym_num*rx_sym_size;
+			*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+rx_num_sym_in_buff) = rx_sym_num;
+			*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+rx_sym_buf_base) = rx_sym_base;
+			*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+rx_sym_buff_size) = rx_sym_size;
+			*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+rx_num_sym_in_buff+4) = rx_sym_num;
+			*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+rx_sym_buf_base+4) = rx_sym_base+rx_sym_num*rx_sym_size;
 		}
 		//printf("Received from VSPA:%d, MBox:%d, MSB:0x%08x, LSB:0x%08x.\n", core, mbox_id, ack_msg, 0);  //simulate an ACK
 		return ((uint64_t)ack_msg)<<32;
@@ -1312,13 +1284,13 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 				//reset AXIQ only when FDD mode,  TDD mode doesn't need reset AXIQ for restart.
 				if( ((msb&DFE_MODE_TX_DIS)==0) && (dfe_mode_hi_pre&DFE_MODE_TX_FDD) )
 				{
-					Ant_buffer_tx_axiq_reset(ant_map_tx_pre, vspa_dmem_base_vir);
+					Ant_buffer_tx_axiq_reset(ant_map_tx_pre, g_vspa_dmem_base_vir);
 				}
 				if( ((msb&DFE_MODE_RX_DIS)==0) && (dfe_mode_hi_pre&DFE_MODE_RX_FDD) )
 				{
-					Ant_buffer_rx_axiq_reset(ant_map_rx_pre, vspa_dmem_base_vir);
+					Ant_buffer_rx_axiq_reset(ant_map_rx_pre, g_vspa_dmem_base_vir);
 					if(ant_map_rx2_pre != 0x7)
-						Ant_buffer_rx_axiq_reset(ant_map_rx2_pre, vspa_dmem_base_vir);
+						Ant_buffer_rx_axiq_reset(ant_map_rx2_pre, g_vspa_dmem_base_vir);
 				}
 			}
 			return ((uint64_t)MSG_ID_DFE_MODE_CONFIG_ACK)<<32;
@@ -1327,14 +1299,14 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		//before DFE mode is configured, init DCS
 		unsigned int ant_map_tx = GET_DFE_MODE_ANT_MAP_TX(lsb);
 		if(!(msb&DFE_MODE_TX_DIS))
-			Ant_buffer_tx_init(ant_map_tx, GET_DFE_MODE_TX_IQSWAP(lsb), vspa_dmem_base_vir);
+			Ant_buffer_tx_init(ant_map_tx, GET_DFE_MODE_TX_IQSWAP(lsb), g_vspa_dmem_base_vir);
 		
 		unsigned int ant_map_rx = GET_DFE_MODE_ANT_MAP_RX(lsb);
 		unsigned int ant_map_rx2 = GET_DFE_MODE_ANT_MAP_RX2(lsb);
 		unsigned int ctrl_iqswap = (GET_DFE_MODE_RX_IQSWAP(lsb)<<IQSWAP_BITIDX(0)) | (GET_DFE_MODE_RX2_IQSWAP(lsb)<<IQSWAP_BITIDX(1));
 		unsigned int dcs_id = (ant_map_rx<<ANT_ID_BITIDX(0)) | (ant_map_rx2<<ANT_ID_BITIDX(1));
 		if(!(msb&DFE_MODE_RX_DIS))
-			Ant_buffer_rx_init(dcs_id, ctrl_iqswap, vspa_dmem_base_vir);
+			Ant_buffer_rx_init(dcs_id, ctrl_iqswap, g_vspa_dmem_base_vir);
 
 //		iEdmaInit();
 //		iEdmaChanInit(VSPA_eDMA_CHANNEL);
@@ -1350,7 +1322,7 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 	}
 	else if((msb&0xFF000000)==MSG_ID_STATIC_SLOT_FORMAT)  //static TDD pattern
 	{
-       	struct_tdd_pattern_entry* p_tdd_pattern = (struct_tdd_pattern_entry*)(vspa_dmem_base_vir+core*0x400000+tdd_pattern_entry);
+       	struct_tdd_pattern_entry* p_tdd_pattern = (struct_tdd_pattern_entry*)(g_vspa_dmem_base_vir+core*0x400000+tdd_pattern_entry);
 		unsigned int UE_mask = (*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IP_DFE_MODE_HI)) & (1<<10);
        	unsigned int seq_id_mask = GET_SEQ_ID_MASK(lsb);
 		if(seq_id_mask == 0)
@@ -1374,15 +1346,18 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		
 		if(msb & (1<<MSG_TXRX_IDX))  //TXRX
 		{
-			dest = (*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+addr_phcom_coeff_rx))<<7;
+			dest = (*(unsigned short*)(g_vspa_dmem_base_vir+core*0x400000+addr_phcom_coeff_rx))<<7;
 		}
 		else
 		{
-			dest = (*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+addr_phcom_coeff_tx))<<7;
+			dest = (*(unsigned short*)(g_vspa_dmem_base_vir+core*0x400000+addr_phcom_coeff_tx))<<7;
 		}
-		dest = (vspa_dmem_base_vir+core*0x400000+dest);
+		dest = (g_vspa_dmem_base_vir+core*0x400000+dest);
 		for(int i=0;i<num_coeff;i++)
 			*(uint64_t*)(dest+i*8) = *(uint64_t*)(ddr_host_view+i*8);
+		
+		//munmap((void*)ddr_host_view, 0x1000);
+
 		return 0;
 	}
 	else if((msb&0xFF000000)==MSG_ID_TIMING_OFFSET)
@@ -1392,39 +1367,39 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		if(rx)
 		{
     		if(dis)
-    			*(int*)(vspa_dmem_base_vir+core*0x400000+rx_timing_offset) = 0x80000000;
+    			*(int*)(g_vspa_dmem_base_vir+core*0x400000+rx_timing_offset) = 0x80000000;
 			else
-				*(int*)(vspa_dmem_base_vir+core*0x400000+rx_timing_offset) = lsb;
+				*(int*)(g_vspa_dmem_base_vir+core*0x400000+rx_timing_offset) = lsb;
 		}
 		else
 		{
     		if(dis)
-    			*(int*)(vspa_dmem_base_vir+core*0x400000+tx_timing_offset) = 0x80000000;
+    			*(int*)(g_vspa_dmem_base_vir+core*0x400000+tx_timing_offset) = 0x80000000;
 			else
-				*(int*)(vspa_dmem_base_vir+core*0x400000+tx_timing_offset) = lsb;
+				*(int*)(g_vspa_dmem_base_vir+core*0x400000+tx_timing_offset) = lsb;
 		}
 		return 0;
 	}
 	else if((msb&0xFF000000)==MSG_ID_FINE_CFO_NCO_FREQ_UPDATE_TX)
 	{
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_mixer_freq_update) = lsb;
+		*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+tx_mixer_freq_update) = lsb;
 		return 0;
 	}
 	else if((msb&0xFF000000)==MSG_ID_FINE_CFO_NCO_FREQ_UPDATE_RX)
 	{
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_mixer_freq_update+GET_CFO_TRID(msb)*4) = lsb;
+		*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+rx_mixer_freq_update+GET_CFO_TRID(msb)*4) = lsb;
 		return 0;
 	}
 	else if((msb&0xFF000000)==MSG_ID_CELLTRACK_REQUEST)
 	{
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+celltrack_config_lo) = lsb;
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+celltrack_config_hi) = msb;
+		*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+celltrack_config_lo) = lsb;
+		*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+celltrack_config_hi) = msb;
 		return 0;
 	}
 	else if((msb&0xFF000000)==0x4e000000)   //core map
 	{
-		uint32_t core_map_hi = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+ant_core_map_hi);
-		uint32_t core_map_lo = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+ant_core_map_lo);
+		uint32_t core_map_hi = *(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+ant_core_map_hi);
+		uint32_t core_map_lo = *(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+ant_core_map_lo);
 		//printf("Received from VSPA:%d, MBox:%d, MSB:0x%08x, LSB:0x%08x.\n", core, mbox_id, core_map_hi, core_map_lo);  //simulate an ACK
 		return (((uint64_t)core_map_hi)<<32)|core_map_lo;
 	}
@@ -1434,26 +1409,26 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		if(GET_CONTROL2(msb))
 		{
 			for(int i=0; i<MAX_NUM_SINGLE_TONE; i++)
-				*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+CONFIG_TX_SINGLE_TONE_AMP+i*4) = 0;	//stop single tone
+				*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+CONFIG_TX_SINGLE_TONE_AMP+i*4) = 0;	//stop single tone
 		}
 		else
 		{
 			unsigned int single_tone_amplitude = ((para_hi<<4)*(1-GET_CONTROL1(msb))) | ((para_hi<<20)*(1-GET_CONTROL3(msb))) | SINGLE_TONE_VALID_FLAG;
 			if(GET_CONTROL0(msb) == 0)  //first single tone
 			{
-				*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+CONFIG_TX_SINGLE_TONE_FREQ+0*4) = lsb;
-				*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+CONFIG_TX_SINGLE_TONE_AMP+0*4) = single_tone_amplitude;
+				*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+CONFIG_TX_SINGLE_TONE_FREQ+0*4) = lsb;
+				*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+CONFIG_TX_SINGLE_TONE_AMP+0*4) = single_tone_amplitude;
 				for(int i=1; i<MAX_NUM_SINGLE_TONE; i++)
-					*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+CONFIG_TX_SINGLE_TONE_AMP+i*4) = 0;  //set the rest single tone invalid
+					*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+CONFIG_TX_SINGLE_TONE_AMP+i*4) = 0;  //set the rest single tone invalid
 			}
 			else
 			{
 				for(int i=0; i<MAX_NUM_SINGLE_TONE; i++)
 				{
-					if(*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+CONFIG_TX_SINGLE_TONE_AMP+i*4) == 0)
+					if(*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+CONFIG_TX_SINGLE_TONE_AMP+i*4) == 0)
 					{
-						*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+CONFIG_TX_SINGLE_TONE_FREQ+i*4) = lsb;
-						*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+CONFIG_TX_SINGLE_TONE_AMP+i*4) = single_tone_amplitude;
+						*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+CONFIG_TX_SINGLE_TONE_FREQ+i*4) = lsb;
+						*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+CONFIG_TX_SINGLE_TONE_AMP+i*4) = single_tone_amplitude;
 						break;
 					}
 				}
@@ -1469,12 +1444,12 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		unsigned int dcm = 0;
 		if(rx)
 		{
-			dest = (*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+addr_ant_rx_dump));
+			dest = (*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+addr_ant_rx_dump));
 			dcm = GET_CONTROL2(msb);
 		}
 		else
-			dest = (*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+addr_ant_tx_dump));
-		dest = (vspa_dmem_base_vir+core*0x400000+dest+trid*9*4);
+			dest = (*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+addr_ant_tx_dump));
+		dest = (g_vspa_dmem_base_vir+core*0x400000+dest+trid*9*4);
 		unsigned int para_hi = GET_TEST_PARA_HI(msb);
 		unsigned int control = GET_CONTROL(msb);
 		unsigned int control1 = control>>2;
@@ -1504,21 +1479,21 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		unsigned int trid = (msb & 0x00008000)>>15;
 		if(GET_CONTROL2(msb))
 		{
-			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+CONFIG_RX_SINGLE_TONE_AMP+trid*4) = 0;	//stop single tone
+			*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+CONFIG_RX_SINGLE_TONE_AMP+trid*4) = 0;	//stop single tone
 		}
 		else
 		{
 			unsigned int single_tone_amplitude = ((para_hi<<4)*(1-GET_CONTROL1(msb))) | ((para_hi<<20)*(1-GET_CONTROL3(msb))) | SINGLE_TONE_VALID_FLAG;
-			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+CONFIG_RX_SINGLE_TONE_FREQ+trid*4) = lsb;
-			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+CONFIG_RX_SINGLE_TONE_AMP+trid*4) = single_tone_amplitude;
+			*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+CONFIG_RX_SINGLE_TONE_FREQ+trid*4) = lsb;
+			*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+CONFIG_RX_SINGLE_TONE_AMP+trid*4) = single_tone_amplitude;
 		}
 		return 0;
 	}
 	else if((msb&0xFF3F0000)==0x0a110000)   //ijnect freq tx
 	{
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_sym_buf_base) = GET_INJECT_ADDR(lsb);
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_num_sym_in_buf) = GET_INJECT_NUM_SYMBOLS(lsb);
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_sym_buff_size) = GET_INJECT_SYM_BUF_SIZE(msb);
+		*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+tx_sym_buf_base) = GET_INJECT_ADDR(lsb);
+		*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+tx_num_sym_in_buf) = GET_INJECT_NUM_SYMBOLS(lsb);
+		*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+tx_sym_buff_size) = GET_INJECT_SYM_BUF_SIZE(msb);
 		return 0;
 	}
 	else if((msb&0xFF3F0000)==0x0a0f0000)   //dump freq tx
@@ -1527,10 +1502,10 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		unsigned int dump_addr = GET_INJECT_ADDR(lsb);
 		unsigned int dump_num_sym = GET_INJECT_NUM_SYMBOLS(lsb);
 		unsigned int dump_sym_size =  GET_INJECT_SYM_BUF_SIZE(msb);
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_freq_dump_addr) = dump_addr;
-		*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+tx_freq_dump_num_sym) = dump_num_sym;
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_freq_dump_sym_size) = dump_sym_size;
-		*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+tx_freq_dump_flag) = DUMP_INJECT_WAIT_MASK|DUMP_INJECT_ONCE;
+		*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+tx_freq_dump_addr) = dump_addr;
+		*(unsigned short*)(g_vspa_dmem_base_vir+core*0x400000+tx_freq_dump_num_sym) = dump_num_sym;
+		*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+tx_freq_dump_sym_size) = dump_sym_size;
+		*(unsigned short*)(g_vspa_dmem_base_vir+core*0x400000+tx_freq_dump_flag) = DUMP_INJECT_WAIT_MASK|DUMP_INJECT_ONCE;
 		return 0;
 	}
 	else if((msb&0xFF3F0000)==0x0a1c0000)   //dump freq rx
@@ -1539,10 +1514,10 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		unsigned int dump_addr = GET_INJECT_ADDR(lsb);
 		unsigned int dump_num_sym = GET_INJECT_NUM_SYMBOLS(lsb);
 		unsigned int dump_sym_size =  GET_INJECT_SYM_BUF_SIZE(msb);
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_dumping_sym_buf_base+rid*4) = dump_addr;
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_dumping_num_sym_in_buff) = dump_num_sym;
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_dumping_sym_buff_size) = dump_sym_size;
-		*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+rx_sym_dumping_flag+rid*2) = 1;
+		*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+rx_dumping_sym_buf_base+rid*4) = dump_addr;
+		*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+rx_dumping_num_sym_in_buff) = dump_num_sym;
+		*(unsigned int*)(g_vspa_dmem_base_vir+core*0x400000+rx_dumping_sym_buff_size) = dump_sym_size;
+		*(unsigned short*)(g_vspa_dmem_base_vir+core*0x400000+rx_sym_dumping_flag+rid*2) = 1;
 		return 0;
 	}
 	else if((msb&0xFF3F0000)==0x0A020000)   //QEC
@@ -1555,17 +1530,17 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		
 		if(msb & (1<<14))  //TXRX
 		{
-			dest = (*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+addr_DFE_qec_params_opt_rx))<<7;
+			dest = (*(unsigned short*)(g_vspa_dmem_base_vir+core*0x400000+addr_DFE_qec_params_opt_rx))<<7;
 		}
 		else
 		{
-			dest = (*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+addr_DFE_qec_params_opt_tx))<<7;
+			dest = (*(unsigned short*)(g_vspa_dmem_base_vir+core*0x400000+addr_DFE_qec_params_opt_tx))<<7;
 		}
-		dest = (vspa_dmem_base_vir+core*0x400000+dest+trid*128);
+		dest = (g_vspa_dmem_base_vir+core*0x400000+dest+trid*128);
 		
 		//convert to struct for optimized QEC
 		qec_para_convert((void*)dest, (void*)ddr_host_view);
-
+		//munmap((void*)ddr_host_view, 0x1000);
 		return 0;
 	}
 	return -1;
@@ -1581,6 +1556,7 @@ uint32_t hvif_init(uint64_t modem_ccsr_base_phy, uint64_t vspa_dmem_base_phy, ui
 	g_devmem_fd = open("/dev/mem", O_RDWR);
     g_vspa_ccsr_vir = (uint64_t)mmap(NULL, 0x4000000, PROT_READ | PROT_WRITE, MAP_SHARED, g_devmem_fd, modem_ccsr_base_phy) + 0x1000000;
 	g_vspa_dmem_base_phy = vspa_dmem_base_phy;
+	g_vspa_dmem_base_vir = (uint64_t)mmap(NULL, 0x2000000, PROT_READ | PROT_WRITE,	MAP_SHARED, g_devmem_fd, g_vspa_dmem_base_phy);
 	g_ddr_host_vspa_view_offset = ddr_phy_host_view - ddr_phy_vspa_view;
 
 	unsigned int vspa_hw_ver = *(unsigned int *)(g_vspa_ccsr_vir);
@@ -1605,11 +1581,18 @@ uint32_t hvif_init(uint64_t modem_ccsr_base_phy, uint64_t vspa_dmem_base_phy, ui
 }
 void hvif_reset()
 {
+	PCTRACE("Into hvif_reset\n");
+	//munmap((void*)g_vspa_ccsr_vir, 0x4000000);
+	//PCTRACE("After munmap g_vspa_ccsr_vir\n");
+	//munmap((void*)g_vspa_dmem_base_vir, 0x2000000);
 	close(g_devmem_fd);
+	PCTRACE("End hvif_reset\n");
 }
 
 uint64_t hvif_mbox_recv_1msg(uint32_t core_id, uint32_t mbox_id, uint32_t timeout)
 {
+	PCTRACE("Into hvif_mbox_recv_1msg\n");
+
 	uint64_t addr = g_vspa_ccsr_vir + 0x6A0 + 0x4000 * core_id;
 	uint32_t msb, lsb;
 
@@ -1618,6 +1601,7 @@ uint64_t hvif_mbox_recv_1msg(uint32_t core_id, uint32_t mbox_id, uint32_t timeou
 
 	if (!timeout) {
 		//if(!(ioread32((void*)addr_flag) & (1<<(30+mbox_id)) ))
+			PCTRACE("End hvif_mbox_recv_1msg\n");
 			return 0;		
 	}
 	//iowrite32(1<<(30+mbox_id), (void*)addr_flag); //clear vcpu_host_flag1 bit 30 and 31 which are used specifically for vcpu2host mbox valid flag
@@ -1625,14 +1609,30 @@ uint64_t hvif_mbox_recv_1msg(uint32_t core_id, uint32_t mbox_id, uint32_t timeou
 	addr = MAILBOX_ADDR(mbox_id, 1, core_id);
 	msb = ioread32((void*)addr);
 	lsb = ioread32((void*)addr+4);
+	
+	PCTRACE("End hvif_mbox_recv_1msg\n");
+
 	return (((uint64_t)msb)<<32)|lsb;
 }
 
+void set_reverse_loopback(uint32_t tx_coreA_id, uint32_t rx_coreA_id, uint32_t addr, uint32_t size)
+{
+	struct_dfe_ctrl* dfe_ctrl_tx = (struct_dfe_ctrl*)(g_vspa_dmem_base_vir+tx_coreA_id*0x400000);
+	struct_dfe_ctrl* dfe_ctrl_rx = (struct_dfe_ctrl*)(g_vspa_dmem_base_vir+rx_coreA_id*0x400000);
+	dfe_ctrl_rx->rx_timedomain_dump_addr = addr;
+	dfe_ctrl_rx->rx_timedomain_dump_size = size;
+	dfe_ctrl_tx->tx_timedomain_inject_addr = addr;
+	dfe_ctrl_tx->tx_timedomain_inject_size = size;
+}
 
 uint64_t hvif_mbox_recv(uint32_t core_id, uint32_t mbox_id)
 {
+	PCTRACE("Into hvif_mbox_recv\n");
+
 	uint64_t msg = hvif_mbox_recv_1msg(core_id, mbox_id, 1);
 	
+	PCTRACE("End hvif_mbox_recv\n");
+
 	if(msg)
 		return msg;
 	else
@@ -1641,9 +1641,13 @@ uint64_t hvif_mbox_recv(uint32_t core_id, uint32_t mbox_id)
 
 uint64_t hvif_mbox_send(uint32_t core_id, uint32_t mbox_id, uint32_t msb32, uint32_t lsb32)
 {
+	PCTRACE("Into hvif_mbox_send\n");
+
 	if((msb32&MSG_ID_MASK) == MSG_ID_ERROR_REPORT_MSG)
+	{
+		PCTRACE("End hvif_mbox_send\n");
 		return check_error_core(core_id);
-	
+	}
 	uint64_t addr = MAILBOX_ADDR(mbox_id, 0, core_id);
 	
 	//for specific messages, use direct mem write instead of mbox due to vspa code size limitation or mbox msg not implemeted in vspa
@@ -1662,6 +1666,8 @@ uint64_t hvif_mbox_send(uint32_t core_id, uint32_t mbox_id, uint32_t msb32, uint
 	iowrite32(lsb32, (void*)(addr+4));
 	uint64_t ret1 = hvif_mbox_recv_1msg(core_id, mbox_id, 1);          //recv ack after a send
 	
+	PCTRACE("End hvif_mbox_send\n");
+
 	if(ret == -1) 
 		return ret1;
 	else

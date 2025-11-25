@@ -110,7 +110,7 @@ if [ $filter_type -eq 4 ];then  #rx fir filter
 	[ -f $backup_filename ] || { dumpfile $addr_vir $backup_filename $((num_taps*4)); echo Original filter coeff backed up to $backup_filename; }
 	if [ $dis = 1 ];then
 		./utils/memset $addr_vir $((num_taps-1)) 0
-		./utils/memrw w 32 $((addr_vir+4*(num_taps/2))) 0x3f800000 #write the middle tap to 1.0 for passthrough
+		./utils/memrw w 32 $((addr_vir+4*(num_taps-1))) 0x3f800000 #write the middle tap to 1.0 for passthrough
 		echo RX LPF filter taps at address $addr_vir are set to passthrough on ant $ant.
 	else
 		[ $filesize -ne $((num_taps*4)) ] && { echo -e "***ERROR: File size $filesize is not expected $((num_taps*4)).\n"; exit 1; }
