@@ -1,10 +1,10 @@
 NXP Software Content Register
 
 Release - fr1 fr2 test tool
-DEC 2024
+MAR 2025
 
-Package:                   fr1_fr2_test_tool_v4.9.tgz
-Version:                   v4.9
+Package:                   fr1_fr2_test_tool_v5.0.tgz
+Version:                   v5.0
 Outgoing License:          LA_OPT_Online Code Hosting NXP_Software_License - v1.4 May 2025
 License File:              LICENSE.txt
 Package Category:          fr1_fr2_test_tool

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -39,7 +39,7 @@ if [ $# -lt 3 ];then
 	exit
 fi
 training_len=16384 #16384 #8192 #
-training_tool_delay=256 #$training_len #16384 # 256 512         #provided by training tool designer
+filt_trans=1024 #$training_len #16384 # 256 512         #provided by training tool designer
 physical_delay=256
 
 dpdpath=./dpd_training
@@ -86,10 +86,12 @@ num_coeff=$dpd
 
 dpd_model_spec_file_gen
 
-dpdo_size=$(((training_len+training_tool_delay)*4))
+dpdo_size=$(((training_len+filt_trans*2)*4))
 dpdo_file=tx_timedomain_$dpdo_size\_DPDoutput_$dpdo_sps\ksps_dump_ant$ant.bin
 feedback_file=$2
 feedback_sps=$3
+feedback_size=$(((dpdo_size+physical_delay*4)*feedback_sps/dpdo_sps))
+echo Required num of feedback samples is $((feedback_size)), starting from offset of No. $((offset*32768/4)) sample from frame boundary.
 feedback_122880_ratio=$((feedback_sps/122880))
 ([ $feedback_122880_ratio -eq 0 ] || [ $feedback_122880_ratio -gt 16 ] || [ $((feedback_122880_ratio*122880)) -ne $feedback_sps ]) && { echo ***ERROR: error feedback sampling rate. Command failed; echo; exit; }
 feedback_size=$(((dpdo_size+physical_delay*4)*feedback_sps/dpdo_sps))
@@ -101,8 +103,8 @@ coef_file=$dpdpath/dpd_coeff_vspa.flp
 
 [ -f $coef_file ] && rm $coef_file
 
-echo ./dump_time_domain_tx.sh $ant dpdo $dpdo_size HRAM offset=$offset
-./dump_time_domain_tx.sh $ant dpdo $dpdo_size HRAM offset=$offset
+echo ./dump_time_domain_tx.sh $ant dpdo $dpdo_size HRAM offset=$offset pow
+./dump_time_domain_tx.sh $ant dpdo $dpdo_size HRAM offset=$offset pow
 
 log=`python3 ./utils/calc_pwr.py -i $dpdo_file -f $((1000*dpdo_sps))`  #get the power of DPD output
 pwr_ori=${log:${#log}-6}
@@ -126,19 +128,23 @@ else
 			srx_resampling_arg=3
 		elif [ $fb_dpdo_ratio -eq 4 ];then
 			srx_resampling_arg=5
+		elif [ $fb_dpdo_ratio -eq 8 ];then
+			srx_resampling_arg=7
 		else
 			echo Error sampling rate configuration: DPDoutput=$dpdo_sps ksps, feedback=$feedback_sps ksps.; exit 1;
 		fi
 
 	echo $dpdpath/dpdt -c $dpdpath/dpd_spec.cfg -b $training_len -r $dpdo_file -s $feedback_file -x $srx_resampling_arg -d 0.00001
 	$dpdpath/dpdt -c $dpdpath/dpd_spec.cfg -b $training_len -r $dpdo_file -s $feedback_file -x $srx_resampling_arg -d 0.00001
-	cp ./dpd_coeff_vspa.flp ./dpd_coeff_vspa_ant$ant.flp  
+	ret=$?; echo dpdt return value: $ret
+	#[ $ret -ne 0 ] && { echo DPD training error: error code $ret; read -t 10 -p "Press CTRL+C to abort. ENTER to continue: " yesno; }
 fi
 
 if [ $fstop = 1 ];then log=`vspa_mbox send $txcore $host_vspa_mbox_id 0x0a0e21ff 0x00040000`; echo Ant $ant is set active after training.
 fi
 
 [ -f dpd_coeff_vspa.flp ] || { echo ***ERROR: DPD training failed; exit 1; }
+cp ./dpd_coeff_vspa.flp ./dpd_coeff_vspa_ant$ant.flp  
 mv dpd_coeff_*.* $dpdpath/
 cp $coef_file $dpdpath/dpd_training_record_file_coef_ant$ant.bin
 
@@ -147,8 +153,8 @@ echo TX signal shut down before applying DPD coeff.
 
 ./update_dpd_coeff.sh $ant $coef_file
 
-echo ./dump_time_domain_tx.sh $ant dpdo $dpdo_size HRAM offset=$offset
-./dump_time_domain_tx.sh $ant dpdo $dpdo_size HRAM offset=$offset
+echo ./dump_time_domain_tx.sh $ant dpdo $dpdo_size HRAM offset=$offset pow
+./dump_time_domain_tx.sh $ant dpdo $dpdo_size HRAM offset=$offset pow
 log=`python3 ./utils/calc_pwr.py -i $dpdo_file -f $((1000*dpdo_sps))`   #check TX power after DPD coeff is updated
 pwr=${log:${#log}-6}
 pwr00=$pwr\00
@@ -160,7 +166,7 @@ if [ $((pwrmpy100-pwrmpy100_ori)) -ge $((dpd_out_power_increase_limit*100)) ];th
 	echo "***WARNING: DPD out power before training=$pwr_ori, after traing=$pwr, Power increase exceeding limit. DPD set to passthrough."
 fi
 
-output_turn_on $txcore $tid $ant		#resume TX output to AXIQ
+output_turn_on $txcore $tid		#resume TX output to AXIQ
 echo TX signal resumed.
 	
 echo -e "\nDPD Training done.\n"

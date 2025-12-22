@@ -45,7 +45,7 @@ done
 for ((i=0;i<NUM_ANTS;i++))
 do
 	if [ $((ant_enable[i]&BITMASK_ANT_ENABLE_TX)) = 0 ];then
-		[ $((ant_list[i])) -eq 1 ] && echo ***WARBING: Ant $i is disabled, can not be set active.
+		[ $((ant_list[i])) -eq 1 ] && echo Ant $i is in disabled state.
 		continue
 	fi
 	txcore=${anttx[$i]}

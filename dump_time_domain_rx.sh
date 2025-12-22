@@ -40,6 +40,7 @@ known_waveform_list=(
 #list for RX time domain dump:
 3186a4b1fcc7cc4375f90a788fb71b48 "FDD single tone 30Khz 25% scale at 61Msps time domain dump" 
 05b35b703c659129117f5c9a7f95d6d6 "TDD single tone 30Khz 25% scale at 245Msps time domain dump for pattern 7624"
+c26c8c3b83503c19e9cd159dcd94a781 "TDD single tone 30Khz 25% scale at 245Msps time domain dump for pattern 7624 with filter delay compensation"
 bccbdab7f62763014a6d2026ee99ef44 "FDD single tone 15Khz 25% scale at 61Msps time domain dump" 
 9a5332e4ecf6fda434f66c1a2014e47b "TDD single tone 15Khz 25% scale at 61Msps time domain dump for pattern DDGUG"
 d5fbdae4f8c3d684b00693d9b4f40b29 "TDD single tone 15Khz 25% scale at 61Msps time domain dump for pattern DDGGG GGUUG GGGGG UUUUG"
@@ -160,14 +161,14 @@ num_32KB=$((num_32KB))
 [ $dump_time_len = 0.5 ] && dump_time_len_double=1 || dump_time_len_double=$((dump_time_len*2))
 if [ $num_32KB -eq 0 ];then
 	((size=sps*4*$dump_time_len_double/2))
-	dump_filename=rx_timedomain_$dump_time_len\ms_$sps\ksps_dump_ant
+	dump_filename0=rx_timedomain_$dump_time_len\ms_$sps\ksps_dump_ant
 else
 	if [ $num_32KB -lt 1024 ];then
 		((size=num_32KB*32768))
-		dump_filename=rx_timedomain_$((num_32KB*32))KB_$sps\ksps_dump_ant
+		dump_filename0=rx_timedomain_$((num_32KB*32))KB_$sps\ksps_dump_ant
 	else
 		((size=num_32KB))
-		dump_filename=rx_timedomain_$num_32KB\_$sps\ksps_dump_ant
+		dump_filename0=rx_timedomain_$num_32KB\_$sps\ksps_dump_ant
 	fi
 fi
 
@@ -191,7 +192,7 @@ dump_1time()
 	do
 		addr_vir_ant=$((addr_vir+i*size_32KB_aligned_per_ant))
 		if [ $mem = 0 ];then
-			dump_filename=$dump_filename${sync_dump_ant[i]}.bin
+			dump_filename=$dump_filename0${sync_dump_ant[i]}.bin
 			dumpfile $addr_vir_ant $dump_filename $size
 			echo "Antenna ${sync_dump_ant[i]} dumping done, size:$size, address:`printf 0x%x $addr_vir_ant`, file:$dump_filename"
 			[ $fast = 0 ] && { md5sum_check ${sync_dump_ant[i]} $dump_filename; check_error_ant ${sync_dump_ant[i]}; }
@@ -200,19 +201,7 @@ dump_1time()
 		fi
 		
 		if ([ $fast = 0 ] && [ $pow = 1 ]);then
-		dump_size=$((10*14*65536)); [ $dump_size -gt $((size_32KB_aligned_per_ant/4)) ] && dump_size=$((size_32KB_aligned_per_ant/4))
-		log=`./utils/power $addr_vir_ant 0 $((size_32KB_aligned_per_ant/4))`
-		eval "$log"
-
-		v_tx_pow_acc=$power_IQ
-		v_tx_pow_num_samples=$num_samples_valid
-		sample_power=($(echo $v_tx_pow_acc $v_tx_pow_num_samples | awk '{ x=10*(log($1/$2)/log(10)); printf("%f %3.1f %d\n", $1/$2, x, x); }'))
-		[ ${sample_power[1]} = -inf ] && { sample_power[1]=-99999; sample_power[2]=-99999; }  #negative infinite
-		echo "Sample power at ADC: ${sample_power[0]}/sample, ${sample_power[1]} dB, max I=$max_I, max Q=$max_Q, dc_I=$dc_I, dc_Q=$dc_Q"
-		[ $((sample_power[2])) -lt -15 ] && echo -e "***WARNING: RX ant ${sync_dump_ant[i]} ADC input power does not reach 10-15 dB, your test is not fully utilizing the DAC dynamic range!\n"
-		
-		max_IQ100=`echo $max_IQ | awk '{ abs_val = ($1 >= 0) ? $1 : -$1; printf("%d\n", abs_val*100); }'`
-		[ $max_IQ100 -ge 97 ] && warn_saturated="***WARNING: RX ant ${sync_dump_ant[i]} ADC input is saturated, max value $max_IQ\n"
+			check_sample_power $addr_vir $((size/4))
 		fi
 	done
 }
@@ -230,7 +219,7 @@ dump_via_hram_mlti_times()
 	[ $size_left = 0 ] && { ((num_loop=num_chunks)); size_left=$size_hram; } || ((num_loop=num_chunks+1))
 	[ $num_loop -ge 64 ] &&  { echo ***Error: HRAM available size too small, num of blocks exceeds 64.; exit 1; }
 	
-	dump_filename=$dump_filename$ant.bin
+	dump_filename=$dump_filename0$ant.bin
 	[ -f $dump_filename ] && rm $dump_filename
 	lsb=`printf "0x%08x" $(( ((size_hram/32/1024)<<20) + (start_hram_phy>>12) ))`
 	

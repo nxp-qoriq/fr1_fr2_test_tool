@@ -45,7 +45,6 @@ class Slot:
 
 def plot_dump(dump_file='./waveforms/rx0_dump.bin', fs=122880000*2, swap_en=False, conj_en=False, sign_mag=False):
 
-    print fs
     upsamp = fs/61440000
     fs=upsamp*61440000
     fft_window =512*upsamp

@@ -23,6 +23,18 @@ install, activate or otherwise use the software.
 
 #include "antman_axiq.h"
 
+#define DUMP_INJECT_STOPPED						0x0000
+#define DUMP_INJECT_WAIT_MASK					0x0001
+#define DUMP_DONE_MASK							0x0001
+#define DUMP_INJECT_ONCE						0x0002
+#define DUMP_INJECT_FOREVER						0x0004
+//#define DUMP_INJECT_COMPACT						0x0008
+#define DUMP_INJECT_MODE_ONCE					0x0020
+#define DUMP_INJECT_MODE_FOREVER				0x0040
+//#define DUMP_INJECT_MODE_COMPACT				0x0080
+#define DUMP_INJECT_MODE_SHIFT					4
+
+
 #define IP_IDX_FAST_FLAGS	0x714
 #define IP_IDX_NSC			0x138
 #define IP_DFE_MODE_HI 		0x13C
@@ -31,6 +43,66 @@ install, activate or otherwise use the software.
 #define VCPU_HOST_FLAGS1    0x018
 #define HOST_VCPU_FLAGS0    0x01C
 #define HOST_VCPU_FLAGS1    0x020
+
+
+// Trigger options:
+#define DMAC_TRIG_IPPU          (0b1 << 12)     //!< Trigger IPPU on transfer completion.
+#define DMAC_TRIG_VCPU          (0b1 << 13)     //!< Trigger VCPU on transfer completion.
+#define DMAC_TRIG_IRQ           (0b1 << 14)     //!< Trigger IRQ  on transfer completion.
+#define DMAC_TRIG_FECU          (0b1 << 22)     //!< Trigger FECU on transfer completion.
+
+// Pending options:
+#define DMAC_PEND_EXT           (0b1 << 16)     //!< Transfer pending on external trigger.
+#define DMAC_PEND_IPPU          (0b1 << 17)     //!< Transfer pending on IPPU procedure completion.
+#define DMAC_PEND_FECU          (0b1 << 23)     //!< Transfer pending on FECU operation completion.
+
+// Pointer reset request:
+#define DMAC_PRST_REQ           (0b1 << 15)
+
+// FIFO mode:
+#define DMAC_FIFO_HS            ((0b1 << 11))
+#define DMAC_FIFO               ((0b1 << 11) | DMAC_PEND_EXT)
+#define DMAC_FIFO_RESET         ((0b1 << 11) | DMAC_PRST_REQ)
+
+// Program memory access:
+#define DMAC_VPRAM              (0b010 << 8)    //!< Transfer to VCPU program memory.
+#define DMAC_IPRAM              (0b011 << 8)    //!< Transfer to IPPU program memory.
+
+// Turbo read:
+#define DMAC_MBRE               (0b1 << 7)      //!< Enable multi-burst read.
+
+// Transfer modes:
+#define DMAC_RD                 ((0b000 << 8) | DMAC_MBRE)      //!< Read from AXI (use multi-burst)
+#define DMAC_RDC                (0b001 << 8)                    //!< Read from AXI and convert to sign-magnitude.
+#define DMAC_WR                 (0b110 << 8)                    //!< Write to AXI.
+#define DMAC_WRC                (0b111 << 8)                    //!< Write to AXI and convert to 2's complement.
+#define DMAC_DI8                ((0b100 << 8) | (0b001 << 18))  //!<  8-bit write to AXI.
+#define DMAC_DI4_MSB0           ((0b100 << 8) | (0b010 << 18))  //!<  4-bit write to AXI.
+#define DMAC_DI4_MSB1           ((0b100 << 8) | (0b011 << 18))  //!<  4-bit write to AXI.
+#define DMAC_DI16               ((0b100 << 8) | (0b100 << 18))  //!< 16-bit write to AXI.
+#define DMAC_DI32               ((0b100 << 8) | (0b101 << 18))  //!< 32-bit write to AXI.
+#define DMA_TRIG				DMAC_PEND_EXT
+
+#define DMA_DMEM_PRAM_ADDR              (0x0B0)
+#define DMA_AXI_ADDRESS                 (0x0B4)
+#define DMA_AXI_BYTE_CNT                (0x0B8)
+#define DMA_XFR_CTRL                    (0x0BC)
+#define DMA_STAT_ABORT                  (0x0C0)
+#define DMA_IRQ_STAT                    (0x0C4)
+#define DMA_COMP_STAT                   (0x0C8)
+#define DMA_XFRERR_STAT                 (0x0CC)
+#define DMA_CFGERR_STAT                 (0x0D0)
+#define DMA_XRUN_STAT                   (0x0D4)
+#define DMA_GO_STAT                     (0x0D8)
+#define DMA_FIFO_STAT                   (0x0DC)
+
+#define IPPUCONTROL                     (0x700)
+#define IPPUSTATUS                      (0x704)
+#define IPPURC                          (0x708)
+#define IPPUARGBASEADDR                 (0x70C)
+#define IPPUHWVER                       (0x710)
+#define IPPUSWVER                       (0x714)
+
 
 #define LA9310
 
@@ -132,6 +204,18 @@ typedef struct tdd_pattern_entry_s
 #define addr_ant_rx_dump				((addr_ant_tx_dump+4))
 #define	tx_timing_offset							((addr_ant_rx_dump+4))
 #define	rx_timing_offset							((tx_timing_offset+4))
+#define	tx_circ_total_write_size							((rx_timing_offset+4))
+#define	rx_inject_addr							((tx_circ_total_write_size+4))
+#define	rx_inject_size							((rx_inject_addr+4))
+#define	tx_freq_dump_flag							((rx_inject_size+4))
+#define	tx_freq_dump_num_sym							((tx_freq_dump_flag+2))
+#define	tx_freq_dump_addr							((tx_freq_dump_num_sym+2))
+#define	tx_freq_dump_sym_size							((tx_freq_dump_addr+4))
+#define	error_info									((tx_freq_dump_sym_size+4))
+#define rx_dumping_sym_buf_base			0x1bc
+#define rx_dumping_num_sym_in_buff		0x1c4
+#define rx_dumping_num_sym_in_buff		0x1c4
+#define rx_dumping_sym_buff_size		0x1c8
 
 #define GET_CONTROL0(msg32msb)							(((msg32msb)>>22)&0x3)
 #define GET_CONTROL1(msg32msb)							(((msg32msb)>>14)&0x1)
@@ -178,6 +262,11 @@ typedef struct tdd_pattern_entry_s
 #define MSG_ID_STAT_REQ_TX_POWER				0x16000000
 #define MSG_ID_UPDATE_PHCOM_COEFF				0x18000000
 #define MSG_ID_CELLTRACK_REQUEST				0x19000000
+
+#define MSG_ID_ERROR_REPORT_MSG					0x44000000
+#define ERROR_REPORT_MSG_ERROR_TYPE_DMA_CONFIG_ERR		4	
+#define ERROR_REPORT_MSG_ERROR_TYPE_DMA_TRANSFER_ERR	5	
+#define ERROR_REPORT_MSG_ERROR_TYPE_IPPU_ERR			6
 
 #define GET_DFE_MODE_RX_IQSWAP(msg32lsb)				(((msg32lsb)>>23)&1)
 #define GET_DFE_MODE_TX_IQSWAP(msg32lsb)				(((msg32lsb)>>19)&1)
@@ -327,6 +416,8 @@ uint64_t g_ddr_host_vspa_view_offset;  //DDR address host vspa view offset (DDR 
 #define GPIN0                           (0x500 >> 2)
 #define GPI(x)      (GPIN0 + (x))
 
+#define TCM_BASE	0x20000000
+
 #define NUM_ANT_BUFFERS	2
 
 typedef struct buf_stat_td_s
@@ -394,6 +485,56 @@ typedef struct struct_antman_ctrl_rx_s
 
 //#include "eDMA_la9310.h"
 
+
+
+#define dsb(opt) asm volatile("dsb " #opt : : : "memory")
+#define dmb(opt) asm volatile("dmb " #opt : : : "memory")
+
+static inline uint32_t ioread32(const volatile void *addr)
+{
+    uint32_t val;
+
+    asm volatile(
+            "ldr %w[val], [%x[addr]]"
+            : [val] "=r" (val)
+            : [addr] "r" (addr));
+
+    dsb(ld);
+    return val;
+}
+
+static inline uint64_t ioread64(const volatile void *addr)
+{
+    uint64_t val;
+
+    asm volatile(
+            "ldr %x[val], [%x[addr]]"
+            : [val] "=r" (val)
+            : [addr] "r" (addr));
+
+    dsb(ld);
+    return val;
+}
+
+static inline void iowrite32(uint32_t val, volatile void *addr)
+{
+    dsb(st);
+    asm volatile(
+            "str %w[val], [%x[addr]]"
+            :
+            : [val] "r" (val), [addr] "r" (addr));
+}
+
+static inline void iowrite64(uint64_t val, volatile void *addr)
+{
+    dsb(st);
+    asm volatile(
+            "str %x[val], [%x[addr]]"
+            :
+            : [val] "r" (val), [addr] "r" (addr));
+}
+
+
 //convert float16 to float 32.  float 16 has 1 sign bit + 5 shift bit + 10 fractional bit. float 32 has 1 sign bit + 8 shift bit + 23 fractinal bit
 int float16_to_float32(short data16)
 {
@@ -419,7 +560,152 @@ int float16_to_float32(short data16)
 	return (int)data32;
 }
 
+void qec_para_convert(void* p_qec_para_converted, void* p_qec_para)
+{
+	uint64_t  addr_qec_para = (uint64_t)p_qec_para;
+	float f1=*(float*)((addr_qec_para+128+4*2));
+	float f2=*(float*)((addr_qec_para+128+4*3));
+	float f4=*(float*)((addr_qec_para+128+4*4));
+	float gre=*(float*)((addr_qec_para+128+4*5));
+	float gim=*(float*)((addr_qec_para+128+4*6));
+	float dcre=*(float*)((addr_qec_para+128+4*7));
+	float dcim=*(float*)((addr_qec_para+128+4*8));
+	
+		
+	//convert to struct for optimized QEC
+	uint64_t  addr_qec_para_converted = (uint64_t)p_qec_para_converted;
+		
+	if (gim == 0) gim = gre;
+	
+	f1 *= gre;
+	f2 *= gim;
+	f4 *= gim;
+	
+	*(float*)(addr_qec_para_converted+4*0) = f1;
+	*(float*)(addr_qec_para_converted+4*1) = f4;
+	*(float*)(addr_qec_para_converted+4*2) = 0;
+	*(float*)(addr_qec_para_converted+4*3) = f2;
+	*(float*)(addr_qec_para_converted+4*4) = dcre;
+	*(float*)(addr_qec_para_converted+4*5) = dcim;
+	*(float*)(addr_qec_para_converted+4*6) = f1;
+	*(float*)(addr_qec_para_converted+4*7) = f4;
+	*(float*)(addr_qec_para_converted+4*8) = 0;
+	*(float*)(addr_qec_para_converted+4*9) = f2;
+}
 
+
+uint64_t check_error_core(uint32_t core)
+{
+	//check DMA error
+	uint32_t config_error = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_CFGERR_STAT);
+	if(config_error)
+	{
+		*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_CFGERR_STAT) = config_error; //clear config error status bits
+		return (((uint64_t)(MSG_ID_ERROR_REPORT_MSG|(ERROR_REPORT_MSG_ERROR_TYPE_DMA_CONFIG_ERR<<16)))<<32)|config_error;
+	}
+	uint32_t transfer_error = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_XFRERR_STAT);
+	if(transfer_error)
+	{
+		*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_XFRERR_STAT) = transfer_error;
+		return (((uint64_t)(MSG_ID_ERROR_REPORT_MSG|(ERROR_REPORT_MSG_ERROR_TYPE_DMA_TRANSFER_ERR<<16)))<<32)|transfer_error;
+	}
+	uint32_t ippu_error = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IPPUSTATUS);
+	if(ippu_error&(1<<27)) //cmd error
+	{
+		*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IPPURC) = 0x80000000;  //clear cmd error status bit
+		return (((uint64_t)(MSG_ID_ERROR_REPORT_MSG|(ERROR_REPORT_MSG_ERROR_TYPE_IPPU_ERR<<16)))<<32)|ippu_error;
+	}
+	uint64_t vspa_dmem_base_vir = (uint64_t)mmap(NULL, 0x400000*8, PROT_READ | PROT_WRITE,	MAP_SHARED, g_devmem_fd, g_vspa_dmem_base_phy);
+	uint64_t dcs_error = *(uint64_t*)(vspa_dmem_base_vir+core*0x400000+error_info);
+	if(dcs_error)
+	{
+		*(uint64_t*)(vspa_dmem_base_vir+core*0x400000+error_info) = 0; //clear the error
+	}
+	return dcs_error;
+}	
+
+void dmac_enable(unsigned int ctrl, unsigned int size, unsigned int axi_addr, unsigned int dmem_addr)
+{
+	unsigned int core = 0;
+	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_DMEM_PRAM_ADDR) = dmem_addr;
+	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_AXI_ADDRESS) = axi_addr;
+	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_AXI_BYTE_CNT) = size;
+	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_XFR_CTRL) = ctrl;
+}
+#ifdef LA9310
+#define UNIT2BYTE(x)	((x)*2)
+#else
+#define UNIT2BYTE(x)	((x)*1)
+#endif
+
+volatile unsigned int counter;
+void delay_cycles(unsigned int cycles)
+{
+	for(unsigned int i = 0; i<cycles; i++)
+	{
+		counter++;
+	}
+}
+
+void dmac_abort(unsigned int mask)
+{
+	unsigned int core = 0;
+	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+DMA_STAT_ABORT) = mask;
+}
+
+void Ant_buffer_tx_axiq_reset(struct_antman_ctrl_tx* antman_ctrl_tx)
+{
+	unsigned int core = 0;
+	unsigned int axiq_dma_chan = antman_ctrl_tx->axiq_dma_chan;
+
+	dmac_abort(1<<axiq_dma_chan);
+	
+	#ifdef LA9310
+	//configure a short DMA with PTR_RST to reset AXIQ, 9310 AXIQ can only reset by ptr_rst
+	dmac_enable(DMAC_PRST_REQ | DMA_TRIG | DMAC_WRC | DMAC_FIFO_HS | axiq_dma_chan, 64, antman_ctrl_tx->axiq_fifo_addr, UNIT2BYTE(antman_ctrl_tx->buf_stat_ant_tx[0].buf_addr[0]));
+	delay_cycles(1000);
+	//if AXIQ is in normal state, this DMA will be pending there, then abort it.
+	//if AXIQ is in Flush mode, this DMA will be consumed and Flush mode will be ended, then this abort will take no effect.
+	dmac_abort(1<<axiq_dma_chan);
+	#endif
+
+	//disable AXIQ, reset AXIQ(LA12xx only), clr errors
+	//__ip_write(antman_ctrl_tx->axiq_control_gpo, antman_ctrl_tx->axiq_control_enable_bitfield|antman_ctrl_tx->axiq_control_fifo_rst_clr_err_bitfield, antman_ctrl_tx->axiq_control_fifo_rst_clr_err_bitfield);
+	unsigned int gpo = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_tx->axiq_control_gpo*4);
+	gpo &= ~(antman_ctrl_tx->axiq_control_enable_bitfield|antman_ctrl_tx->axiq_control_fifo_rst_clr_err_bitfield);
+	gpo |= antman_ctrl_tx->axiq_control_fifo_rst_clr_err_bitfield;
+	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_tx->axiq_control_gpo*4) = gpo;
+	delay_cycles(32); //wait at least 8 clocks for reset to complete
+	//__ip_write(antman_ctrl_tx->axiq_control_gpo, antman_ctrl_tx->axiq_control_fifo_rst_clr_err_bitfield, 0);
+	gpo &= ~antman_ctrl_tx->axiq_control_fifo_rst_clr_err_bitfield;
+	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_tx->axiq_control_gpo*4) = gpo;
+}
+void Ant_buffer_rx_axiq_reset(struct_antman_ctrl_rx* antman_ctrl_rx)
+{
+	unsigned int core = 0;
+	unsigned int axiq_dma_chan = antman_ctrl_rx->axiq_dma_chan;
+	dmac_abort(1<<axiq_dma_chan);
+
+	#ifdef LA9310
+	//configure a short DMA with PTR_RST to reset AXIQ, 9310 AXIQ can only reset by ptr_rst
+	dmac_enable(DMAC_PRST_REQ | DMA_TRIG | DMAC_RDC | DMAC_FIFO_HS | axiq_dma_chan, 64, antman_ctrl_rx->axiq_fifo_addr, UNIT2BYTE(antman_ctrl_rx->buf_stat_ant_rx[0].buf_addr[0]));
+	delay_cycles(1000);
+	//if AXIQ is in normal state, this DMA will be pending there, then abort it.
+	//if AXIQ is in Flush mode, this DMA will be consumed and Flush mode will be ended, then this abort will take no effect.
+	dmac_abort(1<<axiq_dma_chan);
+	#endif
+
+	//disable AXIQ, reset AXIQ(LA12xx only), clr errors
+	//__ip_write(antman_ctrl_rx->axiq_control_gpo, antman_ctrl_rx->axiq_control_enable_bitfield|antman_ctrl_rx->axiq_control_fifo_rst_clr_err_bitfield, antman_ctrl_rx->axiq_control_fifo_rst_clr_err_bitfield);
+	unsigned int gpo = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_rx->axiq_control_gpo*4);
+	gpo &= ~(antman_ctrl_rx->axiq_control_enable_bitfield|antman_ctrl_rx->axiq_control_fifo_rst_clr_err_bitfield);
+	gpo |= antman_ctrl_rx->axiq_control_fifo_rst_clr_err_bitfield;
+	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_rx->axiq_control_gpo*4) = gpo;
+	delay_cycles(32); //wait at least 8 clocks for reset to complete
+	//__ip_write(antman_ctrl_rx->axiq_control_gpo, antman_ctrl_rx->axiq_control_fifo_rst_clr_err_bitfield, 0);
+	gpo &= ~antman_ctrl_rx->axiq_control_fifo_rst_clr_err_bitfield;
+	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+antman_ctrl_rx->axiq_control_gpo*4) = gpo;
+}
 int Ant_buffer_tx_init(unsigned int dcs_id, unsigned int iq_swap, uint64_t vspa_dmem_base_vir)
 {
 	unsigned int core = 0;
@@ -821,35 +1107,87 @@ unsigned int get_min(unsigned int a, unsigned int b)
 	else		return b;
 }
 
+#define DFE_INITIALIZED					(1<<12)
 
 //due to LA9310 code size limitation, mailbox msg will be converted to direct memory access by this API.
 //return value: 0-success,  -1 fail (the msg not sent)
 uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, unsigned int msb, unsigned int lsb)
 {
 	uint64_t vspa_dmem_base_vir = (uint64_t)mmap(NULL, 0x100000, PROT_READ | PROT_WRITE,	MAP_SHARED, g_devmem_fd, g_vspa_dmem_base_phy);
-	if((msb&0xFF000000)==MSG_ID_SYMBOL_BUFFER_STRUCT)   //buffer struct msg
+	if( ((msb&0xFF000000)==MSG_ID_SYMBOL_BUFFER_STRUCT) || ((msb&0xFF000000)==MSG_ID_SYMBOL_BUFFER_STRUCT2) )   //buffer struct msg
 	{
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_num_sym_in_buf) = get_max(1, ((lsb>>20)&0xF)*2);
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_sym_buf_base) = (lsb&0xFFFFF)<<12;
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_sym_buff_size) = ((lsb>>24)&0xFF)*128;
+		unsigned int tx_sym_base, rx_sym_base, ack_msg;
+		if((msb&0xFF000000)==MSG_ID_SYMBOL_BUFFER_STRUCT)
+		{
+			tx_sym_base = (lsb&0xFFFFF)<<12;
+			rx_sym_base = (msb&0xFFFFF)<<12; 
+			ack_msg = MSG_ID_SYMBOL_BUFFER_STRUCT_ACK;
+		}
+		else
+		{
+			tx_sym_base = ((lsb&0xFFFFF)<<7)|TCM_BASE;
+			rx_sym_base = ((msb&0xFFFFF)<<7)|TCM_BASE;
+			ack_msg = MSG_ID_SYMBOL_BUFFER_STRUCT2_ACK;
+		}
 		
-		unsigned int rx_sym_base=(msb&0xFFFFF)<<12; 
-		unsigned int rx_sym_num=get_max(1, ((msb>>20)&0xF)*2); 
-		unsigned int rx_sym_size=((lsb>>24)&0xFF)*128;
+		if(tx_sym_base)
+		{
+			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_num_sym_in_buf) = get_max(1, ((lsb>>20)&0xF)*2);
+			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_sym_buf_base) = tx_sym_base;
+			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_sym_buff_size) = ((lsb>>24)&0xFF)*128;
+		}
+		
+		if(rx_sym_base)
+		{
+			unsigned int rx_sym_num=get_max(1, ((msb>>20)&0xF)*2); 
+			unsigned int rx_sym_size=((lsb>>24)&0xFF)*128;
 
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_num_sym_in_buff) = rx_sym_num;
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_sym_buf_base) = rx_sym_base;
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_sym_buff_size) = rx_sym_size;
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_num_sym_in_buff+4) = rx_sym_num;
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_sym_buf_base+4) = rx_sym_base+rx_sym_num*rx_sym_size;
-		
-		//printf("Received from VSPA:%d, MBox:%d, MSB:0x%08x, LSB:0x%08x.\n", core, mbox_id, MSG_ID_SYMBOL_BUFFER_STRUCT_ACK, 0);  //simulate an ACK
-		return ((uint64_t)MSG_ID_SYMBOL_BUFFER_STRUCT_ACK)<<32;
+			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_num_sym_in_buff) = rx_sym_num;
+			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_sym_buf_base) = rx_sym_base;
+			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_sym_buff_size) = rx_sym_size;
+			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_num_sym_in_buff+4) = rx_sym_num;
+			*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_sym_buf_base+4) = rx_sym_base+rx_sym_num*rx_sym_size;
+		}
+		//printf("Received from VSPA:%d, MBox:%d, MSB:0x%08x, LSB:0x%08x.\n", core, mbox_id, ack_msg, 0);  //simulate an ACK
+		return ((uint64_t)ack_msg)<<32;
 	}
 	else if((msb&0xFF000000)==MSG_ID_DFE_MODE_CONFIG)   //DFE MODE msg
 	{
+		unsigned int dfe_mode_pre = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IP_DFE_MODE_HI);
+		if(dfe_mode_pre)  //update DFE mode bits only
+		{
+			unsigned int v_addr_antman_tx = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+addr_antman_tx);
+			struct_antman_ctrl_tx antman_ctrl_tx = *(struct_antman_ctrl_tx*)(vspa_dmem_base_vir+core*0x400000+v_addr_antman_tx);
+			unsigned int v_addr_antman_rx = *(unsigned int*)(vspa_dmem_base_vir+core*0x400000+addr_antman_rx);
+			struct_antman_ctrl_rx antman_ctrl_rx = *(struct_antman_ctrl_rx*)(vspa_dmem_base_vir+core*0x400000+v_addr_antman_rx);
+
+
+			*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IP_DFE_MODE_LO) = lsb;
+			*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IP_DFE_MODE_HI) = msb;
+			
+			if(msb&(DFE_MODE_RESTART_TX|DFE_MODE_RESTART_RX))
+			{
+				//restart, wait until vspa retart ready and cleared the restart bit
+				unsigned int dfe_mode_cur;
+				do
+				{
+					dfe_mode_cur = *(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IP_DFE_MODE_HI);
+				}while(dfe_mode_cur & DFE_MODE_RESTART_TX);
+				
+				//reset AXIQ only when FDD mode,  TDD mode doesn't need reset AXIQ for restart.
+				if( ((msb&DFE_MODE_TX_DIS)==0) && (dfe_mode_pre&DFE_MODE_TX_FDD) )
+				{
+					Ant_buffer_tx_axiq_reset(&antman_ctrl_tx);
+				}
+				if( ((msb&DFE_MODE_RX_DIS)==0) && (dfe_mode_pre&DFE_MODE_RX_FDD) )
+				{
+					Ant_buffer_rx_axiq_reset(&antman_ctrl_rx);
+				}
+			}
+			return ((uint64_t)MSG_ID_DFE_MODE_CONFIG_ACK)<<32;
+		}
+		//first time DFE mode configuration after reset
 		//before DFE mode is configured, init DCS
-		
 		unsigned int ant_map_tx = GET_DFE_MODE_ANT_MAP_TX(lsb);
 		if(!(msb&DFE_MODE_TX_DIS))
 			Ant_buffer_tx_init(ant_map_tx, GET_DFE_MODE_TX_IQSWAP(lsb), vspa_dmem_base_vir);
@@ -860,7 +1198,7 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		unsigned int dcs_id = (ant_map_rx<<ANT_ID_BITIDX(0)) | (ant_map_rx2<<ANT_ID_BITIDX(1));
 		if(!(msb&DFE_MODE_RX_DIS))
 			Ant_buffer_rx_init(dcs_id, ctrl_iqswap, vspa_dmem_base_vir);
-		
+
 //		iEdmaInit();
 //		iEdmaChanInit(14);
 		
@@ -878,7 +1216,7 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
        	struct_tdd_pattern_entry* p_tdd_pattern = (struct_tdd_pattern_entry*)(vspa_dmem_base_vir+core*0x400000+tdd_pattern_entry);
 		unsigned int UE_mask = (*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+IP_DFE_MODE_HI)) & (1<<10);
        	unsigned int seq_id_mask = GET_SEQ_ID_MASK(lsb);
-		if(seq_id_mask = 0)
+		if(seq_id_mask == 0)
 			p_tdd_pattern->num_patterns = 0;  //clear num of entry if this is the first msg
 		add_a_pattern(lsb, p_tdd_pattern, UE_mask);
        	if(msb&0xFFFFFF)
@@ -1045,20 +1383,28 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_sym_buff_size) = GET_INJECT_SYM_BUF_SIZE(msb);
 		return 0;
 	}
+	else if((msb&0xFF3F0000)==0x0a0f0000)   //dump freq tx
+	{
+		//unsigned int rid=(( ( msb >> 15) & 1 ));
+		unsigned int dump_addr = GET_INJECT_ADDR(lsb);
+		unsigned int dump_num_sym = GET_INJECT_NUM_SYMBOLS(lsb);
+		unsigned int dump_sym_size =  GET_INJECT_SYM_BUF_SIZE(msb);
+		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_freq_dump_addr) = dump_addr;
+		*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+tx_freq_dump_num_sym) = dump_num_sym;
+		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+tx_freq_dump_sym_size) = dump_sym_size;
+		*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+tx_freq_dump_flag) = DUMP_INJECT_WAIT_MASK|DUMP_INJECT_ONCE;
+		return 0;
+	}
 	else if((msb&0xFF3F0000)==0x0a1c0000)   //dump freq rx
 	{
 		unsigned int rid=(( ( msb >> 15) & 1 ));
 		unsigned int dump_addr = GET_INJECT_ADDR(lsb);
 		unsigned int dump_num_sym = GET_INJECT_NUM_SYMBOLS(lsb);
 		unsigned int dump_sym_size =  GET_INJECT_SYM_BUF_SIZE(msb);
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_sym_buf_base+rid*4) = dump_addr;
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_num_sym_in_buff+rid*4) = dump_num_sym;
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_sym_buff_size) = dump_sym_size;
-		//for 2R case, the other RX is also dumping, configure its dump addr to after current RX
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_sym_buf_base+(1-rid)*4) = (dump_addr+dump_num_sym*dump_sym_size + 4095)/4096*4096;
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_num_sym_in_buff+(1-rid)*4) = dump_num_sym;
-		
-		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_sym_dumping_flag) = 1;
+		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_dumping_sym_buf_base+rid*4) = dump_addr;
+		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_dumping_num_sym_in_buff) = dump_num_sym;
+		*(unsigned int*)(vspa_dmem_base_vir+core*0x400000+rx_dumping_sym_buff_size) = dump_sym_size;
+		*(unsigned short*)(vspa_dmem_base_vir+core*0x400000+rx_sym_dumping_flag+rid*2) = 1;
 		return 0;
 	}
 	else if((msb&0xFF3F0000)==0x0A020000)   //QEC
@@ -1080,49 +1426,7 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		dest = (vspa_dmem_base_vir+core*0x400000+dest+trid*128);
 		
 		//convert to struct for optimized QEC
-		uint32_t f1=*(unsigned int*)((ddr_host_view+128+4*2));
-		uint32_t f2=*(unsigned int*)((ddr_host_view+128+4*3));
-		uint32_t f4=*(unsigned int*)((ddr_host_view+128+4*4));
-		float gre=*(float*)((ddr_host_view+128+4*5));
-		float gim=*(float*)((ddr_host_view+128+4*6));
-		float dcre=*(float*)((ddr_host_view+128+4*7));
-		float dcim=*(float*)((ddr_host_view+128+4*8));
-
-		float output_scaling_factor=*(float*)(dest+4*23);
-		float gre_scaled=gre*output_scaling_factor;
-		float gim_scaled=gim*output_scaling_factor;
-		
-		if(dcre < 0)
-			dcre = -1.0 - dcre;
-		if(dcim < 0)
-			dcim = -1.0 - dcim;
-		
-		short dcre_hfix = dcre*32768;
-		short dcim_hfix = dcim*32768;
-		
-		*(unsigned int*)(dest+4*0) = f1;
-		*(unsigned int*)(dest+4*1) = f4;
-		*(unsigned int*)(dest+4*2) = 0;
-		*(unsigned int*)(dest+4*3) = f2;
-		*(unsigned int*)(dest+4*4) = f1;
-		*(unsigned int*)(dest+4*5) = f4;
-		*(unsigned int*)(dest+4*6) = 0;
-		*(unsigned int*)(dest+4*7) = f2;
-		*(unsigned int*)(dest+4*8) = f1;
-		*(unsigned int*)(dest+4*9) = f4;
-		*(unsigned int*)(dest+4*10) = 0;
-		*(unsigned int*)(dest+4*11) = f2;
-		*(unsigned int*)(dest+4*12) = f1;
-		*(unsigned int*)(dest+4*13) = f4;
-		*(unsigned int*)(dest+4*14) = 0;
-		*(unsigned int*)(dest+4*15) = f2;
-		*(float*)(dest+4*16) = gre_scaled;
-		*(float*)(dest+4*17) = gim_scaled;
-		*(float*)(dest+4*18) = gre_scaled;
-		*(float*)(dest+4*19) = gim_scaled;
-		*(uint32_t*)(dest+4*20) = (dcre_hfix&0xFFFF)|(dcim_hfix<<16);
-		*(float*)(dest+4*21) = gre;
-		*(float*)(dest+4*22) = gim;
+		qec_para_convert((void*)dest, (void*)ddr_host_view);
 
 		return 0;
 	}
@@ -1135,73 +1439,22 @@ uint64_t la9310_dmem_write_for_mbox(unsigned int core, unsigned int mbox_id, uns
 		short temp=lsb&0xFFFF;
 		int temp1 = float16_to_float32(temp);
 		float output_scaling_factor = *(float*)&temp1;
-		*(float*)(dest+4*23) = output_scaling_factor;
 		
-		float gre = *(float*)(dest+4*21);
-		float gim = *(float*)(dest+4*22);
-		float gre_scaled=gre*output_scaling_factor;
-		float gim_scaled=gim*output_scaling_factor;
+		float f1 = *(float*)(dest+4*6);
+		float f4 = *(float*)(dest+4*7);
+		float f2 = *(float*)(dest+4*9);
+		f1 *= output_scaling_factor;
+		f2 *= output_scaling_factor;
+		f4 *= output_scaling_factor;
 		
-		*(float*)(dest+4*16) = gre_scaled;
-		*(float*)(dest+4*17) = gim_scaled;
-		*(float*)(dest+4*18) = gre_scaled;
-		*(float*)(dest+4*19) = gim_scaled;
+		*(float*)(dest+4*0) = f1;
+		*(float*)(dest+4*1) = f4;
+		*(float*)(dest+4*3) = f2;
 
 		return 0;
 	}
 	return -1;
 }
-
-
-
-
-#define dsb(opt) asm volatile("dsb " #opt : : : "memory")
-#define dmb(opt) asm volatile("dmb " #opt : : : "memory")
-
-static inline uint32_t ioread32(const volatile void *addr)
-{
-    uint32_t val;
-
-    asm volatile(
-            "ldr %w[val], [%x[addr]]"
-            : [val] "=r" (val)
-            : [addr] "r" (addr));
-
-    dsb(ld);
-    return val;
-}
-
-static inline uint64_t ioread64(const volatile void *addr)
-{
-    uint64_t val;
-
-    asm volatile(
-            "ldr %x[val], [%x[addr]]"
-            : [val] "=r" (val)
-            : [addr] "r" (addr));
-
-    dsb(ld);
-    return val;
-}
-
-static inline void iowrite32(uint32_t val, volatile void *addr)
-{
-    dsb(st);
-    asm volatile(
-            "str %w[val], [%x[addr]]"
-            :
-            : [val] "r" (val), [addr] "r" (addr));
-}
-
-static inline void iowrite64(uint64_t val, volatile void *addr)
-{
-    dsb(st);
-    asm volatile(
-            "str %x[val], [%x[addr]]"
-            :
-            : [val] "r" (val), [addr] "r" (addr));
-}
-
 
 #define MAILBOX_ADDR(mbox, direction, core_idx) \
     (g_vspa_ccsr_vir + 0x680 + direction * 0x10 + mbox * 8 + 0x4000 * core_idx)
@@ -1257,18 +1510,25 @@ uint64_t hvif_mbox_recv_1msg(uint32_t core_id, uint32_t mbox_id, uint32_t timeou
 	addr = MAILBOX_ADDR(mbox_id, 1, core_id);
 	msb = ioread32((void*)addr);
 	lsb = ioread32((void*)addr+4);
-	//printf("Received from VSPA:%d, MBox:%d, MSB:0x%08x, LSB:0x%08x.\n", core_id, mbox_id, msb, lsb);
 	return (((uint64_t)msb)<<32)|lsb;
 }
 
 
 uint64_t hvif_mbox_recv(uint32_t core_id, uint32_t mbox_id)
 {
-	return hvif_mbox_recv_1msg(core_id, mbox_id, 1);
+	uint64_t msg = hvif_mbox_recv_1msg(core_id, mbox_id, 1);
+	
+	if(msg)
+		return msg;
+	else
+		return check_error_core(core_id);  //if no msg, check error.
 }
 
 uint64_t hvif_mbox_send(uint32_t core_id, uint32_t mbox_id, uint32_t msb32, uint32_t lsb32)
 {
+	if((msb32&MSG_ID_MASK) == MSG_ID_ERROR_REPORT_MSG)
+		return check_error_core(core_id);
+	
 	uint64_t addr = MAILBOX_ADDR(mbox_id, 0, core_id);
 	
 	if(g_dfe_ref_la9310)
@@ -1308,4 +1568,24 @@ uint32_t hvif_rx_sym_buf_status(uint32_t core, uint32_t sym_idx)
 void hvif_rx_sym_buf_release(uint32_t core, uint32_t sym_idx)
 {
 	*(unsigned int*)(g_vspa_ccsr_vir+core*0x4000+VCPU_HOST_FLAGS1) = (1<<sym_idx);
+}
+
+void deqec(void* buffer, unsigned int num_samples, float f1, float f2, float f4, float gain_I, float gain_Q, float dcoff_I, float dcoff_Q)
+{
+	short* sample = (short*)buffer;
+
+	for (int i = 0;i < num_samples;i++)
+	{
+		float SI = sample[i * 2] / 32768.0;
+		float SQ = sample[i * 2 + 1] / 32768.0;
+		float OI = SI - dcoff_I;  //remove dcoffset
+		float OQ = SQ - dcoff_Q;
+		//complex_div(OI, OQ, gain_I, gain_Q, &OI, &OQ);   //remove gain
+		OI /= gain_I; OQ /= gain_Q;
+		
+		OI = OI / f1;   //divide by f1
+		OQ = (OQ - OI * f2) / f4;
+		sample[i * 2] = OI * 32768.0;
+		sample[i * 2 + 1] = OQ * 32768.0;
+	}
 }

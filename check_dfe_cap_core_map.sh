@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -96,8 +96,11 @@ ext_log_buf_base=$((rx_sym_dumping_flag+4))
 ext_log_buf_size=$((ext_log_buf_base+4))
 ant_core_map_hi=$((ext_log_buf_size+4))
 ant_core_map_lo=$((ant_core_map_hi+4))
-rx_inject_addr=$((0x100+0x9c))
-rx_inject_size=$((0x100+0xa0))
+addr_DFE_qec_params_opt_tx=$((COREB_STATUS_BASE+0x84))
+rx_inject_addr=$((COREB_STATUS_BASE+0x9c))
+rx_inject_size=$((COREB_STATUS_BASE+0xa0))
+peak_cycle_count=$((COREB_STATUS_BASE+0xb8))
+min_cycle_count=$((COREB_STATUS_BASE+0xba))
 
 host_vspa_mbox_id=0
 tag_tddfdd=(TDD FDD)
@@ -206,7 +209,10 @@ vspa_mbox_ifsend()
 		llog=`echo "$msg" | grep ERROR`; [ $? = 0 ] && { msg_recv_flag=0; msg_recv_msb32=0; msg_recv_lsb32=0; echo "$msg"; return 1; }
 		msg_recv_flag=1; msg_recv_msb32=${msg:34:10}; msg_recv_lsb32=${msg:50:10}
 		local msg_type=$((msg_recv_msb32>>24))
-		[ $msg_type -ge $((0x40)) ] && [ $msg_type -le $((0x44)) ] && parse_error_msg $1 0 $msg_recv_msb32 $msg_recv_lsb32
+		if ([ $msg_type -ge $((0x40)) ] && [ $msg_type -le $((0x44)) ]);then
+			parse_error_msg $1 $msg_recv_msb32 $msg_recv_lsb32
+			msg_recv_flag=0
+		fi
 		return 0;
 	fi
 }
@@ -215,16 +221,19 @@ vspa_mbox_ifrecv()   #recv multiple msg
 {
 	local msg=`./utils/vspa_mbox ifrecv $modembase_phy $VDRAMaddr_vir $DDR_host_vspa_view_offset $@`
 	echo ./utils/vspa_mbox recv $@ >> ./command_list.sh
-	if [ "$msg" = "" ]; then
-		sleep 0.02
-		msg=`./utils/vspa_mbox ifrecv $modembase_phy $VDRAMaddr_vir $DDR_host_vspa_view_offset $@`
-	fi
+#	if [ "$msg" = "" ]; then
+#		sleep 0.02
+#		msg=`./utils/vspa_mbox ifrecv $modembase_phy $VDRAMaddr_vir $DDR_host_vspa_view_offset $@`
+#	fi
 	if [ "$msg" = "" ]; then
 		msg_recv_flag=0; msg_recv_msb32=0; msg_recv_lsb32=0
 	else
 		msg_recv_flag=1; msg_recv_msb32=${msg:34:10}; msg_recv_lsb32=${msg:50:10}
 		local msg_type=$((msg_recv_msb32>>24))
-		[ $msg_type -ge $((0x40)) ] && [ $msg_type -le $((0x44)) ] && parse_error_msg $1 0 $msg_recv_msb32 $msg_recv_lsb32
+		if ([ $msg_type -ge $((0x40)) ] && [ $msg_type -le $((0x44)) ]);then
+			parse_error_msg $1 $msg_recv_msb32 $msg_recv_lsb32
+			msg_recv_flag=0
+		fi
 	fi
 }
 
@@ -321,7 +330,10 @@ dpd_model_est_load()
 
 dpd_model_get_para()
 {
-	if [ $((dpd_model_id)) -eq 5 ];then
+	if [ $((dpd_model_id)) -eq 7 ];then
+		dpd_model_max_p=(0 0 5  1 0 4  2 0 1  0 1 5  1 1 2  2 2 3)
+		dpd_model_id_para=(${dpd_model_max_p[@]})
+	elif [ $((dpd_model_id)) -eq 5 ];then
 		dpd_model_max_p=(0 0 6  1 1 6  2 2 6)
 		dpd_model_id_para=(${dpd_model_max_p[@]})
 	elif [ $((dpd_model_id)) -eq 4 ];then
@@ -436,32 +448,23 @@ if [ $cfr_pass -ne 0 ];then
 	((cfr_pass++))
 fi
 up1=$((($cap_lsb >> 4) & 0xF))
-if [ $up1 -eq $((0xF)) ]; then
-up1=64
-else if [ $up1 -eq $((0xE)) ]; then
-up1=32
-else if [ $up1 -le $((0x5)) ]; then
-up1=0
-else
-up1=$((($up1 + 2) * 2))
-fi
-fi
+if [ $up1 -eq $((0xF)) ]; then		up1=64
+elif [ $up1 -eq $((0xE)) ]; then	up1=32
+elif [ $up1 -eq $((0xD)) ]; then	up1=48
+elif [ $up1 -le $((0x5)) ]; then	up1=0
+else								up1=$((($up1 + 2) * 2))
 fi
 
 dpd_model_id=$((($cap_lsb >> 8) & 0x1F))
 block_size=$(((($cap_lsb >> 13) & 0x7F)*512))
 up2=$((($cap_lsb >> 16) & 0xF))
-if [ $up2 -eq $((0xF)) ]; then
-up2=64
-else if [ $up2 -eq $((0xE)) ]; then
-up2=32
-else if [ $up2 -le $((0x5)) ]; then
-up2=0
-else
-up2=$((($up2 + 2) * 2))
+if [ $up2 -eq $((0xF)) ]; then		up2=64
+elif [ $up2 -eq $((0xE)) ]; then	up2=32
+elif [ $up2 -eq $((0xD)) ]; then	up2=48
+elif [ $up2 -le $((0x5)) ]; then	up2=0
+else								up2=$((($up2 + 2) * 2))
 fi
-fi
-fi
+
 txqec_timing_skew=$((($cap_lsb >> 22) & 0x1))
 txqec_en=$((($cap_lsb >> 23) & 0x1))
 rxqec_timing_skew=$((($cap_lsb >> 26) & 0x1))
@@ -536,6 +539,7 @@ elif [ $scs -eq 30 ];then
 	
 	if [ $bandwidth -eq 100 ];then
 		max_sym_size=3276
+		[ $nrb -eq 24 ] && default_waveform_filename=(./test_vectors/TM3.3_10MHz_30kHz_TDD.bin ./test_vectors/TM3.3_10MHz_30kHz_FDD.bin)
 		
 	elif [ $bandwidth -eq 50 ];then
 		max_sym_size=1596
@@ -561,10 +565,12 @@ elif [ $scs -eq 30 ];then
 	
 elif [ $scs -eq 60 ];then
 	if [ $bandwidth_ori -eq 25 ];then		max_sym_size_ori=372
+	elif [ $bandwidth_ori -eq 200 ];then	max_sym_size_ori=3168
 	else echo -e "Undefiend bandwidth $bandwidth_ori\n"; exit 1;
 	fi
 	
-	if [ $bandwidth -eq 25 ];then
+	if [ $bandwidth -eq 200 ];then		max_sym_size=3168
+	elif [ $bandwidth -eq 25 ];then
 		max_sym_size=372; 
 		[ $vspa_dev_type = LA9310 ] && { nrb=24; pattern=(${pattern2[@]}); }   #set default 20Mhz with specified pattern
 		[ $nrb -eq 24 ] && [ $option8 = 0 ] && default_waveform_filename=(./test_vectors/G-FR1-A1-5_20MHz_60kHz_TDD.bin ./test_vectors/TM3.3_20MHz_60kHz_FDD.bin)
@@ -611,7 +617,7 @@ default_waveform_len=${input_waveform_len[$tx_fdd]}
 sym_num=$((sym_num_1m*default_waveform_len_double/2))
 
 txaxiq=$txdcs
-([ $txaxiq = 1966080 ] && [ $arg_nhwdcm = 0 ] && [ $((bandwidth_ori)) -ne 800 ]) && hwdcm=1
+([ $txaxiq = 1966080 ] && [ $((arg_hwdcm|arg_nhwdcm)) = 0 ] && [ $((bandwidth_ori)) -ne 800 ] && [ $sinad = 0 ]) && hwdcm=1
 [ $fr2 = 0 ] && axiq_2G_mode=0 || axiq_2G_mode=$hwdcm
 
 rxaxiq=$((rxdcs/(axiq_2G_mode+1)))
@@ -630,7 +636,7 @@ if [ $((option8)) -eq 1 ];then
 	fi
 fi
 
-[ $vspa_dev_type = LA9310 ] && option8_rx=$(((cap_msb>>11)&1)) || option8_rx=option8
+[ $vspa_dev_type = LA9310 ] && option8rx=$(((cap_msb>>11)&1)) || option8rx=$option8
 
 return 0
 }
@@ -734,6 +740,9 @@ mem_addr_check_host_view() #check the addr range is legal or not, $1=addr, $2=si
 	if ([ $start_addr -ge $(($VDRAMaddr_vir)) ] && [ $end_addr -lt $(($VDRAMaddr_vir+VDRAM_size)) ]);then
 		return 0; #legal HRAM Address
 	fi
+	if ([ $start_addr -ge $(($FRAMaddr_vir)) ] && [ $end_addr -lt $(($FRAMaddr_vir+FRAM_size)) ]);then
+		return 0; #legal HRAM Address
+	fi
 	echo -e "***ERROR: Address `HEX $1` with size $2 is out of valid range in host side view. Aborted\n"
 	exit 1
 }
@@ -775,13 +784,12 @@ dumpfile()
 	fi
 	
 	if ([ $lsize -ne 0 ] && [ $lsize -le $((ddr_size)) ]);then     # 0<size<=128MB
-		#echo dumping to file $2 from address $1, size $lsize
-		log=`./utils/bin2mem -f $2 -a $1 $arg_c -r $lsize`
+		local log=`./utils/bin2mem -f $2 -a $1 $arg_c -r $lsize`
 	else
 		echo Dumping from address $1 size $lsize which is out of valid range. Continue dumping \(Y/N\)?
 		read keyin
 		if ([ $keyin = Y ] || [ $keyin = y ]);then
-			log=`./utils/bin2mem -f $2 -a $1 $arg_c -r $lsize`
+			local log=`./utils/bin2mem -f $2 -a $1 $arg_c -r $lsize`
 		else
 			echo Aborted.
 			echo
@@ -1155,10 +1163,11 @@ output_turn_off()  #$1=txcore $2=tid
 	./utils/memrw w 32 $((test_tool_env_tx_scaling_output+ant*4)) $((factor|0x80000000))
 	vspa_mbox_ifsend $1 $host_vspa_mbox_id $((0x0a030000+(tid<<15))) 0
 }
-output_turn_on()  #$1=txcore $2=tid $3=ant
+output_turn_on()  #$1=txcore $2=tid
 {
 	local ant=${coretx_tr0[$1]}
 	local factor=$((`./utils/memrw r 32 $((test_tool_env_tx_scaling_output+ant*4))` & 0x7FFFFFFF ))
+	./utils/memrw w 32 $((test_tool_env_tx_scaling_output+ant*4)) $factor
 	vspa_mbox_ifsend $1 $host_vspa_mbox_id $((0x0a030000+(tid<<15))) `percent_to_F16 $factor`
 }
 
@@ -1170,11 +1179,10 @@ mem_test()
 
 	vspa_mbox_ifsend $core $host_vspa_mbox_id $((0x60000000+(readwrite<<16)+(test_size&0xFFFF))) $((test_addr>>12))
 	[ $msg_recv_flag = 0 ] && vspa_mbox_ifrecv $core $host_vspa_mbox_id
-	vspa_mbox_ifrecv $core $host_vspa_mbox_id; 
 	([ $msg_recv_flag = 0 ] || [ $((msg_recv_msb32&0xFF000000)) -ne $((0x61000000)) ]) && return 1
 	cycle2chan=$((msg_recv_msb32&0x00FFFFFF))
 	cycle1chan=$((msg_recv_lsb32))
-	[ $vspa_dev_type = LA9310 ] && return 0 #only simple read/write test in LA9310, 1 msg from vspa
+	#[ $vspa_dev_type = LA9310 ] && return 0 #only simple read/write test in LA9310, 1 msg from vspa
 	
 	vspa_mbox_ifrecv $core $host_vspa_mbox_id
 	([ $msg_recv_flag = 0 ] || [ $((msg_recv_msb32&0xFF000000)) -ne $((0x61000000)) ]) && return 1
@@ -1242,39 +1250,56 @@ mpy_hexfloat() #two hexfloat multiplication, output is hexfloat
 	echo $vfloat 
 }
 
-parse_error()
+parse_error() #$1=msg_hi $2=msg_lo
 {
-	local error_type=$1; local core=$2; local ant=$3
-	
+	local msg_hi=$1; local msg_lo=$2; local error_type=$(((msg_hi>>16)&0xFF)); local core=$3
+	local i
 	if [ $(($error_type)) -eq $((0xff)) ];then
-		echo " Error from core $core ant $ant TX: DCS started earlier than DFE started."
+		echo -n " Error from core $core: TX DCS started earlier than DFE started."
 	elif [ $(($error_type)) -eq $((0xfe)) ];then
-		echo " Error from core $core ant $ant TX: DCS enabling error."
+		echo -n " Error from core $core: RX DCS enabling error."
+	elif [ $(($error_type)) -eq $((0xfd)) ];then
+		echo -n " Error from core $core: TX DCS init state error."
+	elif [ $(($error_type)) -eq $((0xfc)) ];then
+		echo -n " Error from core $core: RX DCS init state error."
 	elif [ $(($error_type)) -eq $((0x01)) ];then
-		echo " Error from core $core ant $ant TX: TX AXIQ underflow."
+		echo -n " Error from core $core: TX AXIQ underflow at sample index $msg_lo, num configured AXIQ DMA is $(((msg_hi>>14)&0x3))."
 	elif [ $(($error_type)) -eq $((0x02)) ];then
-		echo " Error from core $core ant $ant RX: RX AXIQ overflow. "
+		echo -n " Error from core $core: RX AXIQ overflow at sample index $msg_lo, num configured AXIQ DMA is $(((msg_hi>>14)&0x3))."
 	elif [ $(($error_type)) -eq $((0x04)) ];then
-		echo " Error from core $core ant $ant: VSPA DMA config error."
+		echo -n " Error from core $core: VSPA DMA config error in channel "
+		for ((i=0;i<32;i++))
+		do
+			[ $((msg_lo&(1<<i))) -ne 0 ] && echo -n $i
+		done
+		echo -n .
 	elif [ $(($error_type)) -eq $((0x05)) ];then
-		echo " Error from core $core ant $ant: VSPA DMA transfer error."
+		echo -n " Error from core $core: VSPA DMA transfer error in channel "
+		for ((i=0;i<32;i++))
+		do
+			[ $((msg_lo&(1<<i))) -ne 0 ] && echo -n $i
+		done
+		echo -n .
+	elif [ $(($error_type)) -eq $((0x06)) ];then
+		echo -n " Error from core $core: VSPA IPPU cmd error."
 	elif [ $(($error_type)) -eq $((0x11)) ];then
-		echo " Error from core $core ant $ant TX: TX symbols deadline missed, sent to DFE by host too late."
+		echo -n " Error from core $core: TX symbols deadline missed, sent to DFE by host too late."
 	elif [ $(($error_type)) -eq $((0x12)) ];then
-		echo " Error from core $core ant $ant RX: RX symbols deadline missed, fetched from DFE by host too late."
+		echo -n " Error from core $core: RX symbols deadline missed, fetched from DFE by host too late."
 	elif [ $(($error_type)) -eq $((0x21)) ];then
-		echo " Error from core $core ant $ant TX: TX ant data arrived at DCS too late, TX ant buffer empty."
+		echo -n " Error from core $core: TX ant data arrived at DCS too late, TX ant buffer empty."
 	elif [ $(($error_type)) -eq $((0x22)) ];then
-		echo " Error from core $core ant $ant RX: RX ant data processed too later, RX ant buffer full."
+		echo -n " Error from core $core: RX ant data processed too later, RX ant buffer full."
 	elif [ $(($error_type)) -eq $((0x31)) ];then
-		echo " Error from core $core ant $ant TX: Unexpected tx allowed falling edge."
+		echo -n " Error from core $core: Unexpected tx allowed falling edge."
 	elif [ $(($error_type)) -eq $((0x32)) ];then
-		echo " Error from core $core ant $ant RX: Unexpected rx allowed falling edge."
+		echo -n " Error from core $core: Unexpected rx allowed falling edge."
 	elif [ $(($error_type)) -eq $((0x34)) ];then
-		echo " Error from core $core ant $ant TX: Sample Check Error, sample value to AXIQ is `sample_hfix2int $error_data_lo`, timestamp ${error_data_hi}0000."
+		echo -n " Error from core $core: Sample Check Error, sample value to AXIQ is `sample_hfix2int $error_data_lo`, timestamp ${error_data_hi}0000."
 	else
-		echo " undefined error."
+		echo -n " undefined error."
 	fi
+	echo " Error info MSB:$msg_hi, LSB:$msg_lo"
 }
 
 get_vspa_reg_addr()
@@ -1284,6 +1309,8 @@ get_vspa_reg_addr()
 
 check_dma_error_core() #$1=core
 {
+	[ $((vspa_image_version)) -ge $((0x500)) ] && return;  #from v5.0, DMA error is checked by mailbox msg
+	
 	local error=0
 	dma_error_reg_addr=`get_vspa_reg_addr $1 0xCC`
 	dma_error=`./utils/memrw r 32 $dma_error_reg_addr`
@@ -1310,10 +1337,9 @@ check_dma_error_core() #$1=core
 	fi
 }
 
-parse_error_msg() #S1=core $2=ant $3=msg_msb $4=msg_lsb
+parse_error_msg() #S1=core $2=msg_msb $3=msg_lsb
 {
-	([ $((sinad)) = 1 ] && [ $((ant)) -ge 4 ]) && return 0  #sinad test on HS will cause error itself, no need to check and print errors
-	local error=0; local core=$1; local ant=$2; local msg_recv_msb32=$3; local msg_recv_lsb32=$4
+	local error=0; local core=$1; local msg_recv_msb32=$2; local msg_recv_lsb32=$3
 
 	msg_type=$((msg_recv_msb32>>24)) #${cap:36:2}
 	if [ $msg_type -eq $((0x40)) ];then
@@ -1326,10 +1352,7 @@ parse_error_msg() #S1=core $2=ant $3=msg_msb $4=msg_lsb
 		err_info="***ERROR: Wrong slot patter msg from core $core mbox 0. Error msg MSB:$msg_recv_msb32, LSB:$msg_recv_lsb32"
 		echo $err_info
 	elif [ $msg_type -eq $((0x44)) ];then
-		error_type=$(((msg_recv_msb32>>16)&0xFF)) #0x${cap:38:2}
-		error_data_hi=$((msg_recv_msb32&0xFFFF)) #0x${cap:40:4}
-		error_data_lo=$((msg_recv_lsb32)) #${cap:50:10}
-		err_info="`parse_error $error_type $core $ant`""Error msg MSB:$msg_recv_msb32, LSB:$msg_recv_lsb32"
+		err_info=`parse_error $msg_recv_msb32 $msg_recv_lsb32 $core`
 		echo $err_info
 		[ "$first_error" = 0 ] && { first_error="$err_info"; echo "first_error=\"$first_error\"" >> runtime_config.txt; }
 		error=1
@@ -1346,17 +1369,33 @@ parse_error_msg() #S1=core $2=ant $3=msg_msb $4=msg_lsb
 	fi
 }
 
-check_error_core()  #S1=core $2=ant
+check_error_core()  #S1=core
 {
-	([ $((sinad)) = 1 ] && [ $((ant)) -ge 4 ]) && return 0  #sinad test on HS will cause error itself, no need to check and print errors
-	local error=0; local core=$1; local ant=$2
+	local error=0; local core=$1
 	vspa_mbox_ifrecv $core $host_vspa_mbox_id
-	[ $msg_recv_flag -ne 0 ] &&  parse_error_msg $1 $2 $msg_recv_msb32 $msg_recv_lsb32
 }
 
 check_error_ant() #S1=ant
 {
-	check_error
+	local ant=$1
+	local tx_core=${anttx[$ant]}; local rx_core=${antrx[$ant]};
+	if [ $((tx_core)) -le $((NUM_CORES)) ];then
+		check_error_core $tx_core; check_dma_error_core $tx_core
+		local score=${slave_core[tx_core]}; 
+		if [ $((score)) -ne $((tx_core)) ];then
+			check_error_core $score
+			check_dma_error_core $score
+		fi
+	fi
+	if ([ $((rx_core)) -le $((NUM_CORES)) ] && [ $((rx_core)) -ne $((tx_core)) ]);then
+		check_error_core $rx_core; check_dma_error_core $rx_core
+		local score=${slave_core[rx_core]}; 
+		if [ $((score)) -ne $((rx_core)) ];then
+			check_error_core $score
+			check_dma_error_core $score
+		fi
+	fi
+	[ "$first_error" != 0 ] && echo First Error: $first_error
 }
 
 check_error()
@@ -1365,11 +1404,11 @@ check_error()
 	local i
 	for ((i=0;i<$NUM_CORES;i++))
 	do
-		local tx_enable_ant0=0; local tx_enable_ant1=0; local rx_enable_ant0=0; local rx_enable_ant1=0
-		local txant0=$((coretx_tr0[i])); [ $txant0 -ne $((0xf)) ] && tx_enable_ant0=$((ant_enable[txant0]&BITMASK_ANT_ENABLE_TX))
-		local txant1=$((coretx_tr1[i])); [ $txant1 -ne $((0xf)) ] && tx_enable_ant1=$((ant_enable[txant1]&BITMASK_ANT_ENABLE_TX))
-		local rxant0=$((corerx_tr0[i])); [ $rxant0 -ne $((0xf)) ] && rx_enable_ant0=$((ant_enable[rxant0]&BITMASK_ANT_ENABLE_RX))
-		local rxant1=$((corerx_tr1[i])); [ $rxant1 -ne $((0xf)) ] && rx_enable_ant1=$((ant_enable[rxant1]&BITMASK_ANT_ENABLE_RX))
+		local tx_enable_ant0=0; local tx_enable_ant1=0; local rx_enable_ant0=0; local rx_enable_ant1=0; local ant
+		local txant0=$((coretx_tr0[i])); [ $txant0 -ne $((0xf)) ] && { tx_enable_ant0=$((ant_enable[txant0]&BITMASK_ANT_ENABLE_TX)); ant=$txant0; }
+		local txant1=$((coretx_tr1[i])); [ $txant1 -ne $((0xf)) ] && { tx_enable_ant1=$((ant_enable[txant1]&BITMASK_ANT_ENABLE_TX)); ant=$txant1; }
+		local rxant0=$((corerx_tr0[i])); [ $rxant0 -ne $((0xf)) ] && { rx_enable_ant0=$((ant_enable[rxant0]&BITMASK_ANT_ENABLE_RX)); ant=$rxant0; }
+		local rxant1=$((corerx_tr1[i])); [ $rxant1 -ne $((0xf)) ] && { rx_enable_ant1=$((ant_enable[rxant1]&BITMASK_ANT_ENABLE_RX)); ant=$rxant1; }
 		if [ $((dfe_core[i])) = 1 ] && [ $((tx_enable_ant0|tx_enable_ant1|rx_enable_ant0|rx_enable_ant1)) -ne 0 ];then
 			check_error_core $i
 			check_dma_error_core $i
@@ -1380,6 +1419,7 @@ check_error()
 			fi
 		fi
 	done
+	[ "$first_error" != 0 ] && echo First Error: $first_error
 }
 
 get_running_time()
@@ -1434,10 +1474,11 @@ inject_freq_domain_tx_stop() #$1=core, $2=mailbox, $3=msb, $4=lsb
 if ([ $((vspa_image_version)) -le $((0x450)) ] || [ $vspa_dev_type = LA12xx ]);then
 	vspa_mbox_ifsend $1 $2 $3 $4
 else
-	#this is to restore TX sym buf struct, but it also restores RX sym buf struct.
+	#this is to restore TX sym buf struct
 	local txcore=$1
 	msb=`devmem $((test_tool_env_buf_struct_msg+txcore*8+0))`
 	lsb=`devmem $((test_tool_env_buf_struct_msg+txcore*8+4))`
+	[ $((vspa_image_version)) -ge $((0x500)) ] && msb=$((msb&0xFFF00000))
 	vspa_mbox_ifsend $txcore $host_vspa_mbox_id $msb $lsb; [ $msg_recv_flag = 0 ] && vspa_mbox_ifrecv $txcore $host_vspa_mbox_id
 fi
 }
@@ -1446,6 +1487,14 @@ dump_freq_domain_rx() #$1=core, $2=mailbox, $3=msb, $4=lsb
 {
 	vspa_mbox_ifsend $1 $2 $3 $4
 	sleep 0.1
+	#this is to restore RX sym buf struct
+	local rxcore=$1
+	if [ $((vspa_image_version)) -ge $((0x500)) ];then
+	msb=`devmem $((test_tool_env_buf_struct_msg+rxcore*8+0))`
+	lsb=`devmem $((test_tool_env_buf_struct_msg+rxcore*8+4))`
+	lsb=$((lsb&0xFFF00000))
+	vspa_mbox_ifsend $rxcore $host_vspa_mbox_id $msb $lsb; [ $msg_recv_flag = 0 ] && vspa_mbox_ifrecv $rxcore $host_vspa_mbox_id
+	fi
 }
 
 send_celltrack_cmd() #$1=core, $2=ssb_period, $3=ssb_sym_id, $4=ssb_re_offset, $5=NID2, $6=NID1
@@ -1558,5 +1607,34 @@ kernel_disable() #$1=core, $2=disalbe_mask_bits, $3=disable_value_bits
 rounding() #$1: data,  $2: value to round tto
 {
 	echo $(( ($1+$2/2)/$2*$2 ))
+}
+
+deqec() #$1:core #$2:addr $3:num samples
+{
+	local addr_qec_struct=`get_hwordvalue_from_vspa $1 $addr_DFE_qec_params_opt_tx`
+	local addr_qec_struct=`get_vspa_dmem_addr $1 $((addr_qec_struct<<7))`
+	local f1=`./utils/memrw r 32 $((addr_qec_struct+0*4))`
+	local f4=`./utils/memrw r 32 $((addr_qec_struct+1*4))`
+	local f2=`./utils/memrw r 32 $((addr_qec_struct+3*4))`
+	local dci=`./utils/memrw r 32 $((addr_qec_struct+4*4))`
+	local dcq=`./utils/memrw r 32 $((addr_qec_struct+5*4))`
+	local gre=0x3f800000
+	local gim=0x3f800000
+	./utils/deqec $2 $3 $f1 $f2 $f4 $gre $gim $dci $dcq
+}
+
+check_sample_power() #$1:address, $2:num_samples
+{
+	local log=`./utils/power $1 0 $2`
+	eval "$log"
+	local v_tx_pow_acc=$power_IQ
+	local v_tx_pow_num_samples=$num_samples_valid
+	local sample_power=($(echo $v_tx_pow_acc $v_tx_pow_num_samples | awk '{ x=10*(log($1/$2)/log(10)); printf("%f %3.1f %d\n", $1/$2, x, x); }'))
+	dbFS=${sample_power[1]}
+	echo "  Sample power: ${sample_power[0]}/sample, ${sample_power[1]} dB, max I=$max_I, max Q=$max_Q, dc_I=$dc_I, dc_Q=$dc_Q"
+	[ $((sample_power[2])) -lt -15 ] && echo "  ***WARNING: Sample power does not reach 10-15 dB, your test is not fully utilizing the DCS dynamic range!"
+	[ $((sample_power[2])) -gt -8 ] && echo "  ***WARNING: Sample power is higher than -8 dB, be careful not to damage PA"
+	local max_IQ100=`echo $max_IQ | awk '{ abs_val = ($1 >= 0) ? $1 : -$1; printf("%d\n", abs_val*100); }'`
+	[ $max_IQ100 -ge 99 ] && echo "  ***WARNING: Sample may be saturated, max value $max_IQ"
 }
 #fi

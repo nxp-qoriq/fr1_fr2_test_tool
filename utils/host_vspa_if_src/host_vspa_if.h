@@ -108,4 +108,46 @@ void     hvif_rx_sym_buf_release(uint32_t core_id, uint32_t sym_idx);
 ************************************************************/
 #define MBOX_ID_HOST	0
 
+/*********************************************************************
+  qec_para_convert: convert the original QEC coeff struct to new optimized QEC para struct (starting from DFE Ref V5.0.1)
+  original QEC para struct defined as qec_params_t, new struct defined as qec_params_opt_t
+  p_qec_para_converted:  dest buffer for converted para struct
+  p_qec_para: original struct.  p_qec_para_converted can be same as p_qec_para
+************************************************************/
+/*
+typedef struct{
+    cfloat32_t	FD_taps[QEC_MAX_FD_TAP_CNT];
+    uint32_t 	int_del;
+    uint32_t 	FD_tap_cnt;
+    float32_t 	f1;
+    float32_t 	f2;
+    float32_t   f4;
+    cfloat32_t	g;	
+    cfloat32_t	dc;	
+	cfloat32_t	fegain_ori_backup;
+}qec_params_t;
+typedef struct{
+    float32_t 	f1;
+    float32_t 	f4;
+    float32_t 	pad0;    //set to 0
+    float32_t 	f2;
+    float32_t	dcoff_I;
+    float32_t	dcoff_Q;
+    float32_t 	f1_backup;
+    float32_t 	f4_backup;
+    float32_t 	pad1;    //set to 0
+    float32_t 	f2_backup;
+	float32_t	pad2[22];     //to make the struct size to 1 line
+}qec_params_opt_t;
+*/
+void qec_para_convert(void* p_qec_para_converted, void* p_qec_para);
+
+/*********************************************************************
+  de-QEC: reverse of QEC. When QEC is integrated into DPD, DPD output can not be dumped out,
+  users should dump QEC output and call this API to de-QEC and get DPD output for DPD training.
+  
+  the QEC parameters in the arguments are the QEC parameters being used by QEC algorithm.
+************************************************************/
+void deqec(void* buffer, unsigned int num_samples, float f1, float f2, float f4, float gain_I, float gain_Q, float dcoff_I, float dcoff_Q);
+
 #endif

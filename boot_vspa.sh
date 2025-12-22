@@ -60,14 +60,19 @@ done
 
 if [ "$arg" = "" ];then	echo VSPA image name not specified; exit 1
 elif ([ $arg = LS ] || [ $arg = ls ]);then						arg=ADvspa_images_LS.4T4R_100M_30K_491_245_TDDFDD
+elif ([ $arg = LS50 ] || [ $arg = ls50 ]);then					arg=ADvspa_images_LS.4T4R_50M_30K_245_122_TDDFDD
+elif ([ $arg = LS25 ] || [ $arg = ls25 ]);then					arg=ADvspa_images_LS.4T4R_25M_30K_122_122_TDDFDD
+elif ([ $arg = LS10 ] || [ $arg = ls10 ]);then					arg=ADvspa_images_LS.4T4R_10M_30K_61_61_TDDFDD
 elif [ $arg = tddinfdd ];then									arg=ADvspa_images_LS.4T4R_100M_30K_491_245_TDDinFDD
 elif ([ $arg = LSISC ] || [ $arg = lsisc ]);then				arg=ADvspa_images_LS.4T4R_100M_30K_491_245_TDD_ISC
 elif ([ $arg = HS ] || [ $arg = hs ]);then						arg=MEvspa_images_HS.2T2R_400M_120K_1966_1966_TDDFDD
+elif ([ $arg = HS800 ] || [ $arg = hs800 ]);then				arg=MEvspa_images_HS.1T1R_800M_120K_1966_1966_TDDFDD
 elif ([ $arg = LSHS ] || [ $arg = lshs ]);then					arg=ADvspa_images_LS.2T2R_100M_30K_491_245_HS.2R_400M_120K_1966_1966_TDDFDD
 elif ([ $arg = SINAD ] || [ $arg = sinad ]);then				arg=MEvspa_images_LS.4T4R_100M_30K_491_245_HS.2T2R_400M_120K_1966_1966_TDDFDD_SINAD
 elif ([ $arg = SINAD983 ] || [ $arg = sinad983 ]);then			arg=MEvspa_images_LS.4T4R_100M_30K_245_245_HS.2T2R_400M_120K_983_983_TDDFDD_SINAD
 elif ([ $arg = DPD ] || [ $arg = dpd ]);then					arg=ADvspa_images_LS.2T2R_100M_30K_491_245_HS.2R_400M_120K_1966_1966_TDDFDD
 elif ([ $arg = DPDT4x ] || [ $arg = dpdt4x ]);then				arg=ADvspa_images_LS.2T2R.T4x_100M_30K_491_245_HS.2R_400M_120K_1966_1966_TDDFDD
+elif ([ $arg = DPDT4x19 ] || [ $arg = dpdt4x19 ]);then			arg=ADvspa_images_LS.2T2R.T4x_100M_30K_491_245_HS.2R_400M_120K_1966_1966_TDDFDD_DPD19
 elif [ $arg = rc15 ];then										arg=MEvspa_images_LS.1T2R_10M_15K_61_61_TDDFDD_LA93
 elif [ $arg = rc30 ];then										arg=MEvspa_images_LS.1T2R_25M_30K_61_61_TDDFDD_LA93
 elif [ $arg = rc60 ];then										arg=MEvspa_images_LS.1T2R_25M_60K_61_61_TDDFDD_LA93
@@ -223,6 +228,8 @@ else
 	obs_sps=0
 fi
 
+echo Booting VSPA images $arg ...
+
 if [ $flag_la93 = 1 ];then
 	log=`lsmod | grep la9310shiva`
 	if [ "$log" != "" ];then
@@ -232,15 +239,6 @@ if [ $flag_la93 = 1 ];then
 		sleep 1
 		cd $curpwd
 	fi
-else 							
-	log=`lsmod | grep yami`
-	sleep 1
-	[ "$log" != "" ] && rmmod yami
-fi
-
-echo Booting VSPA images $arg ...
-
-if [ $flag_la93 = 1 ];then
 	echo "1" > /sys/bus/pci/rescan
 	echo 7 > /proc/sys/kernel/printk
 	gpioget 2 9
@@ -272,12 +270,20 @@ if [ $flag_la93 = 1 ];then
 	sleep 1
 	tag="\nNext step: run ./channels_start.sh\n"
 else
-	echo 1 > /sys/bus/pci/rescan
-	echo 8 > /proc/sys/kernel/printk
-	#tail -f /var/log/syslog &
-	echo $boot_tool scratch_buf_size=$mscratch_buf_size share_buf_size=$mshare_buf_size scratch_buf_phys_addr=$mscratch_buf_phys_addr $dcs_enable_arg $dcs1_enable_arg rf_data_size=$mrf_data_size rfic_disable=0 alt_firmware_name=$malt_firmware_name alt_vspa_fw_name_prefix=$malt_vspa_fw_name_prefix $mpci_addr_array
-	insmod $boot_tool scratch_buf_size=$mscratch_buf_size share_buf_size=$mshare_buf_size scratch_buf_phys_addr=$mscratch_buf_phys_addr $dcs_enable_arg $dcs1_enable_arg rf_data_size=$mrf_data_size rfic_disable=0 alt_firmware_name=$malt_firmware_name alt_vspa_fw_name_prefix=$malt_vspa_fw_name_prefix $mpci_addr_array
-	[ $? -ne 0 ] && { echo -e "***ERROR: Failure in insmod $boot_tool, need reboot."; exit 1; }
+	while [ 1 ];
+	do
+		log=`lsmod | grep yami`
+		[ "$log" != "" ] && { rmmod yami; sleep 1; }
+		echo 1 > /sys/bus/pci/rescan
+		echo 8 > /proc/sys/kernel/printk
+		#tail -f /var/log/syslog &
+		echo $boot_tool scratch_buf_size=$mscratch_buf_size share_buf_size=$mshare_buf_size scratch_buf_phys_addr=$mscratch_buf_phys_addr $dcs_enable_arg $dcs1_enable_arg rf_data_size=$mrf_data_size rfic_disable=0 alt_firmware_name=$malt_firmware_name alt_vspa_fw_name_prefix=$malt_vspa_fw_name_prefix $mpci_addr_array
+		insmod $boot_tool scratch_buf_size=$mscratch_buf_size share_buf_size=$mshare_buf_size scratch_buf_phys_addr=$mscratch_buf_phys_addr $dcs_enable_arg $dcs1_enable_arg rf_data_size=$mrf_data_size rfic_disable=0 alt_firmware_name=$malt_firmware_name alt_vspa_fw_name_prefix=$malt_vspa_fw_name_prefix $mpci_addr_array
+		ret=$? 
+		out=$(modem_info)
+		[ "$out" != "" ] && [ $ret -eq 0 ] && break
+		echo "***ERROR: Boot failed, trying again..."
+	done
 	var=$(cat /sys/yami/yami_status |grep -A3 "Devices Detected" |grep "="|cut -d"=" -f2|tr -d ' '|head -1)
 	modem_num=$((var))
 	tag="\nNo. of LA12xx Modem Detected: $modem_num \nNext step: run ./channels_start.sh\n"

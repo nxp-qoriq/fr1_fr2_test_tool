@@ -102,7 +102,53 @@ elif [ "$module_name" = axiq ];then
 	echo " OVERFLOW:       "`show_bits $gpi0 $((0*4+3)) 1` `show_bits $gpi0 $((1*4+3)) 1` `show_bits $gpi0 $((2*4+3)) 1` `show_bits $gpi0 $((3*4+3)) 1`
 	
 	else
-	echo Reg details not defined.
+	gpi8=`./utils/memrw r 32 $((start_addr_host+4*8))`  #LA12xx RX AXIQ DCS0,1 STATUS
+	gpi11=`./utils/memrw r 32 $((start_addr_host+4*11))`  #LA12xx RX AXIQ DCS2,3 STATUS
+	gpi15=`./utils/memrw r 32 $((start_addr_host+4*15))`  #LA12xx TX and RX AXIQ DCS4,5 STATUS
+	gpi9=`./utils/memrw r 32 $((start_addr_host+4*9))`  #LA12xx TX AXIQ DCS0,1 STATUS
+	gpi12=`./utils/memrw r 32 $((start_addr_host+4*12))`  #LA12xx TX AXIQ DCS2,3 STATUS
+	
+	gpo8=`./utils/memrw r 32 $((start_addr_host+0x80+4*8))`  #LA12xx RX AXIQ DCS0,1 CONTROL
+	gpo10=`./utils/memrw r 32 $((start_addr_host+0x80+4*10))`  #LA12xx RX AXIQ DCS2,3 CONTROL
+	gpo12=`./utils/memrw r 32 $((start_addr_host+0x80+4*12))`  #LA12xx TX and RX AXIQ DCS4 CONTROL
+	gpo13=`./utils/memrw r 32 $((start_addr_host+0x80+4*13))`  #LA12xx TX and RX AXIQ DCS5 CONTROL
+	gpo9=`./utils/memrw r 32 $((start_addr_host+0x80+4*9))`  #LA12xx TX AXIQ DCS0,1 CONTROL
+	gpo11=`./utils/memrw r 32 $((start_addr_host+0x80+4*11))`  #LA12xx TX AXIQ DCS2,3 CONTROL
+	./utils/devmem5 r $((start_addr_host+0x80)) $((end_addr_host+0x80)) w   #show CONTROL REGS
+	
+	echo 
+	echo "TX CHAN CONTROL: 0 1 2 3 4 5"
+	echo " ENABLE:         "`show_bits $gpo9 $((0*8+0)) 1` `show_bits $gpo9 $((1*8+0)) 1` `show_bits $gpo11 $((0*8+0)) 1` `show_bits $gpo11 $((1*8+0)) 1` `show_bits $gpo12 16 1` `show_bits $gpo13 16 1`
+	echo " FIFO THRESHOLD: "`show_bits $gpo9 $((0*8+1)) 2` `show_bits $gpo9 $((1*8+1)) 2` `show_bits $gpo11 $((0*8+1)) 2` `show_bits $gpo11 $((1*8+1)) 2` `show_bits $gpo12 17 2` `show_bits $gpo13 17 2`
+	echo " IQSWAP:         "`show_bits $gpo9 $((0*8+3)) 1` `show_bits $gpo9 $((1*8+3)) 1` `show_bits $gpo11 $((0*8+3)) 1` `show_bits $gpo11 $((1*8+3)) 1` `show_bits $gpo12 19 1` `show_bits $gpo13 19 1`
+	echo " CLR ERROR:      "`show_bits $gpo9 $((0*8+4)) 1` `show_bits $gpo9 $((1*8+4)) 1` `show_bits $gpo11 $((0*8+4)) 1` `show_bits $gpo11 $((1*8+4)) 1` `show_bits $gpo12 20 1` `show_bits $gpo13 20 1`
+	
+	echo
+	echo "TX CHAN STATUS:  0 1 2 3 4 5"
+	echo " ENABLE:         "`show_bits $gpi9 $((0*8+0)) 1` `show_bits $gpi9 $((1*8+0)) 1` `show_bits $gpi12 $((0*8+0)) 1` `show_bits $gpi12 $((1*8+0)) 1` `show_bits $gpi15 $((0*8+0)) 1` `show_bits $gpi15 $((2*8+0)) 1`
+	echo " FIFO NOT EMPTY: "`show_bits $gpi9 $((0*8+1)) 1` `show_bits $gpi9 $((1*8+1)) 1` `show_bits $gpi12 $((0*8+1)) 1` `show_bits $gpi12 $((1*8+1)) 1` `show_bits $gpi15 $((0*8+1)) 1` `show_bits $gpi15 $((2*8+1)) 1`
+	echo " TX ALLOWED:     "`show_bits $gpi9 $((0*8+2)) 1` `show_bits $gpi9 $((1*8+2)) 1` `show_bits $gpi12 $((0*8+2)) 1` `show_bits $gpi12 $((1*8+2)) 1` `show_bits $gpi15 $((0*8+2)) 1` `show_bits $gpi15 $((2*8+2)) 1`
+	echo " RESET COMPLETE: "`show_bits $gpi9 $((0*8+3)) 1` `show_bits $gpi9 $((1*8+3)) 1` `show_bits $gpi12 $((0*8+3)) 1` `show_bits $gpi12 $((1*8+3)) 1` `show_bits $gpi15 $((0*8+3)) 1` `show_bits $gpi15 $((2*8+3)) 1`
+	echo " UNDERFLOW:      "`show_bits $gpi9 $((0*8+4)) 1` `show_bits $gpi9 $((1*8+4)) 1` `show_bits $gpi12 $((0*8+4)) 1` `show_bits $gpi12 $((1*8+4)) 1` `show_bits $gpi15 $((0*8+4)) 1` `show_bits $gpi15 $((2*8+4)) 1`
+	echo " OVERFLOW:       "`show_bits $gpi9 $((0*8+5)) 1` `show_bits $gpi9 $((1*8+5)) 1` `show_bits $gpi12 $((0*8+5)) 1` `show_bits $gpi12 $((1*8+5)) 1` `show_bits $gpi15 $((0*8+5)) 1` `show_bits $gpi15 $((2*8+5)) 1`
+	echo " RESET ERROR:    "`show_bits $gpi9 $((0*8+6)) 1` `show_bits $gpi9 $((1*8+6)) 1` `show_bits $gpi12 $((0*8+6)) 1` `show_bits $gpi12 $((1*8+6)) 1` `show_bits $gpi15 $((0*8+6)) 1` `show_bits $gpi15 $((2*8+6)) 1`
+
+	echo 
+	echo "RX CHAN CONTROL: 0 1 2 3 4 5"
+	echo " ENABLE:         "`show_bits $gpo8 $((0*8+0)) 1` `show_bits $gpo8 $((1*8+0)) 1` `show_bits $gpo10 $((0*8+0)) 1` `show_bits $gpo10 $((1*8+0)) 1` `show_bits $gpo12 0 1` `show_bits $gpo13 0 1`
+	echo " FIFO THRESHOLD: "`show_bits $gpo8 $((0*8+1)) 2` `show_bits $gpo8 $((1*8+1)) 2` `show_bits $gpo10 $((0*8+1)) 2` `show_bits $gpo10 $((1*8+1)) 2` `show_bits $gpo12 1 2` `show_bits $gpo13 1 2`
+	echo " IQSWAP:         "`show_bits $gpo8 $((0*8+3)) 1` `show_bits $gpo8 $((1*8+3)) 1` `show_bits $gpo10 $((0*8+3)) 1` `show_bits $gpo10 $((1*8+3)) 1` `show_bits $gpo12 3 1` `show_bits $gpo13 3 1`
+	echo " CLR ERROR:      "`show_bits $gpo8 $((0*8+4)) 1` `show_bits $gpo8 $((1*8+4)) 1` `show_bits $gpo10 $((0*8+4)) 1` `show_bits $gpo10 $((1*8+4)) 1` `show_bits $gpo12 4 1` `show_bits $gpo13 4 1`
+
+	echo
+	echo "RX CHAN STATUS:  0 1 2 3 4 5"
+	echo " ENABLE:         "`show_bits $gpi8 $((0*8+0)) 1` `show_bits $gpi8 $((1*8+0)) 1` `show_bits $gpi11 $((0*8+0)) 1` `show_bits $gpi11 $((1*8+0)) 1` `show_bits $gpi15 $((1*8+0)) 1` `show_bits $gpi15 $((3*8+0)) 1`
+	echo " FIFO NOT EMPTY: "`show_bits $gpi8 $((0*8+1)) 1` `show_bits $gpi8 $((1*8+1)) 1` `show_bits $gpi11 $((0*8+1)) 1` `show_bits $gpi11 $((1*8+1)) 1` `show_bits $gpi15 $((1*8+1)) 1` `show_bits $gpi15 $((3*8+1)) 1`
+	echo " RX ALLOWED:     "`show_bits $gpi8 $((0*8+2)) 1` `show_bits $gpi8 $((1*8+2)) 1` `show_bits $gpi11 $((0*8+2)) 1` `show_bits $gpi11 $((1*8+2)) 1` `show_bits $gpi15 $((1*8+2)) 1` `show_bits $gpi15 $((3*8+2)) 1`
+	echo " RESET COMPLETE: "`show_bits $gpi8 $((0*8+3)) 1` `show_bits $gpi8 $((1*8+3)) 1` `show_bits $gpi11 $((0*8+3)) 1` `show_bits $gpi11 $((1*8+3)) 1` `show_bits $gpi15 $((1*8+3)) 1` `show_bits $gpi15 $((3*8+3)) 1`
+	echo " UNDERFLOW:      "`show_bits $gpi8 $((0*8+4)) 1` `show_bits $gpi8 $((1*8+4)) 1` `show_bits $gpi11 $((0*8+4)) 1` `show_bits $gpi11 $((1*8+4)) 1` `show_bits $gpi15 $((1*8+4)) 1` `show_bits $gpi15 $((3*8+4)) 1`
+	echo " OVERFLOW:       "`show_bits $gpi8 $((0*8+5)) 1` `show_bits $gpi8 $((1*8+5)) 1` `show_bits $gpi11 $((0*8+5)) 1` `show_bits $gpi11 $((1*8+5)) 1` `show_bits $gpi15 $((1*8+5)) 1` `show_bits $gpi15 $((3*8+5)) 1`
+	echo " RESET ERROR:    "`show_bits $gpi8 $((0*8+6)) 1` `show_bits $gpi8 $((1*8+6)) 1` `show_bits $gpi11 $((0*8+6)) 1` `show_bits $gpi11 $((1*8+6)) 1` `show_bits $gpi15 $((1*8+6)) 1` `show_bits $gpi15 $((3*8+6)) 1`
 	fi
 	exit 0;
 fi

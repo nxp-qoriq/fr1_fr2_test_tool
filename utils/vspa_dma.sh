@@ -53,5 +53,5 @@ dma_mode=$((dma_mode+(conv*0x100)+dma_chan)) #VCPU GO set
 ./utils/memrw w 32 $((modembase_phy+0x1000000+$core_id*0x4000+0xB4)) $axi_addr
 ./utils/memrw w 32 $((modembase_phy+0x1000000+$core_id*0x4000+0xB8)) $size
 ./utils/memrw w 32 $((modembase_phy+0x1000000+$core_id*0x4000+0xBC)) $dma_mode
-echo -e "VSPA DMA command finished: DMEM_ADDR(VSPA view)=`HEX $dmem_addr`, AXI_ADDR(VSPA view)=`HEX $axi_addr`, SIZE=$size, MODE=`HEX $dma_mode`"
+echo -e "VSPA DMA command finished: DMEM_ADDR(VSPA view)=`HEX $dmem_addr`, AXI_ADDR(VSPA view)=`HEX $axi_addr`, SIZE=$size, MODE=`HEX $dma_mode`, Channel=$dma_chan\n"
 check_error

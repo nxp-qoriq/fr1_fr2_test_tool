@@ -143,7 +143,7 @@ fi
 
 if [ $input_scaling = 1 ];then
 	echo Scaling input waveform amplitude for antenna $ant to $input_scaling_factor%...
-	if [ $phcom_disable = 1 ];then
+	if ([ $phcom_disable = 1 ] || [ $((option8_tx[ant])) -eq 1 ]);then #when phcom is disabled or time domain, scale input waveform
 	filename=${invecfile_cur[$ant]}; [ $filename = 0 ] && { echo -e "Waveform file not loaded\n"; exit 1; }
 	log=`./update_test_vector.sh $ant $filename #restore test vector`
 	[ $((len)) -eq 0 ] && len=$((invecsize_exp[$ant]/4))

@@ -49,6 +49,7 @@ source ./check_dfe_cap_core_map.sh
 ant=0; dis=0; txrx=0; inc=0
 from_file=0
 flag_imb=0; flag_gain=0; flag_dc=0
+pnswapi=-1; pnswapq=-1
 num_counter=0
 num_coeff_word=41
 
@@ -59,6 +60,10 @@ arg_parse()
 	elif [ $1 = inc ]; then 	inc=1
 	elif [ $1 = rx ]; then 		txrx=1
 	elif [ $1 = tx ]; then 		txrx=0
+	elif [ $1 = pnswapi ]; then 		pnswapi=1
+	elif [ $1 = pnswapq ]; then 		pnswapq=1
+	elif [ $1 = nopnswapi ]; then 		pnswapi=0
+	elif [ $1 = nopnswapq ]; then 		pnswapq=0
 	elif [ $1 = 0 ]; then 		ant=$1
 	elif [ $1 = 1 ]; then 		ant=$1
 	elif [ $1 = 2 ]; then 		ant=$1
@@ -91,9 +96,18 @@ done
 
 if [ $txrx = 0 ];then	
 	check_ant_enable_tx $ant; cmd=0x0A020000; tagtxrx=TX; tagtxrx1=tx; core=${anttx[$ant]}; trid=${tidant[$ant]}
+	[ $pnswapi = -1 ] && pnswapi=$((pnswap_tx_I[ant_map_tx[ant]])) || ((pnswap_tx_I[ant_map_tx[ant]]=pnswapi))
+	[ $pnswapq = -1 ] && pnswapq=$((pnswap_tx_Q[ant_map_tx[ant]])) || ((pnswap_tx_Q[ant_map_tx[ant]]=pnswapq))
 else 					
 	check_ant_enable_rx $ant; cmd=0x0A024000; tagtxrx=RX; tagtxrx1=rx; core=${antrx[$ant]}; trid=${ridant[$ant]}
+	[ $pnswapi = -1 ] && pnswapi=$((pnswap_rx_I[ant_map_rx[ant]])) || ((pnswap_rx_I[ant_map_rx[ant]]=pnswapi))
+	[ $pnswapq = -1 ] && pnswapq=$((pnswap_rx_Q[ant_map_rx[ant]])) || ((pnswap_rx_Q[ant_map_rx[ant]]=pnswapq))
 fi
+if ([ $((vspa_image_version)) -lt $((0x501)) ] || [ $txqec_timing_skew = 1 ]);then
+	[ $((pnswapi|pnswapq)) -ne 0 ] && { pnswapi=0; pnswapq=0; echo "PNSWAP not supported in VSPA image older than V5.0.1, PNSWAP ignored."; }
+fi
+
+echo -e "pnswap_tx_I=(${pnswap_tx_I[@]}); pnswap_tx_Q=(${pnswap_tx_Q[@]}); pnswap_rx_I=(${pnswap_rx_I[@]}); pnswap_rx_Q=(${pnswap_rx_Q[@]})" >> ./runtime_config.txt
 
 save_filename=./qec/qec_coeff_$tagtxrx1\_ant$ant.bin
 addr_phy=$addr_dump
@@ -143,10 +157,87 @@ intdel=`devmem $((addr_vir+32*4))`; num_taps=`devmem $((addr_vir+33*4))`
 ([ $((num_taps)) -eq 0 ] || ([ $((num_taps)) -ge 6 ] && [ $((num_taps)) -le 16 ])) || { echo "***ERROR: Illegal QEC timing skew filter taps $((num_taps)), expected num taps must be 0 or between 6 and 16. command failed"; exit 1; }
 ([ $((intdel)) -eq 0 ] || [ $((intdel)) -lt $((num_taps)) ]) || { echo "***ERROR: Illegal integar delay $((intdel)), expected delay must be 0 or smaller than num of timing skew filter taps $((num_taps)). command failed"; exit 1; }
 
+[ $((dis+noupdate)) = 0 ] && { dumpfile $addr_vir $save_filename $((num_coeff_word*4)); echo "Updated coeff saved to file $save_filename"; }
+
+f1=`devmem $((addr_vir+34*4))`
+f2=`devmem $((addr_vir+35*4))`
+f4=`devmem $((addr_vir+36*4))`
+gainI=`devmem $((addr_vir+37*4))`
+gainQ=`devmem $((addr_vir+38*4))`
+dcoffI=`devmem $((addr_vir+39*4))`
+dcoffQ=`devmem $((addr_vir+40*4))`
+
+if ([ $((vspa_image_version)) -ge $((0x500)) ] && [ $((gainQ)) -eq 0 ]);then
+	devmem $((addr_vir+38*4)) w $gainI  #set gain_Im = gain_re.
+	gainQ=$gainI
+fi
+devmem $((addr_vir+41*4)) w $gainI  #backup used for scaling for non-optimized QEC
+devmem $((addr_vir+42*4)) w $gainQ
+
+if [ $txqec_timing_skew = 0 ];then #when optimized QEC is used
+if [ $((vspa_image_version)) -ge $((0x501)) ];then
+	if [ $(($gainI)) -ne $((0x3F800000)) ];then
+		f1=`mpy_hexfloat $f1 $gainI`
+		f2=`mpy_hexfloat $f2 $gainQ`
+		gainI=0x3F800000
+	fi
+	if [ $(($gainQ)) -ne $((0x3F800000)) ];then
+		f4=`mpy_hexfloat $f4 $gainQ`
+		gainQ=0x3F800000
+	fi
+fi
+
+if [ $txrx = 0 ];then  #pnswap
+	if [ $pnswapi = 1 ];then
+		[ $((f1)) -ne 0 ] && f1=$((f1^0x80000000));
+		[ $((dcoffI)) -ne 0 ] && dcoffI=$((dcoffI^0x80000000));
+		echo PN SWAPED on TX I
+	fi
+	if [ $pnswapq = 1 ];then
+		[ $((f2)) -ne 0 ] && f2=$((f2^0x80000000));
+		[ $((f4)) -ne 0 ] && f4=$((f4^0x80000000));
+		[ $((dcoffQ)) -ne 0 ] && dcoffQ=$((dcoffQ^0x80000000));
+		echo PN SWAPED on TX Q
+	fi
+else
+	if [ $pnswapi = 1 ];then
+		[ $((f1)) -ne 0 ] && f1=$((f1^0x80000000));
+		[ $((f2)) -ne 0 ] && f2=$((f2^0x80000000));
+		echo PN SWAPED on RX I
+	fi
+	if [ $pnswapq = 1 ];then
+		[ $((f4)) -ne 0 ] && f4=$((f4^0x80000000));
+		echo PN SWAPED on RX Q
+	fi
+fi
+
+if ([ $vspa_dev_type = LA9310 ] || [ $((vspa_image_version)) -lt $((0x501)) ]);then #LA9310 will convert struct in mailbox API
+devmem $((addr_vir+34*4)) w $f1
+devmem $((addr_vir+35*4)) w $f2
+devmem $((addr_vir+36*4)) w $f4
+devmem $((addr_vir+37*4)) w $gainI
+devmem $((addr_vir+38*4)) w $gainQ
+devmem $((addr_vir+39*4)) w $dcoffI
+devmem $((addr_vir+40*4)) w $dcoffQ
+
+else #LA12xx needs converted struct from v501
+devmem $((addr_vir+0*4)) w $f1
+devmem $((addr_vir+1*4)) w $f4
+devmem $((addr_vir+2*4)) w 0
+devmem $((addr_vir+3*4)) w $f2
+devmem $((addr_vir+4*4)) w $dcoffI
+devmem $((addr_vir+5*4)) w $dcoffQ
+devmem $((addr_vir+6*4)) w $f1          #backup used for scaling for optimized QEC
+devmem $((addr_vir+7*4)) w $f4
+devmem $((addr_vir+8*4)) w 0
+devmem $((addr_vir+9*4)) w $f2
+fi
+fi
+
 vspa_mbox_ifsend $core $host_vspa_mbox_id $((cmd+(trid<<15))) $((addr_phy>>7))
+./utils/memrw w 32 $((test_tool_env_tx_scaling_output+ant*4)) 100   #set scaling factor to 100 after qec coeff updated 
 
 echo "$tagtxrx QEC coeff for antenna $ant on core $core updated from address $addr_vir"
-[ $((dis+noupdate)) = 0 ] && { dumpfile $addr_vir $save_filename $((num_coeff_word*4)); echo "Updated coeff saved to file $save_filename"; }
 
 echo
 check_error_ant $ant

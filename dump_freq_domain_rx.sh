@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -26,6 +26,7 @@ da6c2cdd77948780b4537cd96012745b "TDD single tone 30Khz 25% scale at 245Msps wit
 7a2771661cd30e1c207bef07ac91f7c6 "FDD single tone 15Khz 25% scale at 61Msps freq symbols dump for 10Mhz SCS15" 
 19f74bdbbe5d4482fae6c3642c92bf53 "FDD single tone 30Khz 25% scale at 61Msps freq symbols dump 10ms for 10Mhz SCS30" 
 dd07de3da4ddfc55fb9ead966f26d05c "FDD single tone 30Khz 25% scale at 61Msps freq symbols dump 10ms for 20Mhz SCS30" 
+4917ab6a0b8255272069954ff57a9b6a "FDD single tone 30Khz 25% scale at 61Msps freq symbols dump 10ms for 20Mhz SCS30 with filter dealy compensation" 
 159146f7f14f1b6cdec38936b17192a8 "FDD single tone 30Khz 25% scale at 61Msps freq symbols dump 10ms for 20Mhz SCS30 LA12xx" 
 00cb95c3921a11970eaf180673d106bf "FDD single tone 30Khz 25% scale at 122Msps freq symbols dump 10ms for 25Mhz SCS30 LA12xx" 
 6bb443d8c226e243d7cfc2fa63f19fcc "FDD single tone 30Khz 25% scale at 61Msps freq symbols dump 20ms for 20Mhz SCS30" 
@@ -44,7 +45,7 @@ c548add24325dc1dbda976d414cbafc2 "Default G-FR1-A1-5 100Mhz 30Khz TDD 9-bit comp
 ab5c4eae7126eb2d959e40381127ef36 "G-FR1-A1-5_UL_5ms_100MHz_30kHz_TDD used as FDD 10ms freq domain dump"
 d4ccc9d730efa7b013c708bf15dc142c "100MHz_30kHz_FDD single tone 30Khz 25% scale decimation tap8 20ms freq domain dump" 
 b131389b2eceb4bf79454fef0f0f0b31 "100MHz_30kHz_FDD single tone 30Khz 25% scale decimation tap64 20ms freq domain dump" 
-62aabcf9afdf8e953a8a3d6f76568d6d "100MHz_30kHz_FDD single tone 30Khz 25% scale decimation tap64 + 63 taps low pass filter + timing offset compensation 20ms freq domain dump" 
+38eab66365b88483957bb0923b7c8667 "100MHz_30kHz_FDD single tone 30Khz 25% scale decimation tap64 + 63 taps low pass filter passthrough + timing offset compensation 20ms freq domain dump" 
 eb96da0530415069194301eb8ea13298 "100MHz_30kHz_FDD single tone 30Khz 25% scale decimation tap64 + LPF 63taps with filter delay compensation 10ms dump" 
 241a4269784c3b7f74e522e93fec023b "G-FR1-A1-5_UL_5ms_100MHz_30kHz_TDD used as FDD 20ms freq domain dump"
 158a33e4d2ba8c4912b6bd5883f4bbbc "400Mhz 120Khz UL 5ms reference"
@@ -69,6 +70,7 @@ d0fed1c21152ce6f5ac46cce96064ffa "Singletone 30Khz 61Msps FDD RX freq domain wit
 013a03142789171c09549761014b307d "Singletone 30Khz 245Msps FDD RX freq domain with phase compensation dump"
 f94fa084e3169ebc0565dc1561339e36 "Singletone 30Khz 245Msps FDD RX freq domain with phase compensation dump"
 bf1f7ea2972cafa00389b89c251a2ca1 "Singletone 30Khz 245Msps TDD RX freq domain with phase compensation dump"
+0461196b4f0cde6a86ccc85bab58f32a "Singletone 30Khz 245Msps TDD RX freq domain"
 662b8867818fd5fd5c99cde4faa85dc0 "20Mhz 30Khz TM3.3 FDD TX loopbacked to RX reference"
 0 )  #the last element must be a 0 for end of list flag
 
@@ -80,7 +82,7 @@ print_usage()
 	echo "  time_len_ms:must be one of 0.5ms, 1ms, 2ms, 5ms, 10ms, 20ms, 40ms"
 	echo "  mem:        dump to memeory without saving to file."
 	echo "  example:    ./dump_freq_domain_rx.sh 0           will dumped freq domain waveform with length defined in input_waveform_len in config.dat"
-	echo "  example:    ./dump_freq_domain_rx.sh 0 1         will dumped freq domain waveform 1ms"
+	echo "  example:    ./dump_freq_domain_rx.sh 0 1ms         will dumped freq domain waveform 1ms"
 	echo
 }
 
@@ -138,7 +140,7 @@ do
 	arg_parse $i
 done
 [ $fr1_used = 0 ] && ant=$(((ant%2)+4))
-([ $((bbsps_rx[ant])) -ge 500000 ] && [ $((force_hram+force_ddr)) = 0 ]) && dump_via_hram=1
+([ $((bbsps_rx[ant])) -ge 400000 ] && [ $((force_hram+force_ddr)) = 0 ]) && { dump_via_hram=1; force_hram=1; }
 dcsid=$ant
 check_ant_enable_rx $ant #[ $((ant_enable[ant]&BITMASK_ANT_ENABLE_RX)) = 0 ] && { echo ***ERROR: Current RX ant $ant is not enabled.; exit 1; }
 
@@ -176,9 +178,9 @@ else
 		size_hram=$((available_hram/1024/1024*1024*1024))
 	fi
 
-	addr_phy=$((HRAMaddr_phy+6*1024*1024-size_hram))
+	addr_phy=$((HRAMaddr_phy+HRAM_size-size_hram))
 	addr_vir=`printf "0x%x" $((HRAMaddr_vir+6*1024*1024-size_hram))`
-	[ $((size_hram)) -lt $size_file ] && { echo ***ERROR: HRAM size $((size_hram)) is not big enough to hold the dump size $size_file, try dumping with smaller size such as 1ms; exit 1; }
+	[ $((size_hram)) -lt $size_file ] && { echo ***ERROR: HRAM size $((size_hram)) is not big enough to hold the dump size $size_file, try dumping with smaller size such as 0.5ms or 1ms; exit 1; }
 	echo Clearing memory from $addr_vir with size $size_hram...; clear_mem $addr_vir $size_hram
 	echo Using HRAM size $size_hram starting from $addr_vir as intermediate buffer for dumping...
 fi

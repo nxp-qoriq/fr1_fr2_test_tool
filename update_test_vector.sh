@@ -28,7 +28,7 @@ lh=0
 rh=0
 ant=all
 send_fixed_sample_flag=0
-
+flag_idx=0
 num_counter=0
 
 arg_parse()
@@ -37,6 +37,9 @@ arg_parse()
 	if 		[ $1 = help ]; 	then		print_usage; exit;
 	elif 	[ $1 = -lh ]; 	then		lh=1
 	elif 	[ $1 = -rh ]; 	then		rh=1
+	elif 	[ ${arg:0:4} = "idx=" ]; then 		
+		arg=${arg:4}; arg=(${arg//:/ }); [ ${#arg[@]} != 2 ] && { echo -e "***ERROR: wrong idx parameters\n"; exit 1; }
+		flag_idx=1; idx_start=${arg[0]}; idx_end=${arg[1]}
 	elif 	[ $1 = 0 ]; 	then		ant=0
 	elif 	[ $1 = 1 ]; 	then		ant=1
 	elif 	[ $1 = 2 ]; 	then		ant=2
@@ -121,7 +124,6 @@ if [ $send_fixed_sample_flag = 0 ];then
 	echo Loading $tag $vec_file to address $addr_vir with size $filesize_exp for ant$ant
 	loadfile $addr_vir $vec_file $filesize_exp
 	./utils/memrw w 32 $((test_tool_env_tx_scaling_input+ant*4)) 100 #input sacling restored to 100% as new waveform loaded
-	log=`./scale_percent.sh $ant 100`
 	if [ $filesize -lt $filesize_exp ];then
 		numload=$((filesize_exp/filesize)); [ $numload -gt 40 ] && { echo -e "***ERROR: Input waveform file size $filesize is too small than expected ${input_waveform_len[$tx_fdd]}ms $filesize_exp.\n"; exit 1; }
 		echo -e "***WARNING: Ant $ant waveform size $filesize is smaller than expected ${input_waveform_len[$tx_fdd]}ms $filesize_exp, repeating/concatenating $numload times.\n"
@@ -139,6 +141,8 @@ fi
 
 ((num_ant_updated++))
 
+[ $((lh+rh+flag_idx)) -ne 0 ] && [ $((option8_tx[ant])) = 1 ] && { echo ***WARNING: -lh,-rh,idx= are not supported in option8. ignored.; continue; }
+
 if [ $lh = 1 ];then #only send left half, clearing righ half
 	((clr_start=sym_size/2))
 	((clr_end=sym_size-1))
@@ -147,15 +151,34 @@ elif [ $rh = 1 ];then #only send right half, clearing left half
 	((clr_start=0))
 	((clr_end=sym_size/2-1))
 	echo Sending only RIGHT half of total bandwidth...
+elif [ $flag_idx = 1 ];then
+	((keep_start=sym_size/2+idx_start))
+	((keep_end=sym_size/2+idx_end))
+	echo Sending specified range of subcarriers...
 fi
 
 if [ $((lh+rh)) -eq 1 ];then
 for ((i=0;i<num_sym;i++))
 do
 	((addr=addr_vir+(i*sym_buf_size+clr_start)*4))
-	addr=`printf 0x%x $addr`
 	clear_mem $addr $((sym_size/2*4))
 done
+
+elif [ $flag_idx = 1 ];then
+	if [ $((keep_start)) -gt 0 ];then
+		for ((i=0;i<num_sym;i++))
+		do
+			((addr=addr_vir+(i*sym_buf_size+0)*4))
+			clear_mem $addr $((keep_start*4))
+		done
+	fi
+	if [ $((keep_end)) -lt $((sym_size-1)) ];then
+		for ((i=0;i<num_sym;i++))
+		do
+			((addr=addr_vir+(i*sym_buf_size+keep_end+1)*4))
+			clear_mem $addr $(((sym_size-1-keep_end)*4))
+		done
+	fi
 fi
 
 done

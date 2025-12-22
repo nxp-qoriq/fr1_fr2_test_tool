@@ -36,7 +36,7 @@ get_ts_rxallowed_first_enabled() #$1=core id
 }
 #printing capability and core mapping info
 prodtype=("Vspa-Vspa symbol interface with 2 Symbols Buffer on VSPA DMEM" "Host-Vspa symbol interface with up to 28 Symbols Buffer") #(ISC RU)
-tag_running=(STOPPED RUNNING UN-CHECKED)
+tag_running=("STOPPED     " "RUNNING     " "UN-CHECKED  " "RUNNING-IDLE")
 tag_idle=("" IDLE)
 ant_running_tx=(2 2 2 2 2 2)
 ant_running_rx=(2 2 2 2 2 2)
@@ -152,10 +152,13 @@ local dcs_id_rx=${ant_map_rx[$ant]};
 bw_curr=`size_align $((sym_size*scs/1000)) 5`
 echo "***             Bandwidth:   Max $((bandwidth_tx/baseband_upsampling_rate)) Mhz, Current $bw_curr Mhz, num RE $((sym_size)), SCS $scs Khz"
 
+tag_iqswap=("" "IQSWAPPED")
+[ $((vspa_image_version)) -ge $((0x500)) ] && { tag_pnswap_I=("" "PNSWAPPED_on_I");tag_pnswap_Q=("" "PNSWAPPED_on_Q"); } || { tag_pnswap_I=("" "");tag_pnswap_Q=("" ""); }
+
 if [ $tag = TX+RX ]; then
 ((dcs_used_tx[$dcs_id_tx]++))
 ((dcs_used_rx[$dcs_id_rx]++))
-echo "***      DCS channel used:   TX: "${tag_tddfdd[$tx_fdd]} ${TAG_TXDCSID[$dcs_id_tx]} $txdcs  KSPS,   RX: ${tag_tddfdd[$rx_fdd]} ${TAG_RXDCSID[$dcs_id_rx]} $rxdcs KSPS, HW_2x_Decimation ${onoff[axiq_2G_mode]}
+echo "***      DCS channel used:   TX: "${tag_tddfdd[$tx_fdd]} ${TAG_TXDCSID[$dcs_id_tx]} $txdcs KSPS ${tag_iqswap[iqswap_tx[dcs_id_tx]]} ${tag_pnswap_I[pnswap_tx_I[dcs_id_tx]]} ${tag_pnswap_Q[pnswap_tx_Q[dcs_id_tx]]},   RX: ${tag_tddfdd[$rx_fdd]} ${TAG_RXDCSID[$dcs_id_rx]} $rxdcs KSPS ${tag_iqswap[iqswap_rx[dcs_id_rx]]} ${tag_pnswap_I[pnswap_rx_I[dcs_id_rx]]} ${tag_pnswap_Q[pnswap_rx_Q[dcs_id_rx]]}, HW_2x_Decimation ${onoff[axiq_2G_mode]}
 
 if [ $dfe_only = 0 ];then
 echo "*** Symbols sent/received:   TX: $num_sym_tx ~$num_sym_tx_1ms/ms,   RX: $num_sym_rx ~$num_sym_rx_1ms/ms"
@@ -167,7 +170,7 @@ fi
 
 elif [ $tag = TX ]; then
 ((dcs_used_tx[$dcs_id_tx]++))
-echo "***      DCS channel used:   TX: "${tag_tddfdd[$tx_fdd]} ${TAG_TXDCSID[$dcs_id_tx]} $txdcs  KSPS
+echo "***      DCS channel used:   TX: "${tag_tddfdd[$tx_fdd]} ${TAG_TXDCSID[$dcs_id_tx]} $txdcs KSPS ${tag_iqswap[iqswap_tx[dcs_id_tx]]} ${tag_pnswap_I[pnswap_tx_I[dcs_id_tx]]} ${tag_pnswap_Q[pnswap_tx_Q[dcs_id_tx]]}
 if [ $dfe_only = 0 ];then
 echo "*** Symbols sent/received:   TX: $num_sym_tx ~$num_sym_tx_1ms/ms"
 [ $((num_sym_tx_1ms)) -gt $((sym_num_1m*12/10)) ] && { str="***WARNING: TX sent more symbols than expected on ant $ant, sent $num_sym_tx_1ms/ms, expected $sym_num_1m/ms. Check TX DAC sampling rate\n"; error_list="$error_list$str"; }
@@ -177,7 +180,7 @@ fi
 
 else
 ((dcs_used_rx[$dcs_id_rx]++))
-echo "***      DCS channel used:   RX: "${tag_tddfdd[$rx_fdd]} ${TAG_RXDCSID[$dcs_id_rx]} $rxdcs KSPS, HW_2x_Decimation ${onoff[axiq_2G_mode]}
+echo "***      DCS channel used:   RX: "${tag_tddfdd[$rx_fdd]} ${TAG_RXDCSID[$dcs_id_rx]} $rxdcs KSPS ${tag_iqswap[iqswap_rx[dcs_id_rx]]} ${tag_pnswap_I[pnswap_rx_I[dcs_id_rx]]} ${tag_pnswap_Q[pnswap_rx_Q[dcs_id_rx]]}, HW_2x_Decimation ${onoff[axiq_2G_mode]}
 if [ $dfe_only = 0 ];then
 echo "*** Symbols sent/received:   RX: $num_sym_rx ~$num_sym_rx_1ms/ms"
 [ $((num_sym_rx_1ms)) -gt $((sym_num_1m*12/10)) ] && { str="***WARNING: RX received more symbols than expected on ant $ant, received $num_sym_rx_1ms/ms, expected $sym_num_1m/ms. Check RX ADC sampling rate\n"; error_list="$error_list$str"; }
@@ -307,25 +310,31 @@ if [ $disable_coreload = '0' ]; then
 	cld_qec_tx=`get_kernel_load $core $txdcs $TXPATH_STATUS_OFFSET_CC_QEC $((block_size/4*upsampling_ratio))`
 	cld_qec_rx=`get_kernel_load $core $rxaxiq $RXPATH_STATUS_OFFSET_CC_QEC $((block_size/4*downsampling_ratio))`
 
-
-show_status "***           Kernel load:   ifft/fft" $((cld_ifft+cld_ifft_bitrev))% $((cld_fft+cld_fft_bitrev))%
-show_status "***           Kernel load:   UP/DownSampling" $cld_upsampling% $cld_downsampling%
+[ $((cld_ifft+cld_fft)) -ne 0 ] && show_status "***           Kernel load:   ifft/fft" $((cld_ifft+cld_ifft_bitrev))% $((cld_fft+cld_fft_bitrev))%
+[ $((cld_upsampling+cld_downsampling)) -ne 0 ] && show_status "***           Kernel load:   UP/DownSampling" $cld_upsampling% $cld_downsampling%
 
 ((ld_dpd=ld_dpd*dpd_enable))
 if [ ${tag:0:1} = T ]; then
-echo -n "***           Kernel load:   "
 if [ $baseband_txsps -eq $txaxiq ];then
 	dpd_model_get_para
 	dpd=`dpd_model_num_coeff`	
 	#ld_dpd=$((ld_dpd*2)) #dpd split into 2 cores, load doubled
 	estimated_ld_dpd=`dpd_model_est_load $dpd`; ((estimated_ld_dpd=estimated_ld_dpd*dpd_enable))
 	#[ $((dpd_model_id)) -ge 20 ] && ((estimated_ld_dpd=estimated_ld_dpd*2))
-	echo "DPD Estimated $estimated_ld_dpd% big_model $ld_dpd%"
+	[ $ld_dpd -ne 0 ] && echo "***           Kernel load:   DPD Estimated $estimated_ld_dpd% big_model $ld_dpd%"
 else
-echo "CFR $((cld_cfr))%, DPD $((ld_dpd))%"
+	[ $ld_dpd -ne 0 ] && echo "***           Kernel load:   CFR $((cld_cfr))%, DPD $((ld_dpd))%"
 fi
 fi
-show_status "***           Kernel load:   QEC " $cld_qec_tx% $cld_qec_rx%
+
+[ $((cld_qec_tx+cld_qec_rx)) -ne 0 ] && show_status "***           Kernel load:   QEC " $cld_qec_tx% $cld_qec_rx%
+
+if [ $((vspa_image_version)) -ge $((0x500)) ];then
+cld_peak=`get_kernel_load $score $txdcs $peak_cycle_count $((block_size/4*upsampling_ratio))`
+cld_min=`get_kernel_load $score $txdcs $min_cycle_count $((block_size/4*upsampling_ratio))`
+[ $cld_peak -ne 0 ] && echo "***           Core A load:   Peak $cld_peak%, Control $cld_min%"
+fi
+
 fi
 
 
@@ -347,25 +356,29 @@ fi
 echo "*****************************************************************************************************"
 }
 
-pow_cal_en=1
-source ./boot_vspa_log.txt
-([ ${vspa_image_folder_name:0:37} = MEvspa_images_LS.1T1R.T4x_25M_60K_122 ] || [ ${vspa_image_folder_name:0:36} = MEvspa_images_LS.1T1R.T4x_25M_60K_61 ]) && { pow_cal_en=0; }
-
+pow_cal_en=0
 ant_start=0
 ant_end=$((NUM_ANTS-1))
-if [ $# -ge 1 ];then
-	if [ $1 = nfast ]; then fast=0
-	elif [ $1 = fast ]; then fast=1
-	else
-		ant_start=$1
-		ant_end=$1
+
+arg_parse()
+{
+	arg=$1
+	if [ $arg = 0 ]; then								ant_start=$arg;ant_end=$arg
+	elif [ $arg = 1 ]; then								ant_start=$arg;ant_end=$arg
+	elif [ $arg = 2 ]; then								ant_start=$arg;ant_end=$arg
+	elif [ $arg = 3 ]; then								ant_start=$arg;ant_end=$arg
+	elif [ $arg = 4 ]; then								ant_start=$arg;ant_end=$arg
+	elif [ $arg = 5 ]; then								ant_start=$arg;ant_end=$arg
+	elif [ $arg = fast ]; then							fast=1
+	elif [ $arg = nfast ]; then							fast=0
+	elif [ $arg = pow ]; then							pow_cal_en=1
 	fi
-	if [ $# -ge 2 ];then
-		if [ $2 = nfast ]; then fast=0
-		elif [ $2 = fast ]; then fast=1
-		fi
-	fi
-fi
+}
+
+for i in "$@"
+do
+	arg_parse $i
+done
 
 if [ $fast = 0 ];then
 [ $((one_enabled_dfe_core)) -ge $((NUM_CORES)) ] && one_enabled_dfe_core=0
@@ -497,7 +510,7 @@ if [ $((tx_fdd&rx_fdd)) = 0 ];then
 fi
 
 if [ $((num_T_LS_enabled+num_T_HS_enabled)) -ne 0 ];then
-echo -e "\nAnt Mapping TX:\nant_id  dcsid     dcs           status   scaling_factor(input/ouput)"
+echo -e "\nAnt Mapping TX:\nant_id  dcsid     dcs         status            scaling_factor(input/ouput)"
 for((i=0;i<$NUM_ANTS;i++))
 do
 	if [ $((ant_enable[$i]&BITMASK_ANT_ENABLE_TX)) != 0 ];then
@@ -506,14 +519,16 @@ do
 		scaling_factor_input=$((`./utils/memrw r 32 $((test_tool_env_tx_scaling_input+i*4))`))
 		scaling_factor_output=$((`./utils/memrw r 32 $((test_tool_env_tx_scaling_output+i*4))`))
 		scaling_off=$((scaling_factor_output>>31)); scaling_factor_output=$((scaling_factor_output&0x7FFFFFFF))
-		[ $scaling_off = 1 ] && tag_scaling=OFF || tag_scaling="$scaling_factor_input/$scaling_factor_output"
+		idle_flag=`get_wordvalue_from_vspa ${anttx[$i]} $CONFIG_TX_SINGLE_TONE_AMP`
+		[ $((idle_flag)) -eq 1 ] && ant_running_tx[i]=3 || idle_flag=0
+		[ $((scaling_off|idle_flag)) = 1 ] && tag_scaling=OFF || tag_scaling="$scaling_factor_input/$scaling_factor_output"
 		echo "$i       $tag0    $tag1  ${tag_running[ant_running_tx[i]]}      $tag_scaling"
 	fi
 done
 fi
 
 if [ $((num_R_LS_enabled+num_R_HS_enabled)) -ne 0 ];then
-echo -e "\nAnt Mapping RX:\nant_id  dcsid     dcs           status"
+echo -e "\nAnt Mapping RX:\nant_id  dcsid     dcs         status"
 for((i=0;i<$NUM_ANTS;i++))
 do
 	if [ $((ant_enable[$i]&BITMASK_ANT_ENABLE_RX)) != 0 ];then

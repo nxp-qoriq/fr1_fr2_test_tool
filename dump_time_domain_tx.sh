@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022-2024 NXP
+# Copyright 2022-2025 NXP
 #
 # NXP Confidential. This software is owned or controlled by NXP and may only
 # be used strictly in accordance with the applicable license terms. By expressly accepting
@@ -51,6 +51,7 @@ known_waveform_list=(
 f893c91332db0df79621acfea2f991a8 "TM3.3_5MHz_15kHz_TDD 61Msps time domain 20ms dump for pattern DDGGG GGUUG GGGGG UUUUG"
 4cd4cd46bdc9264cca21fa86277b9d9a "TM3.3_5MHz_15kHz_FDD 61Msps time domain 20ms dump"
 4ebb9f1c03e64ae3f850f16e57fcf450 "TM3.3_20MHz_30kHz_FDD 61Msps time domain 20ms dump"
+b34df33f4cc09341a84ccd7c847994bf "TM3.3_20MHz_30kHz_FDD 61Msps time domain 20ms dump with filter delay compensation"
 0d2be5275a9e9a974c8c562fa2b162bf "TM3.3_20MHz_60kHz_FDD 61Msps time domain 20ms dump"
 022a314fe2359f6e543f8afdee2d152c "TM3.3_10MHz_30kHz_FDD 61Msps time domain 20ms dump"
 c6b30a1f4144c6f9ea722d3bace353df "TM3.3_10MHz_30kHz_FDD 61Msps time domain 20ms dump auto scaled"
@@ -146,6 +147,7 @@ e4716a268aa168085f38d9907d9179f4 "Default TM1.1 100Mhz 30Khz TDD 491Msps TX 20ms
 a67cd85d4ceb5cca7573c3a87cdc8677 "Default TM1.1 100Mhz 30Khz TDD 491Msps TX 20ms dump waveform 6MB QEC passthrough." 
 be418fa8893a5b880f4b509a8e7bfd7c "Default TM1.1 100Mhz 30Khz TDD 491Msps TX 20ms dump waveform QEC tap 0 applied." 
 6496d219bcfd7eed1fc55b8e2357695b "Default TM1.1 100Mhz 30Khz TDD 491Msps TX 20ms dump waveform QEC tap 0 with DC offset -0.125:0.125 applied." 
+183f760e08268107ceae18cdb44fe91a "Default TM1.1 100Mhz 30Khz FDD 491Msps TX 20ms dump waveform QEC tap 0 with DC offset -0.125:0.125 applied." 
 8ff5c5cf89bb4c176bddde304053e4af "Default TM3.3 100Mhz 30Khz TDD 2x16+2x16 taps upsampling waveform." 
 31a3070f0b05453a5de790cf005599d6 "Default TM3.3 100Mhz 30Khz TDD CFR All 3 PASS enabled waveform"
 e41a6817ee5d025f08a4032b34c7a97a "Default TM3.3 100Mhz 30Khz TDD QEC coeff updated waveform." 
@@ -326,16 +328,16 @@ if [ $dump_dpd = 0 ];then
 	if [ $num_32K = 0 ];then
 		((size=sps*4*$dump_time_len_double/2))
 		size_tag=$dump_time_len\ms
-		str="${str}Dumping TX time domain ant data $dump_time_len ms for antenna $ant ...\n"
+		echo "Dumping TX time domain ant data $dump_time_len ms for antenna $ant ..."
 	else
 		if [ $num_32K -lt 1024 ];then
 			((size=num_32K*32768))
 			size_tag=$((num_32K*32))KB
-			str="${str}Dumping TX time domain ant data $((num_32K*32)) KB for antenna $ant ...\n"
+			echo "Dumping TX time domain ant data $((num_32K*32)) KB for antenna $ant ..."
 		else
 			((size=num_32K))
 			size_tag=$size
-			str="${str}Dumping TX time domain ant data $size_tag for antenna $ant ...\n"
+			echo "Dumping TX time domain ant data $size_tag for antenna $ant ..."
 		fi
 	fi
 	dump_filename=tx_timedomain_$size_tag\_$sps\ksps_dump_ant$ant.bin
@@ -362,7 +364,7 @@ else
 	fi
 	
 	dump_filename=tx_timedomain_$size_tag\_DPD${dpdinout[$dpdo]}_$sps\ksps_dump_ant$ant.bin
-	str="${str}Dumping TX time domain DPD ${dpdinout[$dpdo]} data $size_tag for antenna $ant ..."\n
+	echo "Dumping TX time domain DPD ${dpdinout[$dpdo]} data $size_tag for antenna $ant ..."
 fi
 
 size_32KB_aligned=$(((size+32767)/32768*32768))
@@ -377,22 +379,11 @@ dump_1time()
 	#echo dump_time_domain_tx_1time $txcore $tid `HEX $addr_phy` $addr_vir $size_32KB_aligned $dpdo $obs $offset
 	dump_time_domain_tx_1time $txcore $tid $addr_phy $addr_vir $size_32KB_aligned $dpdo $obs $offset
 	[ $? -ne 0 ] && exit 1
+	[ $flag_deqec = 1 ] && [ $dpdo = 1 ] && { echo deqec; deqec $txcore $addr_vir $((size/4)); }
 	dumpfile $addr_vir $dump_filename $size
 	
 	if ([ $fast = 0 ] && [ $pow = 1 ]);then
-	dump_size=$((10*14*65536)); [ $dump_size -gt $((size_32KB_aligned/4)) ] && dump_size=$((size_32KB_aligned/4))
-	log=`./utils/power $addr_vir 0 $((size_32KB_aligned/4))`
-	eval "$log"
-	
-	v_tx_pow_acc=$power_IQ
-	v_tx_pow_num_samples=$num_samples_valid
-	sample_power=($(echo $v_tx_pow_acc $v_tx_pow_num_samples | awk '{ x=10*(log($1/$2)/log(10)); printf("%f %3.1f %d\n", $1/$2, x, x); }'))
-	[ ${sample_power[1]} = -inf ] && { sample_power[1]=-99999; sample_power[2]=-99999; }  #negative infinite
-	str="${str}Sample power at DAC: ${sample_power[0]}/sample, ${sample_power[1]} dB, max I=$max_I, max Q=$max_Q, dc_I=$dc_I, dc_Q=$dc_Q\n"
-	[ $((sample_power[2])) -lt -15 ] && str="${str}***WARNING: TX ant $ant DAC output power does not reach 10-15 dB, your test is not fully utilizing the DAC dynamic range!\n            To scale the power to appropriate level, run ./scale_percent.sh auto\n"
-	[ $((sample_power[2])) -gt -8 ] && str="${str}***WARNING: TX ant $ant DAC output power is higher than -8 dB, be careful not to damage PA\n"
-	max_IQ100=`echo $max_IQ | awk '{ abs_val = ($1 >= 0) ? $1 : -$1; printf("%d\n", abs_val*100); }'`
-	[ $max_IQ100 -ge 97 ] && str="${str}***WARNING: TX ant $ant DAC output is saturated, max value $max_IQ\n"
+		check_sample_power $addr_vir $((size/4))
 	fi
 }
 
@@ -400,7 +391,7 @@ dump_via_hram_mlti_times()
 {
 	addr_vir=`printf "0x%x" $((HRAMaddr_vir+6*1024*1024-size_hram))`
 	((addr_phy=HRAMaddr_phy+6*1024*1024-size_hram))
-	str="${str}Using HRAM size $size_hram starting from $addr_vir as intermediate buffer for dumping...\n"
+	echo "Using HRAM size $size_hram starting from $addr_vir as intermediate buffer for dumping..."
 	
 	((num_chunks=size_32KB_aligned/size_hram))
 	((size_left=size_32KB_aligned-num_chunks*size_hram))

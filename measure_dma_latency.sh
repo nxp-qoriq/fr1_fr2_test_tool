@@ -11,7 +11,7 @@
 
 source ./check_dfe_cap_core_map.sh
 
-if [ $vspa_dev_type = LA9310 ];then	test_size=2048
+if [ $vspa_dev_type = LA9310 ];then	test_size=8192
 else								test_size=16384
 fi
 
@@ -77,17 +77,17 @@ echo "$1", $2 bytes, cycle count "`printf %6d $(($3))`"," `cycle2time $3`" ns, "
 mem_test $txcore $ddr_address $test_size 0; [ $? -ne 0 ] && { echo ***ERROR: VSPA no response; exit 1; }
 ddr_read_cycle_2chan=$cycle2chan 
 ddr_read_cycle_1chan=$cycle1chan
-if [ $vspa_dev_type = LA12xx ];then
+#if [ $vspa_dev_type = LA12xx ];then
 ddr_read_cycle_back2=$cycle4chan
 ddr_read_cycle_back1=$cycle3chan
-fi
+#fi
 mem_test $txcore $ddr_address $test_size 1; [ $? -ne 0 ] && { echo ***ERROR: VSPA no response; exit 1; }
 ddr_write_cycle_2chan=$cycle2chan 
 ddr_write_cycle_1chan=$cycle1chan
-if [ $vspa_dev_type = LA12xx ];then
+#if [ $vspa_dev_type = LA12xx ];then
 ddr_write_cycle_back2=$cycle4chan
 ddr_write_cycle_back1=$cycle3chan
-fi
+#fi
 #mem_test $txcore $peb_address $test_size 0
 #peb_read_cycle_2chan=$cycle2chan 
 #peb_read_cycle_1chan=$cycle1chan
@@ -100,7 +100,7 @@ fi
 #peb_write_cycle_back2=$cycle4chan
 #peb_write_cycle_back1=$cycle3chan
 
-if [ $vspa_dev_type = LA12xx ];then
+#if [ $vspa_dev_type = LA12xx ];then
 mem_test $txcore $hram_address $test_size 0; [ $? -ne 0 ] && { echo ***ERROR: VSPA no response; exit 1; }
 hram_read_cycle_2chan=$cycle2chan 
 hram_read_cycle_1chan=$cycle1chan
@@ -114,43 +114,43 @@ hram_write_cycle_back2=$cycle4chan
 hram_write_cycle_back1=$cycle3chan
 
 tag_back1_read=" with background WRITE by 1 channel"
-tag_back2_read=" with background READ. by 2 channels on DDR"
-tag_back1_writ=" with background READ. by 2 channels"
+tag_back2_read=" with background READ. by 1 channels on DDR"
+tag_back1_writ=" with background READ. by 1 channels"
 tag_back2_writ=" with background WRITE by 1 channel. on DDR"
-fi
+#fi
 
 echo
 echo VSPA DMA Memory read/write performance test result:
 show_result "DDR  READ   by VSPA DMA 1 channel " $test_size $ddr_read_cycle_1chan ""
-[ $vspa_dev_type = LA12xx ] && show_result "DDR  READ   by VSPA DMA 2 channels" $test_size $ddr_read_cycle_2chan ""
+#[ $vspa_dev_type = LA12xx ] && show_result "DDR  READ   by VSPA DMA 2 channels" $test_size $ddr_read_cycle_2chan ""
+show_result "DDR  READ   by VSPA DMA 2 channels" $test_size $ddr_read_cycle_2chan ""
 show_result "DDR  WRITE  by VSPA DMA 1 channel " $test_size $ddr_write_cycle_1chan ""
-[ $vspa_dev_type = LA12xx ] && show_result "DDR  WRITE  by VSPA DMA 2 channels" $test_size $ddr_write_cycle_2chan ""
+#[ $vspa_dev_type = LA12xx ] && show_result "DDR  WRITE  by VSPA DMA 2 channels" $test_size $ddr_write_cycle_2chan ""
+show_result "DDR  WRITE  by VSPA DMA 2 channels" $test_size $ddr_write_cycle_2chan ""
 #show_result "PEBM READ   by VSPA DMA 1 channel " $test_size $peb_read_cycle_1chan ""
 #show_result "PEBM READ   by VSPA DMA 2 channels" $test_size $peb_read_cycle_2chan ""
 #show_result "PEBM WRITE  by VSPA DMA 1 channel " $test_size $peb_write_cycle_1chan ""
 #show_result "PEBM WRITE  by VSPA DMA 2 channels" $test_size $peb_write_cycle_2chan ""
 
-if [ $vspa_dev_type = LA12xx ];then
+#if [ $vspa_dev_type = LA12xx ];then
 show_result "HRAM READ   by VSPA DMA 1 channel " $test_size $hram_read_cycle_1chan ""
 show_result "HRAM READ   by VSPA DMA 2 channels" $test_size $hram_read_cycle_2chan ""
 show_result "HRAM WRITE  by VSPA DMA 1 channel " $test_size $hram_write_cycle_1chan ""
 show_result "HRAM WRITE  by VSPA DMA 2 channels" $test_size $hram_write_cycle_2chan ""
 
 echo
-if [ $((vspa_image_version)) -ge $((0x313)) ];then
-show_result "DDR  READ   by VSPA DMA 2 channels" $test_size $ddr_read_cycle_back1   "$tag_back1_read"
+show_result "DDR  READ   by VSPA DMA 1 channel " $test_size $ddr_read_cycle_back1   "$tag_back1_read"
 show_result "DDR  READ   by VSPA DMA 1 channel " $test_size $ddr_read_cycle_back2   "$tag_back2_read"
 show_result "DDR  WRITE  by VSPA DMA 1 channel " $test_size $ddr_write_cycle_back1  "$tag_back1_writ"
 show_result "DDR  WRITE  by VSPA DMA 1 channel " $test_size $ddr_write_cycle_back2  "$tag_back2_writ"
-#show_result "PEBM READ   by VSPA DMA 2 channels" $test_size $peb_read_cycle_back1   "$tag_back1_read"
+#show_result "PEBM READ   by VSPA DMA 1 channel " $test_size $peb_read_cycle_back1   "$tag_back1_read"
 #show_result "PEBM READ   by VSPA DMA 1 channel " $test_size $peb_read_cycle_back2   "$tag_back2_read"
 #show_result "PEBM WRITE  by VSPA DMA 1 channel " $test_size $peb_write_cycle_back1  "$tag_back1_writ"
 #show_result "PEBM WRITE  by VSPA DMA 1 channel " $test_size $peb_write_cycle_back2  "$tag_back2_writ"
-show_result "HRAM READ   by VSPA DMA 2 channels" $test_size $hram_read_cycle_back1  "$tag_back1_read"
+show_result "HRAM READ   by VSPA DMA 1 channel " $test_size $hram_read_cycle_back1  "$tag_back1_read"
 show_result "HRAM READ   by VSPA DMA 1 channel " $test_size $hram_read_cycle_back2  "$tag_back2_read"
 show_result "HRAM WRITE  by VSPA DMA 1 channel " $test_size $hram_write_cycle_back1 "$tag_back1_writ"
 show_result "HRAM WRITE  by VSPA DMA 1 channel " $test_size $hram_write_cycle_back2 "$tag_back2_writ"
-fi
-fi
+#fi
 echo
 exit 0

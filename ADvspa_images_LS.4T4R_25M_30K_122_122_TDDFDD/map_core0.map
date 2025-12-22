@@ -1,7 +1,7 @@
 ;*********************************************************************************
 ;*StarCore Linker it3a-ld.exe version 3.0.315 - 2022.01.12 Advanced Accelerating Architectures
 ;*
-;*Compilation date : Fri Oct 18 23:00:36 2024
+;*Compilation date : Tue Apr 15 14:53:09 2025
 ;*File Name : C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core0.map
 ;*Invocation line: C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\bin\it3a-ld.exe -o C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/geul-vspa0.eld -Map C:/0_dsp/Projects_VSPA/DFE_Ref/DFE_ref_project/eld/map_core0.map -LC:/0_dsp/Projects_VSPA/DFE_Ref/lib -llib_DFE_Ref_vspa3.elb -c C:/0_dsp/Projects_VSPA/DFE_Ref/LCF/LA1224_sp.lcf -arch vspa3 -core_type=sp -au_count 16 .\source_shared\DFE_func_rx.eln .\source_shared\DFE_func_tx.eln .\source_shared\DFE_init.eln .\source_shared\boot.eln .\source_shared\debug.eln .\source_shared\dump_inject.eln .\source_shared\global_var.eln .\source_shared\host_vspa_msg.eln .\source_shared\inter_core_msg.eln .\source_shared\main_pair_coreA.eln .\source_shared\main_pair_coreB.eln .\source_shared\main_unused_core.eln .\source_shared\pair_para.eln .\source_shared\startup_vspa3_modified.eln .\source_shared\kernel_FFT\ifft_cp.eln .\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln .\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln .\source_shared\eDMA\eDMA_la9310.eln .\source_shared\SINAD\sinad.eln .\source_proj_specific\main_PHY_RX_core.eln .\source_proj_specific\main_PHY_TX_core.eln -start-reread-lib C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\libc99_gen_au16_sp.elb C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\libm_gen_au16_sp.elb -end-reread-lib
 ;*There are one or more errors in this application: 0x40000000
@@ -10,7 +10,7 @@
 ;*********************************************************************************
 ;*		BIND    	INITIAL-SIZE(bytes)	REMOVED(bytes)	FINAL-SIZE(bytes)	NAME                          	MODULE-NAME
 ;*MODULE: .\source_shared\DFE_func_rx.eln
-;*		GLOBAL  	      8960         	      8960    	         0       	_sym_queue_rx                 	.\source_shared\DFE_func_rx.eln
+;*		GLOBAL  	      4480         	      4480    	         0       	_sym_queue_rx                 	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	        64         	        64    	         0       	_axi_flag_rx_symbol_ready     	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	         1         	         1    	         0       	_rx_pattern_sym_idx           	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	         4         	         4    	         0       	_rx_sym_type                  	.\source_shared\DFE_func_rx.eln
@@ -49,6 +49,7 @@
 ;*MODULE: .\source_shared\pair_para.eln
 ;*		GLOBAL  	       512         	       512    	         0       	_cfr_para                     	.\source_shared\pair_para.eln
 ;*		GLOBAL  	      5120         	      5120    	         0       	_cfr_cpulse                   	.\source_shared\pair_para.eln
+;*ALL VARIABLES WERE REMOVED FROM MODULE: .\source_shared\pair_para.eln
 ;*MODULE: .\source_shared\eDMA\eDMA_la9310.eln
 ;*		GLOBAL  	        32         	        32    	         0       	_eDMA_TCD                     	.\source_shared\eDMA\eDMA_la9310.eln
 ;*ALL VARIABLES WERE REMOVED FROM MODULE: .\source_shared\eDMA\eDMA_la9310.eln
@@ -86,7 +87,7 @@
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_8192.eln)
 ;*		LOCAL   	       128         	       128    	         0       	_init_8k_dif_data             	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_8192.eln)
 ;*ALL VARIABLES WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_8192.eln)
-;*TOTAL DATA: 164606 BYTES REMOVED
+;*TOTAL DATA: 160126 BYTES REMOVED
 ;*********************************************************************************
 ;****************************UNREFERENCED FUNCTIONS*******************************
 ;*********************************************************************************
@@ -94,43 +95,45 @@
 ;*MODULE: .\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	        96         	        96    	         0       	_is_phy_rx_buf_available      	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	       368         	       368    	         0       	_start_rx_ippu_bitrev_reversIn_linearOut	.\source_shared\DFE_func_rx.eln
-;*		GLOBAL  	      1368         	      1368    	         0       	_run_fft                      	.\source_shared\DFE_func_rx.eln
-;*		GLOBAL  	       192         	       192    	         0       	_rx_sym_ready_processing      	.\source_shared\DFE_func_rx.eln
+;*		GLOBAL  	      1208         	      1208    	         0       	_run_fft                      	.\source_shared\DFE_func_rx.eln
+;*		GLOBAL  	      1392         	      1392    	         0       	_rx_sym_ready_processing      	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	       136         	       136    	         0       	_pipeline_reset_rx            	.\source_shared\DFE_func_rx.eln
-;*		GLOBAL  	        48         	        48    	         0       	__Z23sssdet_targeted_gemv_rcP10cfloat16_tPmPu6__fx16mmmmm	.\source_shared\DFE_func_rx.eln
-;*		GLOBAL  	       384         	       384    	         0       	_rx_processing_symbol_level   	.\source_shared\DFE_func_rx.eln
+;*		GLOBAL  	       616         	       616    	         0       	_rx_processing_symbol_level   	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	        64         	        64    	         0       	_get_valid_size_for_fft_in    	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	        48         	        48    	         0       	_convert_2implement           	.\source_shared\DFE_func_rx.eln
-;*		GLOBAL  	       224         	       224    	         0       	_get_rx_dump_sym_buf_addr     	.\source_shared\DFE_func_rx.eln
-;*		GLOBAL  	       360         	       360    	         0       	_check_rx_sym_start           	.\source_shared\DFE_func_rx.eln
-;*		GLOBAL  	        32         	        32    	         0       	_ack_phy_rx_buf_available     	.\source_shared\DFE_func_rx.eln
+;*		GLOBAL  	       240         	       240    	         0       	_get_rx_dump_sym_buf_addr     	.\source_shared\DFE_func_rx.eln
+;*		GLOBAL  	       368         	       368    	         0       	_check_rx_sym_start           	.\source_shared\DFE_func_rx.eln
+;*		GLOBAL  	        56         	        56    	         0       	_ack_phy_rx_buf_available     	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL  	        88         	        88    	         0       	_ecpri_comp_init              	.\source_shared\DFE_func_rx.eln
-;*		GLOBAL  	       184         	       184    	         0       	_set_rx_slot_sym_idx          	.\source_shared\DFE_func_rx.eln
-;*		GLOBAL  	       320         	       320    	         0       	_PHY_DFE_interf_rx_check_dma_finish	.\source_shared\DFE_func_rx.eln
-;*		GLOBAL  	      1992         	      1992    	         0       	_PHY_DFE_interf_rx_check_dma_start	.\source_shared\DFE_func_rx.eln
+;*		GLOBAL  	       200         	       200    	         0       	_set_rx_slot_sym_idx          	.\source_shared\DFE_func_rx.eln
+;*		GLOBAL  	       216         	       216    	         0       	_PHY_DFE_interf_rx_check_dma_finish	.\source_shared\DFE_func_rx.eln
+;*		GLOBAL  	      1568         	      1568    	         0       	_PHY_DFE_interf_rx_check_dma_start	.\source_shared\DFE_func_rx.eln
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: .\source_shared\DFE_func_rx.eln
 ;*MODULE: .\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	        48         	        48    	         0       	_circ_addr_advance            	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	        80         	        80    	         0       	_tx_ppln_stop                 	.\source_shared\DFE_func_tx.eln
-;*		GLOBAL  	       792         	       792    	         0       	_tx_sym_counter_update        	.\source_shared\DFE_func_tx.eln
+;*		GLOBAL  	       824         	       824    	         0       	_tx_sym_counter_update        	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	        96         	        96    	         0       	_get_available_size_for_ifft_out	.\source_shared\DFE_func_tx.eln
-;*		GLOBAL  	      2472         	      2472    	         0       	_PHY_DFE_interf_tx_check_dma_start	.\source_shared\DFE_func_tx.eln
-;*		GLOBAL  	      1368         	      1368    	         0       	_tx_sym_ready_processing      	.\source_shared\DFE_func_tx.eln
-;*		GLOBAL  	        72         	        72    	         0       	_advance_tx_sym_idx           	.\source_shared\DFE_func_tx.eln
+;*		GLOBAL  	      2248         	      2248    	         0       	_PHY_DFE_interf_tx_check_dma_start	.\source_shared\DFE_func_tx.eln
+;*		GLOBAL  	      1384         	      1384    	         0       	_tx_sym_ready_processing      	.\source_shared\DFE_func_tx.eln
+;*		GLOBAL  	       120         	       120    	         0       	_advance_tx_sym_idx           	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	        96         	        96    	         0       	_ecpri_decomp_init            	.\source_shared\DFE_func_tx.eln
-;*		GLOBAL  	      2704         	      2704    	         0       	_tx_processing_symbol_level   	.\source_shared\DFE_func_tx.eln
+;*		GLOBAL  	      2632         	      2632    	         0       	_tx_processing_symbol_level   	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	       160         	       160    	         0       	_pipeline_reset_tx            	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	       976         	       976    	         0       	_run_cfr                      	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	       576         	       576    	         0       	_check_ippu_bitrev_done_tx_windowing	.\source_shared\DFE_func_tx.eln
-;*		GLOBAL  	       528         	       528    	         0       	_run_ifft                     	.\source_shared\DFE_func_tx.eln
-;*		GLOBAL  	       152         	       152    	         0       	_PHY_DFE_interf_tx_check_dma_finish	.\source_shared\DFE_func_tx.eln
+;*		GLOBAL  	       448         	       448    	         0       	_run_ifft                     	.\source_shared\DFE_func_tx.eln
+;*		GLOBAL  	       136         	       136    	         0       	_PHY_DFE_interf_tx_check_dma_finish	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	       664         	       664    	         0       	_start_ippu_bitrev_tx         	.\source_shared\DFE_func_tx.eln
-;*		GLOBAL  	      1144         	      1144    	         0       	_dma_tx_1block_to_coreA       	.\source_shared\DFE_func_tx.eln
+;*		GLOBAL  	        88         	        88    	         0       	_vecclr_ippu_bank0            	.\source_shared\DFE_func_tx.eln
+;*		GLOBAL  	        96         	        96    	         0       	_vecclr_ippu_bank1            	.\source_shared\DFE_func_tx.eln
+;*		GLOBAL  	      1152         	      1152    	         0       	_dma_tx_1block_to_coreA       	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	       360         	       360    	         0       	_start_tx_ippu_bitrev_reversIn_linearOut	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	        80         	        80    	         0       	_check_phy_tx_buf_rdy         	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL  	        32         	        32    	         0       	_ack_phy_tx_buf_rdy           	.\source_shared\DFE_func_tx.eln
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: .\source_shared\DFE_func_tx.eln
 ;*MODULE: .\source_shared\DFE_init.eln
+;*		GLOBAL  	        48         	        48    	         0       	_init_coreB                   	.\source_shared\DFE_init.eln
 ;*		GLOBAL  	        48         	        48    	         0       	_current_dma_chan             	.\source_shared\DFE_init.eln
 ;*		GLOBAL  	        48         	        48    	         0       	_advance_dma_chan             	.\source_shared\DFE_init.eln
 ;*		GLOBAL  	       488         	       488    	         0       	_dma_start_with_axi_slave_flag_set	.\source_shared\DFE_init.eln
@@ -138,15 +141,17 @@
 ;*		GLOBAL  	       456         	       456    	         0       	_dma_start                    	.\source_shared\DFE_init.eln
 ;*		GLOBAL  	       496         	       496    	         0       	_dma_start_2xfr               	.\source_shared\DFE_init.eln
 ;*MODULE: .\source_shared\host_vspa_msg.eln
+;*		GLOBAL  	       104         	       104    	         0       	_channel_restart              	.\source_shared\host_vspa_msg.eln
 ;*		GLOBAL  	       368         	       368    	         0       	_add_a_pattern                	.\source_shared\host_vspa_msg.eln
-;*		GLOBAL  	      7072         	      7072    	         0       	_host_msg_handling            	.\source_shared\host_vspa_msg.eln
+;*		GLOBAL  	      6840         	      6840    	         0       	_host_msg_handling            	.\source_shared\host_vspa_msg.eln
+;*		GLOBAL  	       112         	       112    	         0       	_mailbox_send_msg             	.\source_shared\host_vspa_msg.eln
 ;*MODULE: .\source_shared\inter_core_msg.eln
 ;*		GLOBAL  	       168         	       168    	         0       	_ext_word_write_2int          	.\source_shared\inter_core_msg.eln
 ;*		GLOBAL  	        24         	        24    	         0       	_inter_core_gpio_msg_processing	.\source_shared\inter_core_msg.eln
 ;*MODULE: .\source_shared\main_pair_coreA.eln
 ;*		GLOBAL  	       432         	       432    	         0       	_qec                          	.\source_shared\main_pair_coreA.eln
 ;*		GLOBAL  	       208         	       208    	         0       	_decim_2x_handler             	.\source_shared\main_pair_coreA.eln
-;*		GLOBAL  	       368         	       368    	         0       	_check_tx_block_arrival       	.\source_shared\main_pair_coreA.eln
+;*		GLOBAL  	       304         	       304    	         0       	_check_tx_block_arrival       	.\source_shared\main_pair_coreA.eln
 ;*		GLOBAL  	       536         	       536    	         0       	_pair_interf_rx_coreA         	.\source_shared\main_pair_coreA.eln
 ;*		GLOBAL  	       152         	       152    	         0       	_copy_needed_var_to_core_B    	.\source_shared\main_pair_coreA.eln
 ;*MODULE: .\source_shared\startup_vspa3_modified.eln
@@ -154,24 +159,22 @@
 ;*		WEAK    	        24         	        24    	         0       	stb_multidef`1`___init        	.\source_shared\startup_vspa3_modified.eln
 ;*MODULE: .\source_shared\kernel_FFT\ifft_cp.eln
 ;*		GLOBAL  	       256         	       256    	         0       	_start_ippu_tx_bitrev_cp_insert_2parts	.\source_shared\kernel_FFT\ifft_cp.eln
-;*		GLOBAL  	       224         	       224    	         0       	_start_ippu_tx_bitrev_cp_insert	.\source_shared\kernel_FFT\ifft_cp.eln
+;*		GLOBAL  	       144         	       144    	         0       	_start_ippu_tx_bitrev_cp_insert	.\source_shared\kernel_FFT\ifft_cp.eln
 ;*		GLOBAL  	       192         	       192    	         0       	_fft_cp_remove                	.\source_shared\kernel_FFT\ifft_cp.eln
 ;*		GLOBAL  	       232         	       232    	         0       	_start_ippu_ifft_bitrev       	.\source_shared\kernel_FFT\ifft_cp.eln
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: .\source_shared\kernel_FFT\ifft_cp.eln
 ;*MODULE: .\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*		GLOBAL  	        64         	        64    	         0       	_Ant_buffer_rx_check_status_obs	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
-;*		GLOBAL  	       288         	       288    	         0       	_Ant_buffer_rx_dma_check      	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
-;*		GLOBAL  	       448         	       448    	         0       	_rx_error_handling            	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
+;*		GLOBAL  	       200         	       200    	         0       	_rx_error_handling            	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*		GLOBAL  	        56         	        56    	         0       	_get_rx_allowed_status        	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*		GLOBAL  	       104         	       104    	         0       	_convert_sample_idx_to_sym_idx	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*		GLOBAL  	       144         	       144    	         0       	_Ant_buffer_rx_axiq_enable    	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*MODULE: .\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*		GLOBAL  	        56         	        56    	         0       	_get_tx_allowed_status        	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*		GLOBAL  	       400         	       400    	         0       	_Ant_buffer_tx_dma_check      	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*		GLOBAL  	        96         	        96    	         0       	_Ant_buffer_tx_axiq_clrerror  	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*		GLOBAL  	       432         	       432    	         0       	_tx_error_handling            	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*		GLOBAL  	       200         	       200    	         0       	_tx_error_handling            	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*		GLOBAL  	       144         	       144    	         0       	_Ant_buffer_tx_axiq_enable    	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
-;*		GLOBAL  	       744         	       744    	         0       	_Ant_buffer_tx_dma_feed       	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*		GLOBAL  	       704         	       704    	         0       	_Ant_buffer_tx_dma_feed       	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*MODULE: .\source_shared\eDMA\eDMA_la9310.eln
 ;*		GLOBAL  	        72         	        72    	         0       	_iEdmaInit                    	.\source_shared\eDMA\eDMA_la9310.eln
 ;*		GLOBAL  	        64         	        64    	         0       	_iEdmaChanInit                	.\source_shared\eDMA\eDMA_la9310.eln
@@ -185,10 +188,15 @@
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
 ;*		GLOBAL  	       192         	       192    	         0       	_measure_axiq_allowed         	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
 ;*		GLOBAL  	       120         	       120    	         0       	_convert_hfix_to_half         	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
+;*		GLOBAL  	        96         	        96    	         0       	_mpy_f32_f32                  	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
 ;*		GLOBAL  	       184         	       184    	         0       	_IQ_control_f16_asm           	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
 ;*		GLOBAL  	       136         	       136    	         0       	_IQ_control_asm               	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
 ;*		GLOBAL  	       120         	       120    	         0       	_convert_half_to_hfix         	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
+;*		GLOBAL  	       136         	       136    	         0       	_mpy_f32_f16_vs               	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
 ;*		GLOBAL  	       160         	       160    	         0       	_IQ_control_f32_asm           	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssConvert.eln)
+;*		GLOBAL  	       184         	       184    	         0       	_sssConvert                   	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssConvert.eln)
+;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssConvert.eln)
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_rsp_vmult_asm.eln)
 ;*		GLOBAL  	       128         	       128    	         0       	_chp_chf_rsp_vmult_asm        	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_rsp_vmult_asm.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_rsp_vmult_asm.eln)
@@ -214,6 +222,9 @@
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(decompression.eln)
 ;*		GLOBAL  	      1200         	      1200    	         0       	_ecpri_decompression_symbol   	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(decompression.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(decompression.eln)
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sss_msmts.eln)
+;*		GLOBAL  	      1640         	      1640    	         0       	_sss_msmts                    	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sss_msmts.eln)
+;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sss_msmts.eln)
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b1_wrap_msi.eln)
 ;*		GLOBAL  	       240         	       240    	         0       	_bitRev_fft_4096_b0_b1_wrap_msi	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b1_wrap_msi.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b1_wrap_msi.eln)
@@ -267,6 +278,9 @@
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mixer_asm.eln)
 ;*		GLOBAL  	       176         	       176    	         0       	_mixerc_asm                   	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mixer_asm.eln)
 ;*		GLOBAL  	       168         	       168    	         0       	_mixerc_vecalgn_asm           	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mixer_asm.eln)
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chEst.eln)
+;*		GLOBAL  	       168         	       168    	         0       	_chEst                        	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chEst.eln)
+;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chEst.eln)
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(phcom.eln)
 ;*		GLOBAL  	       144         	       144    	         0       	_phcom_asm                    	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(phcom.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(phcom.eln)
@@ -297,14 +311,27 @@
 ;*		GLOBAL  	        40         	        40    	         0       	_fft_DIF_8192_hfx_hfx         	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_8192.eln)
 ;*		GLOBAL  	        32         	        32    	         0       	_ifft_DIF_8192_hfl_hfl        	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_8192.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_8192.eln)
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_csp_vmult_asm.eln)
+;*		GLOBAL  	       152         	       152    	         0       	_chp_chf_csp_vmult_asm        	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_csp_vmult_asm.eln)
+;*		GLOBAL  	       144         	       144    	         0       	_chp_chf_csp_vmult_nonalgn_asm	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_csp_vmult_asm.eln)
+;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_csp_vmult_asm.eln)
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_1024_hfx_vspa3.eln)
 ;*		GLOBAL  	        32         	        32    	         0       	_ifft_DIF_1024_hfx_vspa3      	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_1024_hfx_vspa3.eln)
 ;*		GLOBAL  	        32         	        32    	         0       	_fft_DIF_1024_hfx_vspa3       	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_1024_hfx_vspa3.eln)
 ;*		LOCAL   	      2072         	      2072    	         0       	core_fft_DIF_1024_hfx         	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_1024_hfx_vspa3.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_1024_hfx_vspa3.eln)
-;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b0_wrap_cp_insert.eln)
-;*		GLOBAL  	       264         	       264    	         0       	_bitRev_fft_4096_b0_b0_wrap_cp_insert	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b0_wrap_cp_insert.eln)
-;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b0_wrap_cp_insert.eln)
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssdet_targeted_asm_rc.eln)
+;*		GLOBAL  	       960         	       960    	         0       	_sssdet_targeted_hpgemv_rc_v1 	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssdet_targeted_asm_rc.eln)
+;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssdet_targeted_asm_rc.eln)
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(tim_off_est_asm.eln)
+;*		GLOBAL  	      1216         	      1216    	         0       	_tim_off_est_sp_asm_rc        	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(tim_off_est_asm.eln)
+;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(tim_off_est_asm.eln)
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(atan_asm_rc.eln)
+;*		GLOBAL  	       504         	       504    	         0       	_atan2_x64_csp_sp_asm_rc      	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(atan_asm_rc.eln)
+;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(atan_asm_rc.eln)
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(csp_chf_rcpv_asm.eln)
+;*		GLOBAL  	       264         	       264    	         0       	_csp_chf_rcpv_asm             	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(csp_chf_rcpv_asm.eln)
+;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(csp_chf_rcpv_asm.eln)
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(split_iq_asm.eln)
 ;*		GLOBAL  	       208         	       208    	         0       	_split_iq                     	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(split_iq_asm.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(split_iq_asm.eln)
@@ -330,6 +357,8 @@
 ;*		GLOBAL  	       128         	       128    	         0       	_veccpy_src_circ              	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*		GLOBAL  	        80         	        80    	         0       	_vecset_circ                  	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*		GLOBAL  	       376         	       376    	         0       	_memcpy                       	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
+;*		GLOBAL  	        68         	        68    	         0       	_vecclr_ippu_b0               	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
+;*		GLOBAL  	        68         	        68    	         0       	_vecclr_ippu_b1               	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*		GLOBAL  	       448         	       448    	         0       	_memcpy_dst_circ              	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sinad_rsp_chp_sumsq_asm.eln)
 ;*		GLOBAL  	       224         	       224    	         0       	_sinad_rsp_chp_sumsq_line_asm 	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sinad_rsp_chp_sumsq_asm.eln)
@@ -341,6 +370,9 @@
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(block_floating_decomp.eln)
 ;*		GLOBAL  	      2664         	      2664    	         0       	_ecpri_decompression          	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(block_floating_decomp.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(block_floating_decomp.eln)
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssdet_asm_rc.eln)
+;*		GLOBAL  	       368         	       368    	         0       	_fineCFO_rc                   	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssdet_asm_rc.eln)
+;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssdet_asm_rc.eln)
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b0_wrap_cp_insert_1st.eln)
 ;*		GLOBAL  	       408         	       408    	         0       	_bitRev_fft_4096_b0_b0_wrap_cp_insert_1st	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b0_wrap_cp_insert_1st.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b0_wrap_cp_insert_1st.eln)
@@ -430,7 +462,7 @@
 ;*		GLOBAL  	        80         	        80    	         0       	___cmp64_eq                   	C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
 ;*		GLOBAL  	       128         	       128    	         0       	___cmp64_ge                   	C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
 ;*ALL FUNCTIONS WERE REMOVED FROM MODULE: C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln)
-;*TOTAL CODE: 56100 BYTES REMOVED
+;*TOTAL CODE: 60788 BYTES REMOVED
 ;*********************************************************************************
 ;*************************CALL TREE FOR FUNCTIONS*********************************
 ;*********************************************************************************
@@ -439,17 +471,26 @@
 ;*		GLOBAL 	_start_rx_ippu_bitrev_reversIn_linearOut	calls the following functions:
 ;*				GLOBAL  	_bitRev1024_reverseIn_linearOut_vspa2_b1_b1	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_reverseIn_linearOut_vspa2.eln)
 ;*		GLOBAL 	_run_fft	calls the following functions:
-;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*				GLOBAL  	_bitRev1024_reverseIn_linearOut_vspa2_b1_b1	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_reverseIn_linearOut_vspa2.eln)
 ;*				GLOBAL  	_fft_DIF_1024_hfx_vspa3	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_1024_hfx_vspa3.eln)
 ;*				GLOBAL  	_memcpy_src_circ	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
-;*		GLOBAL 	_rx_sym_ready_processing
+;*		GLOBAL 	_rx_sym_ready_processing	calls the following functions:
+;*				GLOBAL  	_chEst	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chEst.eln)
+;*				GLOBAL  	_sssdet_targeted_hpgemv_rc_v1	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssdet_targeted_asm_rc.eln)
+;*				GLOBAL  	_fineCFO_rc	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssdet_asm_rc.eln)
+;*				GLOBAL  	_csp_chf_rcpv_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(csp_chf_rcpv_asm.eln)
+;*				GLOBAL  	_sss_msmts	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sss_msmts.eln)
+;*				GLOBAL  	_chp_chf_csp_vmult_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_csp_vmult_asm.eln)
+;*				GLOBAL  	_tim_off_est_sp_asm_rc	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(tim_off_est_asm.eln)
+;*				GLOBAL  	_memcpy	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
+;*				GLOBAL  	_sssConvert	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssConvert.eln)
 ;*		GLOBAL 	_pipeline_reset_rx	calls the following functions:
 ;*				GLOBAL  	_vecclr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
-;*		GLOBAL 	__Z23sssdet_targeted_gemv_rcP10cfloat16_tPmPu6__fx16mmmmm
 ;*		GLOBAL 	_rx_processing_symbol_level	calls the following functions:
 ;*				GLOBAL  	_vecclr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*				GLOBAL  	_run_fft	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
+;*				GLOBAL  	_PHY_DFE_interf_rx_check_dma_start	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
+;*				GLOBAL  	_rx_sym_ready_processing	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL 	_get_valid_size_for_fft_in
 ;*		GLOBAL 	_convert_2implement
 ;*		GLOBAL 	_get_rx_dump_sym_buf_addr
@@ -459,7 +500,8 @@
 ;*		GLOBAL 	_ecpri_comp_init	calls the following functions:
 ;*				GLOBAL  	_ecpri_compression_init	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln)
 ;*		GLOBAL 	_set_rx_slot_sym_idx
-;*		GLOBAL 	_PHY_DFE_interf_rx_check_dma_finish
+;*		GLOBAL 	_PHY_DFE_interf_rx_check_dma_finish	calls the following functions:
+;*				GLOBAL  	_rx_sym_ready_processing	DEFINED ON MODULE	.\source_shared\DFE_func_rx.eln
 ;*		GLOBAL 	_PHY_DFE_interf_rx_check_dma_start	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*				GLOBAL  	_phcom_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(phcom.eln)
@@ -471,7 +513,6 @@
 ;*		GLOBAL 	_get_available_size_for_ifft_out
 ;*		GLOBAL 	_PHY_DFE_interf_tx_check_dma_start	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
-;*				GLOBAL  	_tx_sym_ready_processing	DEFINED ON MODULE	.\source_shared\DFE_func_tx.eln
 ;*				GLOBAL  	_vecclr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*				GLOBAL  	_convert_sym_idx_to_sample_idx	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
 ;*		GLOBAL 	_tx_sym_ready_processing	calls the following functions:
@@ -482,7 +523,6 @@
 ;*				GLOBAL  	_ecpri_decompression_init	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln)
 ;*		GLOBAL 	_tx_processing_symbol_level	calls the following functions:
 ;*				GLOBAL  	_bitRev1024_reverseIn_linearOut_vspa2_b0_b1	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_reverseIn_linearOut_vspa2.eln)
-;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*				GLOBAL  	_memclr32	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*				GLOBAL  	_veccpy	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*				GLOBAL  	_tx_sym_ready_processing	DEFINED ON MODULE	.\source_shared\DFE_func_tx.eln
@@ -505,7 +545,6 @@
 ;*				GLOBAL  	_txWindowing_circ_w16	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(txWindowing.eln)
 ;*				GLOBAL  	_mem_clr_circ	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*		GLOBAL 	_run_ifft	calls the following functions:
-;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*				GLOBAL  	_veccpy	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*				GLOBAL  	_vecclr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*				GLOBAL  	_ifft_DIF_1024_hfx_vspa3	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_1024_hfx_vspa3.eln)
@@ -514,12 +553,18 @@
 ;*		GLOBAL 	_start_ippu_bitrev_tx	calls the following functions:
 ;*				GLOBAL  	_bitRev1024_reverseIn_linearOut_vspa2_b0_b1	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_reverseIn_linearOut_vspa2.eln)
 ;*				GLOBAL  	_veccpy_dst_circ	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
+;*		GLOBAL 	_vecclr_ippu_bank0	calls the following functions:
+;*				GLOBAL  	_vecclr_ippu_b0	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
+;*		GLOBAL 	_vecclr_ippu_bank1	calls the following functions:
+;*				GLOBAL  	_vecclr_ippu_b1	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*		GLOBAL 	_dma_tx_1block_to_coreA
 ;*		GLOBAL 	_start_tx_ippu_bitrev_reversIn_linearOut	calls the following functions:
 ;*				GLOBAL  	_bitRev1024_reverseIn_linearOut_vspa2_b0_b1	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_reverseIn_linearOut_vspa2.eln)
 ;*		GLOBAL 	_check_phy_tx_buf_rdy
 ;*		GLOBAL 	_ack_phy_tx_buf_rdy
 ;*MODULE: .\source_shared\DFE_init.eln
+;*		GLOBAL 	_init_coreB	calls the following functions:
+;*				GLOBAL  	_pipeline_reset_tx	DEFINED ON MODULE	.\source_shared\DFE_func_tx.eln
 ;*		GLOBAL 	_current_dma_chan
 ;*		GLOBAL 	_init_common
 ;*		GLOBAL 	_advance_dma_chan
@@ -538,6 +583,14 @@
 ;*		GLOBAL 	_dump_inject_data_1block
 ;*		GLOBAL 	_get_dpdout_dest_addr
 ;*MODULE: .\source_shared\host_vspa_msg.eln
+;*		GLOBAL 	_channel_restart	calls the following functions:
+;*				GLOBAL  	_Ant_buffer_rx_axiq_reset	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
+;*				GLOBAL  	_Ant_buffer_tx_axiq_reset	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*				GLOBAL  	_wait_for_cores	DEFINED ON MODULE	.\source_shared\inter_core_msg.eln
+;*		GLOBAL 	_check_msg	calls the following functions:
+;*				GLOBAL  	_Ant_buffer_rx_axiq_reset	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
+;*				GLOBAL  	_Ant_buffer_tx_axiq_reset	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*				GLOBAL  	_wait_for_cores	DEFINED ON MODULE	.\source_shared\inter_core_msg.eln
 ;*		GLOBAL 	_add_a_pattern
 ;*		GLOBAL 	_core_A_msg_parse	calls the following functions:
 ;*				GLOBAL  	_mpy_f32_f16	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
@@ -545,6 +598,9 @@
 ;*		GLOBAL 	_host_msg_handling	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*				GLOBAL  	_ext_word_write_2int	DEFINED ON MODULE	.\source_shared\inter_core_msg.eln
+;*				GLOBAL  	_Ant_buffer_rx_axiq_reset	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
+;*				GLOBAL  	_Ant_buffer_tx_axiq_reset	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*				GLOBAL  	_wait_for_cores	DEFINED ON MODULE	.\source_shared\inter_core_msg.eln
 ;*		GLOBAL 	_convert_sym_idx_to_sample_idx
 ;*		GLOBAL 	_mailbox_send_msg
 ;*MODULE: .\source_shared\inter_core_msg.eln
@@ -557,7 +613,6 @@
 ;*		GLOBAL 	_init_coreA	calls the following functions:
 ;*				GLOBAL  	_Ant_buffer_tx_init	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*				GLOBAL  	_Ant_buffer_rx_init	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
-;*				GLOBAL  	_init_common	DEFINED ON MODULE	.\source_shared\DFE_init.eln
 ;*		GLOBAL 	_qec	calls the following functions:
 ;*				GLOBAL  	_qec_skew_7t_static_imb_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec.eln)
 ;*				GLOBAL  	_qec_skew_Nt_static_imb_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec.eln)
@@ -570,38 +625,36 @@
 ;*				GLOBAL  	_decimator_2x_8_Taps_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(decim2x.eln)
 ;*	ENTRY	GLOBAL 	_main	calls the following functions:
 ;*				GLOBAL  	_dpd_actuator_model02_withdump	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(dpd_actuator_model02.eln)
-;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*				GLOBAL  	_Ant_buffer_tx_apply_buffer	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*				GLOBAL  	_qec_skew_7t_static_imb_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec.eln)
 ;*				GLOBAL  	_qec_skew_Nt_static_imb_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec.eln)
 ;*				GLOBAL  	_X2_decim_tap64_filter	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(X2_decim_tap64_filter.eln)
 ;*				GLOBAL  	_single_tone_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(single_tone.eln)
-;*				GLOBAL  	_Ant_buffer_rx_axiq_reset	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*				GLOBAL  	_dump_inject_data_1block	DEFINED ON MODULE	.\source_shared\dump_inject.eln
 ;*				GLOBAL  	_ext_word_write	DEFINED ON MODULE	.\source_shared\inter_core_msg.eln
 ;*				GLOBAL  	_get_dpdout_dest_addr	DEFINED ON MODULE	.\source_shared\dump_inject.eln
 ;*				GLOBAL  	_vecclr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*				GLOBAL  	_Ant_buffer_rx_check_status	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
-;*				GLOBAL  	_Ant_buffer_tx_axiq_reset	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
+;*				GLOBAL  	_check_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
 ;*				GLOBAL  	_core_A_msg_parse	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
 ;*				GLOBAL  	_fir_filter_63taps	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fir_filter_63taps.eln)
-;*				GLOBAL  	_mem_clr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
+;*				GLOBAL  	_init_common	DEFINED ON MODULE	.\source_shared\DFE_init.eln
 ;*				GLOBAL  	_qec_skew_6t_static_imb_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec.eln)
 ;*				GLOBAL  	_Ant_buffer_rx_poll_buffer	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*				GLOBAL  	_Ant_buffer_tx_write_complete	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*				GLOBAL  	_IQ_decim_x2_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(X2_interp_tap32_filter.eln)
 ;*				GLOBAL  	_X4_interp_tap64_filter	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(X4_interp_tap64_filter.eln)
-;*				GLOBAL  	_wait_for_cores	DEFINED ON MODULE	.\source_shared\inter_core_msg.eln
 ;*				GLOBAL  	_mixer_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mixer_asm.eln)
+;*				GLOBAL  	_Ant_buffer_rx_dma_check	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*				GLOBAL  	_Ant_buffer_rx_free_buffer	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*				GLOBAL  	_Ant_buffer_tx_check_status	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*				GLOBAL  	_init_coreA	DEFINED ON MODULE	.\source_shared\main_pair_coreA.eln
 ;*				GLOBAL  	_qec_static_imb_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec.eln)
+;*				GLOBAL  	_Ant_buffer_rx_dma_feed	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*				GLOBAL  	_X2_interp_tap32_filter	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(X2_interp_tap32_filter.eln)
 ;*				GLOBAL  	_qec_lo_gain_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec.eln)
 ;*				GLOBAL  	_single_tone_add_asm	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(single_tone.eln)
-;*		GLOBAL 	_check_tx_block_arrival	calls the following functions:
-;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
+;*		GLOBAL 	_check_tx_block_arrival
 ;*		GLOBAL 	_pair_interf_rx_coreA
 ;*		GLOBAL 	_copy_needed_var_to_core_B
 ;*MODULE: .\source_shared\startup_vspa3_modified.eln
@@ -622,7 +675,6 @@
 ;*				GLOBAL  	_bitRev_fft_4096_b0_b1_wrap_cp_insert_1st	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b1_wrap_cp_insert_1st.eln)
 ;*		GLOBAL 	_start_ippu_tx_bitrev_cp_insert	calls the following functions:
 ;*				GLOBAL  	_bitRev_fft_4096_b0_b1_wrap_cp_insert	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b1_wrap_cp_insert.eln)
-;*				GLOBAL  	_bitRev_fft_4096_b0_b0_wrap_cp_insert	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b0_wrap_cp_insert.eln)
 ;*		GLOBAL 	_fft_cp_remove
 ;*		GLOBAL 	_start_ippu_ifft_bitrev	calls the following functions:
 ;*				GLOBAL  	_bitRev_fft_4096_b0_b1_wrap_msi	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b1_wrap_msi.eln)
@@ -631,9 +683,7 @@
 ;*		GLOBAL 	_Ant_buffer_rx_check_status_obs
 ;*		GLOBAL 	_Ant_buffer_rx_check_status	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
-;*				GLOBAL  	_delay_cycles	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
-;*				GLOBAL  	_mailbox_send_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
-;*				GLOBAL  	_Ant_buffer_rx_dma_feed	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
+;*				GLOBAL  	_check_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
 ;*		GLOBAL 	_Ant_buffer_rx_poll_buffer	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*				GLOBAL  	_Ant_buffer_rx_dma_feed	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
@@ -641,8 +691,7 @@
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*		GLOBAL 	_rx_error_handling	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
-;*				GLOBAL  	_delay_cycles	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
-;*				GLOBAL  	_mailbox_send_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
+;*				GLOBAL  	_check_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
 ;*		GLOBAL 	_get_rx_allowed_status
 ;*		GLOBAL 	_Ant_buffer_rx_axiq_reset	calls the following functions:
 ;*				GLOBAL  	_delay_cycles	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
@@ -655,34 +704,30 @@
 ;*				GLOBAL  	_delay_cycles	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
 ;*		GLOBAL 	_Ant_buffer_rx_init	calls the following functions:
 ;*				GLOBAL  	_delay_cycles	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
-;*				GLOBAL  	_mailbox_send_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
-;*		GLOBAL 	_Ant_buffer_rx_free_buffer
+;*		GLOBAL 	_Ant_buffer_rx_free_buffer	calls the following functions:
+;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
+;*				GLOBAL  	_Ant_buffer_rx_dma_feed	DEFINED ON MODULE	.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln
 ;*MODULE: .\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln
 ;*		GLOBAL 	_Ant_buffer_tx_axiq_reset	calls the following functions:
 ;*				GLOBAL  	_delay_cycles	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
 ;*		GLOBAL 	_Ant_buffer_tx_init	calls the following functions:
 ;*				GLOBAL  	_delay_cycles	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
-;*				GLOBAL  	_mailbox_send_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
 ;*		GLOBAL 	_get_tx_allowed_status
 ;*		GLOBAL 	_Ant_buffer_tx_dma_check	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
-;*		GLOBAL 	_Ant_buffer_tx_axiq_clrerror	calls the following functions:
-;*				GLOBAL  	_delay_cycles	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
 ;*		GLOBAL 	_Ant_buffer_tx_check_status	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
-;*				GLOBAL  	_delay_cycles	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
-;*				GLOBAL  	_mailbox_send_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
-;*				GLOBAL  	_dump_inject_data_1block	DEFINED ON MODULE	.\source_shared\dump_inject.eln
-;*				GLOBAL  	_vecclr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
-;*				GLOBAL  	_mem_clr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
+;*				GLOBAL  	_check_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
 ;*		GLOBAL 	_tx_error_handling	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
-;*				GLOBAL  	_delay_cycles	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
-;*				GLOBAL  	_mailbox_send_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
+;*				GLOBAL  	_check_msg	DEFINED ON MODULE	.\source_shared\host_vspa_msg.eln
 ;*		GLOBAL 	_Ant_buffer_tx_axiq_enable	calls the following functions:
 ;*				GLOBAL  	_delay_cycles	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln)
 ;*		GLOBAL 	_Ant_buffer_tx_write_complete	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
+;*				GLOBAL  	_dump_inject_data_1block	DEFINED ON MODULE	.\source_shared\dump_inject.eln
+;*				GLOBAL  	_vecclr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
+;*				GLOBAL  	_mem_clr	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln)
 ;*		GLOBAL 	_Ant_buffer_tx_dma_feed	calls the following functions:
 ;*				GLOBAL  	_log_2int	DEFINED ON MODULE	.\source_shared\debug.eln
 ;*				GLOBAL  	_dump_inject_data_1block	DEFINED ON MODULE	.\source_shared\dump_inject.eln
@@ -717,11 +762,15 @@
 ;*		GLOBAL 	_measure_axiq_allowed
 ;*		GLOBAL 	_convert_hfix_to_half
 ;*		GLOBAL 	_mpy_f32_f16
+;*		GLOBAL 	_mpy_f32_f32
 ;*		GLOBAL 	_IQ_control_f16_asm
 ;*		GLOBAL 	_IQ_control_asm
 ;*		GLOBAL 	_convert_half_to_hfix
+;*		GLOBAL 	_mpy_f32_f16_vs
 ;*		GLOBAL 	_delay_cycles
 ;*		GLOBAL 	_IQ_control_f32_asm
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssConvert.eln)
+;*		GLOBAL 	_sssConvert
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_rsp_vmult_asm.eln)
 ;*		GLOBAL 	_chp_chf_rsp_vmult_asm
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(txWindowing.eln)
@@ -752,6 +801,8 @@
 ;*				GLOBAL  	_ecpri_decompression_update_address	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln)
 ;*				GLOBAL  	_ecpri_decompression_input_transpose_vcpu_1block	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(block_floating_comp.eln)
 ;*				GLOBAL  	_ecpri_decompression	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(block_floating_decomp.eln)
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sss_msmts.eln)
+;*		GLOBAL 	_sss_msmts
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec.eln)
 ;*		GLOBAL 	_qec_skew_7t_static_imb_asm
 ;*		GLOBAL 	_qec_static_imb_asm
@@ -820,6 +871,8 @@
 ;*		GLOBAL 	_mixerc_asm
 ;*		GLOBAL 	_mixer_asm
 ;*		GLOBAL 	_mixerc_vecalgn_asm
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chEst.eln)
+;*		GLOBAL 	_chEst
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(phcom.eln)
 ;*		GLOBAL 	_phcom_asm
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(ecpri_trans_ippu.eln)
@@ -851,16 +904,26 @@
 ;*				LOCAL   	core_fft_DIF_8192	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_8192.eln)
 ;*		GLOBAL 	_ifft_DIF_8192_hfl_hfl	calls the following functions:
 ;*				LOCAL   	core_fft_DIF_8192	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_8192.eln)
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_csp_vmult_asm.eln)
+;*		GLOBAL 	_chp_chf_csp_vmult_asm
+;*		GLOBAL 	_chp_chf_csp_vmult_nonalgn_asm
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_1024_hfx_vspa3.eln)
 ;*		GLOBAL 	_ifft_DIF_1024_hfx_vspa3	calls the following functions:
 ;*				LOCAL   	core_fft_DIF_1024_hfx	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_1024_hfx_vspa3.eln)
 ;*		GLOBAL 	_fft_DIF_1024_hfx_vspa3	calls the following functions:
 ;*				LOCAL   	core_fft_DIF_1024_hfx	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_1024_hfx_vspa3.eln)
 ;*		LOCAL   	core_fft_DIF_1024_hfx
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssdet_targeted_asm_rc.eln)
+;*		GLOBAL 	_sssdet_targeted_hpgemv_rc_v1
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(tim_off_est_asm.eln)
+;*		GLOBAL 	_tim_off_est_sp_asm_rc	calls the following functions:
+;*				GLOBAL  	_atan2_x64_csp_sp_asm_rc	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(atan_asm_rc.eln)
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(atan_asm_rc.eln)
+;*		GLOBAL 	_atan2_x64_csp_sp_asm_rc
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(X2_decim_tap64_filter.eln)
 ;*		GLOBAL 	_X2_decim_tap64_filter
-;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b0_wrap_cp_insert.eln)
-;*		GLOBAL 	_bitRev_fft_4096_b0_b0_wrap_cp_insert
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(csp_chf_rcpv_asm.eln)
+;*		GLOBAL 	_csp_chf_rcpv_asm
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(split_iq_asm.eln)
 ;*		GLOBAL 	_split_iq
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b1_wrap_cp_insert.eln)
@@ -889,6 +952,8 @@
 ;*		GLOBAL 	_veccpy_src_circ
 ;*		GLOBAL 	_vecset_circ
 ;*		GLOBAL 	_memcpy
+;*		GLOBAL 	_vecclr_ippu_b0
+;*		GLOBAL 	_vecclr_ippu_b1
 ;*		GLOBAL 	_memcpy_dst_circ
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(dpd_actuator_model02.eln)
 ;*		GLOBAL 	_dpd_actuator_model02_withdump
@@ -901,6 +966,9 @@
 ;*		GLOBAL 	_sinad_rsp_chp_sumsq_less_samples_asm_wrong
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(block_floating_decomp.eln)
 ;*		GLOBAL 	_ecpri_decompression
+;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssdet_asm_rc.eln)
+;*		GLOBAL 	_fineCFO_rc	calls the following functions:
+;*				GLOBAL  	_atan2_x64_csp_sp_asm_rc	DEFINED ON MODULE	C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(atan_asm_rc.eln)
 ;*MODULE: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fir_filter_63taps.eln)
 ;*		GLOBAL 	_fir_filter_63taps
 ;*		GLOBAL 	_fir_filter_63taps_circ
@@ -1103,11 +1171,11 @@
 ; 0x00000100  VCPU_DataReserveSize
 ; 0x00000800  StackSize
 ; 0x00004000  IPPU_PRAMSize
-; 0x0000f78c  __bss_end
-; 0x0000f78c  __data_start
-; 0x00010580  __data_end
-; 0x0001058c  __end
-; 0x0001058c  _end
+; 0x0000f988  __bss_end
+; 0x0000f988  __data_start
+; 0x00010600  __data_end
+; 0x0001060c  __end
+; 0x0001060c  _end
 ; 0x0001f700  VCPU_DRAMSize
 ; 0x0001f800  StackStart
 ; 0x0001f800  __stack
@@ -1130,8 +1198,8 @@
 ;    r-x |0x00000000..0x0001ffff|  memory .vpram (131072 bytes)
 ;*********************************************************************************
 ;		 Address space with id 1:
-;    rw- |0x00000000..0x0001058b|  memory .vdram (66956 bytes)
-;        |0x0001058c..0x0001f7ff|  memory free space  (62068 bytes)
+;    rw- |0x00000000..0x0001060b|  memory .vdram (67084 bytes)
+;        |0x0001060c..0x0001f7ff|  memory free space  (61940 bytes)
 ;    rw- |0x0001f800..0x0001ffff|  memory memory_stack_and_heap (2048 bytes)
 ;    rw- |0x00020000..0x0004ffff|  memory .idram (196608 bytes)
 ;*********************************************************************************
@@ -1142,167 +1210,167 @@
 ;    Value        Size  Symbol
 ; ========  ==========  ==================================================
 ;*********************************************************************************
-0x00000000       66956  Section: .vdram (Segment: .vdram)
+0x00000000       67084  Section: .vdram (Segment: .vdram)
 ;*********************************************************************************
-0x00000000         704      Section: .vbss0(.\source_shared\global_var.eln)
-0x00000000         704          _dfe_ctrl (run_address 0x00000000)
-0x00000300           0      Section: .bss(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
-0x00000300           0          _decompression_vcpu_buffer (run_address 0x00000300)
-0x00000300           0      Section: .bss(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
-0x00000300           0          _compression_vcpu_buffer (run_address 0x00000300)
-0x00000300           0      Section: .bss(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
-0x00000300           0          _decompression_output_transpose_ippu_argbase_ctrl (run_address 0x00000300)
-0x00000300           0      Section: .bss(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
-0x00000300           0          _decompression_input_transpose_ippu_argbase_ctrl (run_address 0x00000300)
-0x00000300           0      Section: .bss(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
-0x00000300           0          _compression_output_transpose_ippu_argbase_ctrl (run_address 0x00000300)
-0x00000300           0      Section: .bss(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
-0x00000300           0          _compression_input_transpose_ippu_argbase_ctrl (run_address 0x00000300)
-0x00000300           0      Section: .bss(.\source_shared\DFE_func_rx.eln)
-0x00000300           0          _axi_flag_rx_symbol_ready (run_address 0x00000300)
-0x00000300           0      Section: .bss(.\source_shared\DFE_func_rx.eln)
-0x00000300           0          _rx_sym_type (run_address 0x00000300)
-0x00000300           0      Section: .bss(.\source_shared\DFE_func_rx.eln)
-0x00000300           0          _rx_pattern_sym_idx (run_address 0x00000300)
-0x00000300           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
-0x00000300           0          _axi_flag_tx_symbol_consumed (run_address 0x00000300)
-0x00000300           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
-0x00000300           0          _axi_flag_tx_block_ack (run_address 0x00000300)
-0x00000300           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
-0x00000300           0          _cfr_scratch (run_address 0x00000300)
-0x00000300           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
-0x00000300           0          _cfr_status (run_address 0x00000300)
-0x00000300         640      Section: .bss(.\source_shared\DFE_func_tx.eln)
-0x00000300         640          _dpd_history (run_address 0x00000300)
-0x00000580        3072      Section: .bss(.\source_shared\DFE_func_tx.eln)
-0x00000580        3072          _dpd_scratch (run_address 0x00000580)
-0x00001180           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
-0x00001180           0          _ifft_bitrev_in (run_address 0x00001180)
-0x00001180         128      Section: .bss(.\source_shared\DFE_func_tx.eln)
-0x00001180           0          _tx_windowing_history_buff (run_address 0x00001180)
-0x00001200           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
-0x00001200           0          _rx_bitrev_arg (run_address 0x00001200)
-0x00001200           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
-0x00001200           0          _tx_bitrev_arg (run_address 0x00001200)
-0x00001200       14336      Section: .bss(.\source_shared\DFE_func_tx.eln)
-0x00001200       14336          _vcpu_scratch (run_address 0x00001200)
-0x00004a00           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
-0x00004a00           0          _tx_sym_type (run_address 0x00004a00)
-0x00004a00           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
-0x00004a00           0          _tx_pattern_sym_idx (run_address 0x00004a00)
-0x00004a00           0      Section: .bss(.\source_shared\DFE_init.eln)
-0x00004a00           0          _dma_chan_offset (run_address 0x00004a00)
-0x00004a00         512      Section: .bss(.\source_shared\global_var.eln)
-0x00004a00         512          _history_rx_fir (run_address 0x00004a00)
-0x00004c00         128      Section: .bss(.\source_shared\global_var.eln)
-0x00004c00         128          _history_rxqec (run_address 0x00004c00)
-0x00004c80         128      Section: .bss(.\source_shared\global_var.eln)
-0x00004c80         128          _history_txqec (run_address 0x00004c80)
-0x00004d00           0      Section: .bss(.\source_shared\global_var.eln)
-0x00004d00           0          _dbg (run_address 0x00004d00)
-0x00004d00           0      Section: .bss(.\source_shared\host_vspa_msg.eln)
-0x00004d00           0          _ddr_addr (run_address 0x00004d00)
-0x00004d00           0      Section: .bss(.\source_shared\host_vspa_msg.eln)
-0x00004d00           0          _seq_id (run_address 0x00004d00)
-0x00004d00          64      Section: .bss(.\source_shared\host_vspa_msg.eln)
-0x00004d00          16          _axi_flag_msg_response1 (run_address 0x00004d00)
-0x00004d40          64      Section: .bss(.\source_shared\host_vspa_msg.eln)
-0x00004d40          16          _axi_flag_msg_response (run_address 0x00004d40)
-0x00004d80          64      Section: .bss(.\source_shared\inter_core_msg.eln)
-0x00004d80          64          _data_table_rx_block (run_address 0x00004d80)
-0x00004dc0          64      Section: .bss(.\source_shared\inter_core_msg.eln)
-0x00004dc0          64          _addr_table_rx_block (run_address 0x00004dc0)
-0x00004e00          64      Section: .bss(.\source_shared\inter_core_msg.eln)
-0x00004e00          64          _data_table (run_address 0x00004e00)
-0x00004e40          64      Section: .bss(.\source_shared\inter_core_msg.eln)
-0x00004e40          64          _addr_table (run_address 0x00004e40)
-0x00004e80        8192      Section: .bss(.\source_shared\main_pair_coreA.eln)
-0x00004e80        8192          _buf_2xdown_out (run_address 0x00004e80)
-0x00006e80       16384      Section: .bss(.\source_shared\main_pair_coreA.eln)
-0x00006e80       16384          _buf_2xup1_in (run_address 0x00006e80)
-0x0000ae80         128      Section: .bss(.\source_shared\main_pair_coreA.eln)
-0x0000ae80         128          _history_upfilter (run_address 0x0000ae80)
-0x0000af00         256      Section: .bss(.\source_shared\main_pair_coreA.eln)
-0x0000af00         256          _tx_block_status (run_address 0x0000af00)
-0x0000b000         512      Section: .bss(.\source_shared\main_pair_coreA.eln)
-0x0000b000         512          _history_2xdown (run_address 0x0000b000)
-0x0000b200           0      Section: .bss(.\source_shared\main_pair_coreA.eln)
-0x0000b200           0          _rx_pow_acc (run_address 0x0000b200)
-0x0000b200       16384      Section: .bss(.\source_shared\main_pair_coreA.eln)
-0x0000b200       16384          _qec_scratch (run_address 0x0000b200)
-0x0000f200        1152      Section: .bss(.\source_shared\pair_para.eln)
-0x0000f200        1152          _dpd_coeff (run_address 0x0000f200)
-0x0000f680         144      Section: .bss(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x0000f680         144          _antman_ctrl_rx (run_address 0x0000f680)
-0x0000f710         124      Section: .bss(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x0000f710         124          _antman_ctrl_tx (run_address 0x0000f710)
-0x0000f78c           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
-0x0000f78c           0          _snr_params (run_address 0x0000f78c)
-0x0000f78c           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
-0x0000f78c           0          _clk_cycles (run_address 0x0000f78c)
-0x0000f78c           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
-0x0000f78c           0          _clk_overhead (run_address 0x0000f78c)
-0x0000f78c           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
-0x0000f78c           0          _clk_end (run_address 0x0000f78c)
-0x0000f78c           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
-0x0000f78c           0          _clk_start (run_address 0x0000f78c)
-0x0000f78c           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
-0x0000f78c           0          _sinad (run_address 0x0000f78c)
-0x0000f78c           0      Section: .bss(.\source_proj_specific\main_PHY_RX_core.eln)
-0x0000f78c           0      Section: .bss(.\source_proj_specific\main_PHY_TX_core.eln)
-0x0000f78c           0      Section: .rodata(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_8192.eln))
-0x0000f800         256      Section: .data(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(cfr.eln))
-0x0000f800                      _win_offset (run_address 0x0000f800)
-0x0000f900           0      Section: .data(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(compression.eln))
-0x0000f900           0          _shift_table_new_algo_all (run_address 0x0000f900)
-0x0000f900         128      Section: .data(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(decompression.eln))
-0x0000f900           0          _decompress_table_new_algo_HH_LL (run_address 0x0000f900)
-0x0000f980         128      Section: .data(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(decompression.eln))
-0x0000f980           0          _decompress_table_new_algo_combine (run_address 0x0000f980)
-0x0000fa00          36      Section: .data(.\source_shared\dump_inject.eln)
-0x0000fa00          36          _dpd_dump (run_address 0x0000fa00)
-0x0000fa24          36      Section: .data(.\source_shared\dump_inject.eln)
-0x0000fa24          36          _ant_tx_dump (run_address 0x0000fa24)
-0x0000fa48          72      Section: .data(.\source_shared\dump_inject.eln)
-0x0000fa48          72          _ant_rx_dump (run_address 0x0000fa48)
-0x0000fb00           0      Section: .data(.\source_shared\pair_para.eln)
-0x0000fb00           0          _cfr_cpulse (run_address 0x0000fb00)
-0x0000fb00           0      Section: .data(.\source_shared\pair_para.eln)
-0x0000fb00           0          _cfr_para (run_address 0x0000fb00)
-0x0000fb00           8      Section: .data(.\source_shared\startup_vspa3_modified.eln)
-0x0000fb00           4          ___entry (run_address 0x0000fb00)
-0x0000fb20           0      Section: .data(.\source_shared\eDMA\eDMA_la9310.eln)
-0x0000fb20           0          _eDMA_TCD (run_address 0x0000fb20)
-0x0000fb20           0      Section: .data(.\source_shared\SINAD\sinad.eln)
-0x0000fb20           0          _bitrev_rpc_arg (run_address 0x0000fb20)
-0x0000fb80         256      Section: .\source_shared\main_pair_coreA.eln(.data_aligned)(.\source_shared\main_pair_coreA.eln)
-0x0000fb80         256          _filter_taps_downsampling (run_address 0x0000fb80)
-0x0000fc80         512      Section: .\source_shared\main_pair_coreA.eln(.data_aligned)(.\source_shared\main_pair_coreA.eln)
-0x0000fc80         512          _filter_taps_upsampling (run_address 0x0000fc80)
-0x0000fe80         128      Section: .\source_shared\main_pair_coreA.eln(.data_aligned)(.\source_shared\main_pair_coreA.eln)
-0x0000fe80         128          _filter_taps_upsampling1 (run_address 0x0000fe80)
-0x0000ff00         128      Section: .\source_shared\global_var.eln(.data_aligned)(.\source_shared\global_var.eln)
-0x0000ff00           0          _real_window (run_address 0x0000ff00)
-0x0000ff80         128      Section: .\source_shared\global_var.eln(.data_aligned)(.\source_shared\global_var.eln)
+0x00000000         768      Section: .vbss0(.\source_shared\global_var.eln)
+0x00000000         768          _dfe_ctrl (run_address 0x00000000)
+0x00000300           0      Section: .bss_line_aligned(.\source_shared\DFE_init.eln)
+0x00000300           0          _axi_flag_buf (run_address 0x00000300)
+0x00000300         512      Section: .bss_line_aligned(.\source_shared\debug.eln)
+0x00000300         512          _log_buffer (run_address 0x00000300)
+0x00000500           0      Section: .bss(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
+0x00000500           0          _decompression_vcpu_buffer (run_address 0x00000500)
+0x00000500           0      Section: .bss(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
+0x00000500           0          _compression_vcpu_buffer (run_address 0x00000500)
+0x00000500           0      Section: .bss(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
+0x00000500           0          _decompression_output_transpose_ippu_argbase_ctrl (run_address 0x00000500)
+0x00000500           0      Section: .bss(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
+0x00000500           0          _decompression_input_transpose_ippu_argbase_ctrl (run_address 0x00000500)
+0x00000500           0      Section: .bss(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
+0x00000500           0          _compression_output_transpose_ippu_argbase_ctrl (run_address 0x00000500)
+0x00000500           0      Section: .bss(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
+0x00000500           0          _compression_input_transpose_ippu_argbase_ctrl (run_address 0x00000500)
+0x00000500           0      Section: .bss(.\source_shared\DFE_func_rx.eln)
+0x00000500           0          _axi_flag_rx_symbol_ready (run_address 0x00000500)
+0x00000500           0      Section: .bss(.\source_shared\DFE_func_rx.eln)
+0x00000500           0          _rx_sym_type (run_address 0x00000500)
+0x00000500           0      Section: .bss(.\source_shared\DFE_func_rx.eln)
+0x00000500           0          _rx_pattern_sym_idx (run_address 0x00000500)
+0x00000500           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
+0x00000500           0          _axi_flag_tx_symbol_consumed (run_address 0x00000500)
+0x00000500           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
+0x00000500           0          _axi_flag_tx_block_ack (run_address 0x00000500)
+0x00000500           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
+0x00000500           0          _cfr_scratch (run_address 0x00000500)
+0x00000500           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
+0x00000500           0          _cfr_status (run_address 0x00000500)
+0x00000500         640      Section: .bss(.\source_shared\DFE_func_tx.eln)
+0x00000500         640          _dpd_history (run_address 0x00000500)
+0x00000780        3072      Section: .bss(.\source_shared\DFE_func_tx.eln)
+0x00000780        3072          _dpd_scratch (run_address 0x00000780)
+0x00001380           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
+0x00001380           0          _ifft_bitrev_in (run_address 0x00001380)
+0x00001380         128      Section: .bss(.\source_shared\DFE_func_tx.eln)
+0x00001380           0          _tx_windowing_history_buff (run_address 0x00001380)
+0x00001400           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
+0x00001400           0          _rx_bitrev_arg (run_address 0x00001400)
+0x00001400           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
+0x00001400           0          _tx_bitrev_arg (run_address 0x00001400)
+0x00001400       14336      Section: .bss(.\source_shared\DFE_func_tx.eln)
+0x00001400       14336          _vcpu_scratch (run_address 0x00001400)
+0x00004c00           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
+0x00004c00           0          _tx_sym_type (run_address 0x00004c00)
+0x00004c00           0      Section: .bss(.\source_shared\DFE_func_tx.eln)
+0x00004c00           0          _tx_pattern_sym_idx (run_address 0x00004c00)
+0x00004c00           0      Section: .bss(.\source_shared\DFE_init.eln)
+0x00004c00           0          _dma_chan_offset (run_address 0x00004c00)
+0x00004c00        1152      Section: .bss(.\source_shared\global_var.eln)
+0x00004c00        1152          _dpd_coeff (run_address 0x00004c00)
+0x00005080         512      Section: .bss(.\source_shared\global_var.eln)
+0x00005080         512          _history_rx_fir (run_address 0x00005080)
+0x00005280         128      Section: .bss(.\source_shared\global_var.eln)
+0x00005280         128          _history_rxqec (run_address 0x00005280)
+0x00005300         128      Section: .bss(.\source_shared\global_var.eln)
+0x00005300         128          _history_txqec (run_address 0x00005300)
+0x00005380           0      Section: .bss(.\source_shared\global_var.eln)
+0x00005380           0          _dbg (run_address 0x00005380)
+0x00005380           0      Section: .bss(.\source_shared\host_vspa_msg.eln)
+0x00005380           0          _ddr_addr (run_address 0x00005380)
+0x00005380           0      Section: .bss(.\source_shared\host_vspa_msg.eln)
+0x00005380           0          _seq_id (run_address 0x00005380)
+0x00005380          64      Section: .bss(.\source_shared\host_vspa_msg.eln)
+0x00005380          16          _axi_flag_msg_response1 (run_address 0x00005380)
+0x000053c0          64      Section: .bss(.\source_shared\host_vspa_msg.eln)
+0x000053c0          16          _axi_flag_msg_response (run_address 0x000053c0)
+0x00005400          64      Section: .bss(.\source_shared\inter_core_msg.eln)
+0x00005400          64          _data_table_rx_block (run_address 0x00005400)
+0x00005440          64      Section: .bss(.\source_shared\inter_core_msg.eln)
+0x00005440          64          _addr_table_rx_block (run_address 0x00005440)
+0x00005480          64      Section: .bss(.\source_shared\inter_core_msg.eln)
+0x00005480          64          _data_table (run_address 0x00005480)
+0x000054c0          64      Section: .bss(.\source_shared\inter_core_msg.eln)
+0x000054c0          64          _addr_table (run_address 0x000054c0)
+0x00005500        8192      Section: .bss(.\source_shared\main_pair_coreA.eln)
+0x00005500        8192          _buf_2xdown_out (run_address 0x00005500)
+0x00007500       16384      Section: .bss(.\source_shared\main_pair_coreA.eln)
+0x00007500       16384          _buf_2xup1_in (run_address 0x00007500)
+0x0000b500         128      Section: .bss(.\source_shared\main_pair_coreA.eln)
+0x0000b500         128          _history_upfilter (run_address 0x0000b500)
+0x0000b580         256      Section: .bss(.\source_shared\main_pair_coreA.eln)
+0x0000b580         256          _tx_block_status (run_address 0x0000b580)
+0x0000b680         512      Section: .bss(.\source_shared\main_pair_coreA.eln)
+0x0000b680         512          _history_2xdown (run_address 0x0000b680)
+0x0000b880           0      Section: .bss(.\source_shared\main_pair_coreA.eln)
+0x0000b880           0          _rx_pow_acc (run_address 0x0000b880)
+0x0000b880       16384      Section: .bss(.\source_shared\main_pair_coreA.eln)
+0x0000b880       16384          _qec_scratch (run_address 0x0000b880)
+0x0000f880         144      Section: .bss(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x0000f880         144          _antman_ctrl_rx (run_address 0x0000f880)
+0x0000f910         120      Section: .bss(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x0000f910         120          _antman_ctrl_tx (run_address 0x0000f910)
+0x0000f988           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
+0x0000f988           0          _snr_params (run_address 0x0000f988)
+0x0000f988           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
+0x0000f988           0          _clk_cycles (run_address 0x0000f988)
+0x0000f988           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
+0x0000f988           0          _clk_overhead (run_address 0x0000f988)
+0x0000f988           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
+0x0000f988           0          _clk_end (run_address 0x0000f988)
+0x0000f988           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
+0x0000f988           0          _clk_start (run_address 0x0000f988)
+0x0000f988           0      Section: .bss(.\source_shared\SINAD\sinad.eln)
+0x0000f988           0          _sinad (run_address 0x0000f988)
+0x0000f988           0      Section: .bss(.\source_proj_specific\main_PHY_RX_core.eln)
+0x0000f988           0      Section: .bss(.\source_proj_specific\main_PHY_TX_core.eln)
+0x0000f988           0      Section: .rodata(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(fft_DIF_8192.eln))
+0x0000fa00         256      Section: .data(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(cfr.eln))
+0x0000fa00                      _win_offset (run_address 0x0000fa00)
+0x0000fb00           0      Section: .data(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(compression.eln))
+0x0000fb00           0          _shift_table_new_algo_all (run_address 0x0000fb00)
+0x0000fb00         128      Section: .data(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(decompression.eln))
+0x0000fb00           0          _decompress_table_new_algo_HH_LL (run_address 0x0000fb00)
+0x0000fb80         128      Section: .data(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(decompression.eln))
+0x0000fb80           0          _decompress_table_new_algo_combine (run_address 0x0000fb80)
+0x0000fc00          36      Section: .data(.\source_shared\dump_inject.eln)
+0x0000fc00          36          _dpd_dump (run_address 0x0000fc00)
+0x0000fc24          36      Section: .data(.\source_shared\dump_inject.eln)
+0x0000fc24          36          _ant_tx_dump (run_address 0x0000fc24)
+0x0000fc48          72      Section: .data(.\source_shared\dump_inject.eln)
+0x0000fc48          72          _ant_rx_dump (run_address 0x0000fc48)
+0x0000fd00         128      Section: .data(.\source_shared\global_var.eln)
+0x0000fd00           0          _real_window (run_address 0x0000fd00)
+0x0000fe00         256      Section: .data(.\source_shared\main_pair_coreA.eln)
+0x0000fe00         256          _filter_taps_downsampling (run_address 0x0000fe00)
+0x0000ff00           0      Section: .data(.\source_shared\pair_para.eln)
+0x0000ff00           0          _cfr_cpulse (run_address 0x0000ff00)
+0x0000ff00           0      Section: .data(.\source_shared\pair_para.eln)
+0x0000ff00           0          _cfr_para (run_address 0x0000ff00)
+0x0000ff00           8      Section: .data(.\source_shared\startup_vspa3_modified.eln)
+0x0000ff00           4          ___entry (run_address 0x0000ff00)
+0x0000ff20           0      Section: .data(.\source_shared\eDMA\eDMA_la9310.eln)
+0x0000ff20           0          _eDMA_TCD (run_address 0x0000ff20)
+0x0000ff20           0      Section: .data(.\source_shared\SINAD\sinad.eln)
+0x0000ff20           0          _bitrev_rpc_arg (run_address 0x0000ff20)
+0x0000ff80         128      Section: .data_aligned(.\source_shared\global_var.eln)
 0x0000ff80           0          _phcom_coeff_tx (run_address 0x0000ff80)
-0x00010000         128      Section: .\source_shared\global_var.eln(.data_aligned)(.\source_shared\global_var.eln)
+0x00010000         128      Section: .data_aligned(.\source_shared\global_var.eln)
 0x00010000           0          _phcom_coeff_rx (run_address 0x00010000)
-0x00010080         256      Section: .\source_shared\global_var.eln(.data_aligned)(.\source_shared\global_var.eln)
+0x00010080         256      Section: .data_aligned(.\source_shared\global_var.eln)
 0x00010080         172          _DFE_qec_params_tx (run_address 0x00010080)
-0x00010180         256      Section: .\source_shared\global_var.eln(.data_aligned)(.\source_shared\global_var.eln)
+0x00010180         256      Section: .data_aligned(.\source_shared\global_var.eln)
 0x00010180         172          _DFE_qec_params_rx (run_address 0x00010180)
-0x00010280         256      Section: .\source_shared\global_var.eln(.data_aligned)(.\source_shared\global_var.eln)
+0x00010280         256      Section: .data_aligned(.\source_shared\global_var.eln)
 0x00010280         252          _rx_lpf_taps (run_address 0x00010280)
-0x00010380         512      Section: .\source_shared\debug.eln(.bss_line_aligned)(.\source_shared\debug.eln)
-0x00010380         512          _log_buffer (run_address 0x00010380)
-0x00010580           0      Section: .\source_shared\DFE_init.eln(.bss_line_aligned)(.\source_shared\DFE_init.eln)
-0x00010580           0          _axi_flag_buf (run_address 0x00010580)
-0x00010580           4      Section: _cpp_staticinit_start_sect(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(staticinit.eln))
-0x00010580           4          ___cpp_staticinit_start (run_address 0x00010580)
-0x00010584           4      Section: _cpp_staticinit_control_pattern_sect(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(staticinit.eln))
-0x00010584           4          ___cpp_staticinit_control_pattern (run_address 0x00010584)
-0x00010588           4      Section: _cpp_staticinit_end_sect(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(staticinit.eln))
-0x00010588           4          ___cpp_staticinit_end (run_address 0x00010588)
+0x00010380         512      Section: .data_aligned(.\source_shared\main_pair_coreA.eln)
+0x00010380         512          _filter_taps_upsampling (run_address 0x00010380)
+0x00010580         128      Section: .data_aligned(.\source_shared\main_pair_coreA.eln)
+0x00010580         128          _filter_taps_upsampling1 (run_address 0x00010580)
+0x00010600           4      Section: _cpp_staticinit_start_sect(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(staticinit.eln))
+0x00010600           4          ___cpp_staticinit_start (run_address 0x00010600)
+0x00010604           4      Section: _cpp_staticinit_control_pattern_sect(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(staticinit.eln))
+0x00010604           4          ___cpp_staticinit_control_pattern (run_address 0x00010604)
+0x00010608           4      Section: _cpp_staticinit_end_sect(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(staticinit.eln))
+0x00010608           4          ___cpp_staticinit_end (run_address 0x00010608)
 ;*********************************************************************************
 0x00000000           0  Section: .ipram (Segment: .ipram)
 ;*********************************************************************************
@@ -1347,18 +1415,19 @@
 0x00000000           0          _transpose_14X64_64X14_2word (run_address 0x00000000)
 0x00000000           0          _transpose_14X17_17X14_2word (run_address 0x00000000)
 0x00000000           0          _transpose_48X64_64X48_new (run_address 0x00000000)
-0x00000000           0      Section: .itext(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b0_wrap_cp_insert.eln))
-0x00000000           0          _bitRev_fft_4096_b0_b0_wrap_cp_insert (run_address 0x00000000)
 0x00000000           0      Section: .itext(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b1_wrap_cp_insert.eln))
 0x00000000           0          _bitRev_fft_4096_b0_b1_wrap_cp_insert (run_address 0x00000000)
 0x00000000           0      Section: .itext(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitrev_8k_rx.eln))
 0x00000000           0          _br_8k_ippu_vcpu_ippu (run_address 0x00000000)
+0x00000000           0      Section: .itext(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(mem.eln))
+0x00000000           0          _vecclr_ippu_b0 (run_address 0x00000000)
+0x00000000           0          _vecclr_ippu_b1 (run_address 0x00000000)
 0x00000000           0      Section: .itext(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b0_wrap_cp_insert_1st.eln))
 0x00000000           0          _bitRev_fft_4096_b0_b0_wrap_cp_insert_1st (run_address 0x00000000)
 0x00000000           0      Section: .itext(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(bitRev_fft_4096_b0_b1_wrap_cp_insert_1st.eln))
 0x00000000           0          _bitRev_fft_4096_b0_b1_wrap_cp_insert_1st (run_address 0x00000000)
 ;*********************************************************************************
-0x00000000       36440  Section: .vpram (Segment: .vpram)
+0x00000000       36184  Section: .vpram (Segment: .vpram)
 ;*********************************************************************************
 0x00000000         216      Section: .init(.\source_shared\startup_vspa3_modified.eln)
 0x00000000         144          _start (run_address 0x00000000)
@@ -1374,6 +1443,8 @@
 0x000008d8         144          _IQ_decim_x2_asm (run_address 0x000008d8)
 0x00000968         400      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(X4_interp_tap64_filter.eln))
 0x00000968         400          _X4_interp_tap64_filter (run_address 0x00000968)
+0x00000af8           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(atan_asm_rc.eln))
+0x00000af8           0          _atan2_x64_csp_sp_asm_rc (run_address 0x00000af8)
 0x00000af8           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(block_floating_comp.eln))
 0x00000af8           0          _ecpri_compression_input_transpose_vcpu (run_address 0x00000af8)
 0x00000af8           0          _ecpri_decompression_output_transpose_vcpu (run_address 0x00000af8)
@@ -1387,11 +1458,18 @@
 0x00000af8           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(cfr.eln))
 0x00000af8           0          _cfr_with_fir (run_address 0x00000af8)
 0x00000af8           0          _cfr (run_address 0x00000af8)
+0x00000af8           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chEst.eln))
+0x00000af8           0          _chEst (run_address 0x00000af8)
+0x00000af8           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_csp_vmult_asm.eln))
+0x00000af8           0          _chp_chf_csp_vmult_asm (run_address 0x00000af8)
+0x00000af8           0          _chp_chf_csp_vmult_nonalgn_asm (run_address 0x00000af8)
 0x00000af8           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(chp_chf_rsp_vmult_asm.eln))
 0x00000af8           0          _chp_chf_rsp_vmult_asm (run_address 0x00000af8)
 0x00000af8           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(compression.eln))
 0x00000af8           0          _ecpri_compression_symbol (run_address 0x00000af8)
 0x00000af8                      F_ecpri_compression_symbol_end (run_address 0x00000af8)
+0x00000af8           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(csp_chf_rcpv_asm.eln))
+0x00000af8           0          _csp_chf_rcpv_asm (run_address 0x00000af8)
 0x00000af8           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(decompression.eln))
 0x00000af8           0          _ecpri_decompression_symbol (run_address 0x00000af8)
 0x00000af8                      F_ecpri_decompression_symbol_end (run_address 0x00000af8)
@@ -1436,180 +1514,198 @@
 0x000016e0           0          _mixerc_vecalgn_asm (run_address 0x000016e0)
 0x000016e0           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(phcom.eln))
 0x000016e0           0          _phcom_asm (run_address 0x000016e0)
-0x000016e0        2752      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec.eln))
+0x000016e0        2736      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(qec.eln))
 0x000016e0         736          _qec_skew_6t_static_imb_asm (run_address 0x000016e0)
 0x000019c0         776          _qec_skew_7t_static_imb_asm (run_address 0x000019c0)
 0x00001cc8         824          _qec_skew_Nt_static_imb_asm (run_address 0x00001cc8)
 0x00002000         248          _qec_static_imb_asm (run_address 0x00002000)
-0x000020f8         168          _qec_lo_gain_asm (run_address 0x000020f8)
-0x000021a0         240      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sinad_rsp_chp_sumsq_asm.eln))
-0x000021a0           0          _sinad_rsp_chp_sumsq_circ_asm (run_address 0x000021a0)
-0x00002290           0          _sinad_rsp_chp_sumsq_line_asm (run_address 0x00002290)
-0x00002290           0          _sinad_rsp_chp_sumsq_more_samples_asm (run_address 0x00002290)
-0x00002290           0          _sinad_rsp_chp_sumsq_less_samples_asm (run_address 0x00002290)
-0x00002290           0          _sinad_rsp_chp_sumsq_less_samples_asm_wrong (run_address 0x00002290)
-0x00002290         392      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(single_tone.eln))
-0x00002290         192          _single_tone_asm (run_address 0x00002290)
-0x00002350         200          _single_tone_add_asm (run_address 0x00002350)
-0x00002418           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(split_iq_asm.eln))
-0x00002418           0          _split_iq (run_address 0x00002418)
-0x00002418           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
-0x00002418           0          _ecpri_compression_init (run_address 0x00002418)
-0x00002418                      F_ecpri_compression_init_end (run_address 0x00002418)
-0x00002418           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
-0x00002418           0          _ecpri_decompression_init (run_address 0x00002418)
-0x00002418                      F_ecpri_decompression_init_end (run_address 0x00002418)
-0x00002418           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
-0x00002418           0          _ecpri_compression_update_address (run_address 0x00002418)
-0x00002418                      F_ecpri_compression_update_address_end (run_address 0x00002418)
-0x00002418           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
-0x00002418           0          _ecpri_decompression_update_address (run_address 0x00002418)
-0x00002418                      F_ecpri_decompression_update_address_end (run_address 0x00002418)
-0x00002418         512      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(txWindowing.eln))
-0x00002418           0          _txWindowing_circ_w16_vecaligned (run_address 0x00002418)
-0x000024b8           0          _txWindowing_w16_vecaligned (run_address 0x000024b8)
-0x000024b8           0          _txWindowing_circ_w16 (run_address 0x000024b8)
-0x00002618           0          _txWindowing_w16 (run_address 0x00002618)
-0x00002618         336      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln))
-0x00002618           0          _convert_half_to_hfix (run_address 0x00002618)
-0x00002618           0          _convert_hfix_to_half (run_address 0x00002618)
-0x00002618           0          _measure_axiq_allowed (run_address 0x00002618)
-0x00002618           0          _IQ_control_f16_asm (run_address 0x00002618)
-0x000026d0           0          _IQ_control_asm (run_address 0x000026d0)
-0x000026d0           0          _IQ_control_f32_asm (run_address 0x000026d0)
-0x000026d0          96          _mpy_f32_f16 (run_address 0x000026d0)
-0x00002730          56          _delay_cycles (run_address 0x00002730)
-0x00002768           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(vspa_log.eln))
-0x00002768           0          _vspa_log10 (run_address 0x00002768)
-0x00002768           0          _vspa_log2 (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          __Z23sssdet_targeted_gemv_rcP10cfloat16_tPmPu6__fx16mmmmm (run_address 0x00002768)
-0x00002768                      F__Z23sssdet_targeted_gemv_rcP10cfloat16_tPmPu6__fx16mmmmm_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _convert_2implement (run_address 0x00002768)
-0x00002768                      F_convert_2implement_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _pipeline_reset_rx (run_address 0x00002768)
-0x00002768                      F_pipeline_reset_rx_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _set_rx_slot_sym_idx (run_address 0x00002768)
-0x00002768                      F_set_rx_slot_sym_idx_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _ecpri_comp_init (run_address 0x00002768)
-0x00002768                      F_ecpri_comp_init_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _start_rx_ippu_bitrev_reversIn_linearOut (run_address 0x00002768)
-0x00002768                      F_start_rx_ippu_bitrev_reversIn_linearOut_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _get_rx_dump_sym_buf_addr (run_address 0x00002768)
-0x00002768                      F_get_rx_dump_sym_buf_addr_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _get_valid_size_for_fft_in (run_address 0x00002768)
-0x00002768                      F_get_valid_size_for_fft_in_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _check_rx_sym_start (run_address 0x00002768)
-0x00002768                      F_check_rx_sym_start_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _is_phy_rx_buf_available (run_address 0x00002768)
-0x00002768                      F_is_phy_rx_buf_available_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _ack_phy_rx_buf_available (run_address 0x00002768)
-0x00002768                      F_ack_phy_rx_buf_available_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _rx_sym_ready_processing (run_address 0x00002768)
-0x00002768                      F_rx_sym_ready_processing_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _PHY_DFE_interf_rx_check_dma_finish (run_address 0x00002768)
-0x00002768                      F_PHY_DFE_interf_rx_check_dma_finish_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _PHY_DFE_interf_rx_check_dma_start (run_address 0x00002768)
-0x00002768                      F_PHY_DFE_interf_rx_check_dma_start_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _run_fft (run_address 0x00002768)
-0x00002768                      F_run_fft_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_rx.eln)
-0x00002768           0          _rx_processing_symbol_level (run_address 0x00002768)
-0x00002768                      F_rx_processing_symbol_level_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _start_tx_ippu_bitrev_reversIn_linearOut (run_address 0x00002768)
-0x00002768                      F_start_tx_ippu_bitrev_reversIn_linearOut_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _advance_tx_sym_idx (run_address 0x00002768)
-0x00002768                      F_advance_tx_sym_idx_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _ecpri_decomp_init (run_address 0x00002768)
-0x00002768                      F_ecpri_decomp_init_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _circ_addr_advance (run_address 0x00002768)
-0x00002768                      F_circ_addr_advance_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _pipeline_reset_tx (run_address 0x00002768)
-0x00002768                      F_pipeline_reset_tx_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _tx_ppln_stop (run_address 0x00002768)
-0x00002768                      F_tx_ppln_stop_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _tx_sym_counter_update (run_address 0x00002768)
-0x00002768                      F_tx_sym_counter_update_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _ack_phy_tx_buf_rdy (run_address 0x00002768)
-0x00002768                      F_ack_phy_tx_buf_rdy_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _run_ifft (run_address 0x00002768)
-0x00002768                      F_run_ifft_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _run_cfr (run_address 0x00002768)
-0x00002768                      F_run_cfr_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _get_available_size_for_ifft_out (run_address 0x00002768)
-0x00002768                      F_get_available_size_for_ifft_out_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _start_ippu_bitrev_tx (run_address 0x00002768)
-0x00002768                      F_start_ippu_bitrev_tx_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _check_ippu_bitrev_done_tx_windowing (run_address 0x00002768)
-0x00002768                      F_check_ippu_bitrev_done_tx_windowing_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _check_phy_tx_buf_rdy (run_address 0x00002768)
-0x00002768                      F_check_phy_tx_buf_rdy_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _tx_sym_ready_processing (run_address 0x00002768)
-0x00002768                      F_tx_sym_ready_processing_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _PHY_DFE_interf_tx_check_dma_finish (run_address 0x00002768)
-0x00002768                      F_PHY_DFE_interf_tx_check_dma_finish_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _dma_tx_1block_to_coreA (run_address 0x00002768)
-0x00002768                      F_dma_tx_1block_to_coreA_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _PHY_DFE_interf_tx_check_dma_start (run_address 0x00002768)
-0x00002768                      F_PHY_DFE_interf_tx_check_dma_start_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_func_tx.eln)
-0x00002768           0          _tx_processing_symbol_level (run_address 0x00002768)
-0x00002768                      F_tx_processing_symbol_level_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_init.eln)
-0x00002768           0          _current_dma_chan (run_address 0x00002768)
-0x00002768                      F_current_dma_chan_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_init.eln)
-0x00002768           0          _advance_dma_chan (run_address 0x00002768)
-0x00002768                      F_advance_dma_chan_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_init.eln)
-0x00002768           0          _dma_completed (run_address 0x00002768)
-0x00002768                      F_dma_completed_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_init.eln)
-0x00002768           0          _dma_start (run_address 0x00002768)
-0x00002768                      F_dma_start_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_init.eln)
-0x00002768           0          _dma_start_2xfr (run_address 0x00002768)
-0x00002768                      F_dma_start_2xfr_end (run_address 0x00002768)
-0x00002768           0      Section: .text(.\source_shared\DFE_init.eln)
-0x00002768           0          _dma_start_with_axi_slave_flag_set (run_address 0x00002768)
-0x00002768                      F_dma_start_with_axi_slave_flag_set_end (run_address 0x00002768)
-0x00002768         184      Section: .text(.\source_shared\DFE_init.eln)
-0x00002768         184          ___init (run_address 0x00002768)
-0x00002820                      F___init_end (run_address 0x00002820)
-0x00002820         264      Section: .text(.\source_shared\DFE_init.eln)
-0x00002820         264          _init_common (run_address 0x00002820)
+0x000020f8         152          _qec_lo_gain_asm (run_address 0x000020f8)
+0x00002190         240      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sinad_rsp_chp_sumsq_asm.eln))
+0x00002190           0          _sinad_rsp_chp_sumsq_circ_asm (run_address 0x00002190)
+0x00002280           0          _sinad_rsp_chp_sumsq_line_asm (run_address 0x00002280)
+0x00002280           0          _sinad_rsp_chp_sumsq_more_samples_asm (run_address 0x00002280)
+0x00002280           0          _sinad_rsp_chp_sumsq_less_samples_asm (run_address 0x00002280)
+0x00002280           0          _sinad_rsp_chp_sumsq_less_samples_asm_wrong (run_address 0x00002280)
+0x00002280         392      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(single_tone.eln))
+0x00002280         192          _single_tone_asm (run_address 0x00002280)
+0x00002340         200          _single_tone_add_asm (run_address 0x00002340)
+0x00002408           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(split_iq_asm.eln))
+0x00002408           0          _split_iq (run_address 0x00002408)
+0x00002408           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssConvert.eln))
+0x00002408           0          _sssConvert (run_address 0x00002408)
+0x00002408           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sss_msmts.eln))
+0x00002408           0          _sss_msmts (run_address 0x00002408)
+0x00002408           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssdet_asm_rc.eln))
+0x00002408           0          _fineCFO_rc (run_address 0x00002408)
+0x00002408           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(sssdet_targeted_asm_rc.eln))
+0x00002408           0          _sssdet_targeted_hpgemv_rc_v1 (run_address 0x00002408)
+0x00002408           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(tim_off_est_asm.eln))
+0x00002408           0          _tim_off_est_sp_asm_rc (run_address 0x00002408)
+0x00002408           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
+0x00002408           0          _ecpri_compression_init (run_address 0x00002408)
+0x00002408                      F_ecpri_compression_init_end (run_address 0x00002408)
+0x00002408           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
+0x00002408           0          _ecpri_decompression_init (run_address 0x00002408)
+0x00002408                      F_ecpri_decompression_init_end (run_address 0x00002408)
+0x00002408           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
+0x00002408           0          _ecpri_compression_update_address (run_address 0x00002408)
+0x00002408                      F_ecpri_compression_update_address_end (run_address 0x00002408)
+0x00002408           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(transpose.eln))
+0x00002408           0          _ecpri_decompression_update_address (run_address 0x00002408)
+0x00002408                      F_ecpri_decompression_update_address_end (run_address 0x00002408)
+0x00002408         512      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(txWindowing.eln))
+0x00002408           0          _txWindowing_circ_w16_vecaligned (run_address 0x00002408)
+0x000024a8           0          _txWindowing_w16_vecaligned (run_address 0x000024a8)
+0x000024a8           0          _txWindowing_circ_w16 (run_address 0x000024a8)
+0x00002608           0          _txWindowing_w16 (run_address 0x00002608)
+0x00002608         336      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(utilities.eln))
+0x00002608           0          _convert_half_to_hfix (run_address 0x00002608)
+0x00002608           0          _convert_hfix_to_half (run_address 0x00002608)
+0x00002608           0          _measure_axiq_allowed (run_address 0x00002608)
+0x00002608           0          _IQ_control_f16_asm (run_address 0x00002608)
+0x000026c0           0          _IQ_control_asm (run_address 0x000026c0)
+0x000026c0           0          _IQ_control_f32_asm (run_address 0x000026c0)
+0x000026c0          96          _mpy_f32_f16 (run_address 0x000026c0)
+0x00002720           0          _mpy_f32_f16_vs (run_address 0x00002720)
+0x00002720           0          _mpy_f32_f32 (run_address 0x00002720)
+0x00002720          56          _delay_cycles (run_address 0x00002720)
+0x00002758           0      Section: .text(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(vspa_log.eln))
+0x00002758           0          _vspa_log10 (run_address 0x00002758)
+0x00002758           0          _vspa_log2 (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _convert_2implement (run_address 0x00002758)
+0x00002758                      F_convert_2implement_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _pipeline_reset_rx (run_address 0x00002758)
+0x00002758                      F_pipeline_reset_rx_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _set_rx_slot_sym_idx (run_address 0x00002758)
+0x00002758                      F_set_rx_slot_sym_idx_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _ecpri_comp_init (run_address 0x00002758)
+0x00002758                      F_ecpri_comp_init_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _start_rx_ippu_bitrev_reversIn_linearOut (run_address 0x00002758)
+0x00002758                      F_start_rx_ippu_bitrev_reversIn_linearOut_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _get_rx_dump_sym_buf_addr (run_address 0x00002758)
+0x00002758                      F_get_rx_dump_sym_buf_addr_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _get_valid_size_for_fft_in (run_address 0x00002758)
+0x00002758                      F_get_valid_size_for_fft_in_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _check_rx_sym_start (run_address 0x00002758)
+0x00002758                      F_check_rx_sym_start_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _is_phy_rx_buf_available (run_address 0x00002758)
+0x00002758                      F_is_phy_rx_buf_available_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _ack_phy_rx_buf_available (run_address 0x00002758)
+0x00002758                      F_ack_phy_rx_buf_available_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _rx_sym_ready_processing (run_address 0x00002758)
+0x00002758                      F_rx_sym_ready_processing_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _PHY_DFE_interf_rx_check_dma_finish (run_address 0x00002758)
+0x00002758                      F_PHY_DFE_interf_rx_check_dma_finish_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _run_fft (run_address 0x00002758)
+0x00002758                      F_run_fft_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _PHY_DFE_interf_rx_check_dma_start (run_address 0x00002758)
+0x00002758                      F_PHY_DFE_interf_rx_check_dma_start_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_rx.eln)
+0x00002758           0          _rx_processing_symbol_level (run_address 0x00002758)
+0x00002758                      F_rx_processing_symbol_level_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _start_tx_ippu_bitrev_reversIn_linearOut (run_address 0x00002758)
+0x00002758                      F_start_tx_ippu_bitrev_reversIn_linearOut_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _vecclr_ippu_bank0 (run_address 0x00002758)
+0x00002758                      F_vecclr_ippu_bank0_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _vecclr_ippu_bank1 (run_address 0x00002758)
+0x00002758                      F_vecclr_ippu_bank1_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _advance_tx_sym_idx (run_address 0x00002758)
+0x00002758                      F_advance_tx_sym_idx_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _ecpri_decomp_init (run_address 0x00002758)
+0x00002758                      F_ecpri_decomp_init_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _circ_addr_advance (run_address 0x00002758)
+0x00002758                      F_circ_addr_advance_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _pipeline_reset_tx (run_address 0x00002758)
+0x00002758                      F_pipeline_reset_tx_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _tx_ppln_stop (run_address 0x00002758)
+0x00002758                      F_tx_ppln_stop_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _tx_sym_counter_update (run_address 0x00002758)
+0x00002758                      F_tx_sym_counter_update_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _ack_phy_tx_buf_rdy (run_address 0x00002758)
+0x00002758                      F_ack_phy_tx_buf_rdy_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _run_ifft (run_address 0x00002758)
+0x00002758                      F_run_ifft_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _run_cfr (run_address 0x00002758)
+0x00002758                      F_run_cfr_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _get_available_size_for_ifft_out (run_address 0x00002758)
+0x00002758                      F_get_available_size_for_ifft_out_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _start_ippu_bitrev_tx (run_address 0x00002758)
+0x00002758                      F_start_ippu_bitrev_tx_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _check_ippu_bitrev_done_tx_windowing (run_address 0x00002758)
+0x00002758                      F_check_ippu_bitrev_done_tx_windowing_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _check_phy_tx_buf_rdy (run_address 0x00002758)
+0x00002758                      F_check_phy_tx_buf_rdy_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _tx_sym_ready_processing (run_address 0x00002758)
+0x00002758                      F_tx_sym_ready_processing_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _PHY_DFE_interf_tx_check_dma_finish (run_address 0x00002758)
+0x00002758                      F_PHY_DFE_interf_tx_check_dma_finish_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _dma_tx_1block_to_coreA (run_address 0x00002758)
+0x00002758                      F_dma_tx_1block_to_coreA_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _PHY_DFE_interf_tx_check_dma_start (run_address 0x00002758)
+0x00002758                      F_PHY_DFE_interf_tx_check_dma_start_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_func_tx.eln)
+0x00002758           0          _tx_processing_symbol_level (run_address 0x00002758)
+0x00002758                      F_tx_processing_symbol_level_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_init.eln)
+0x00002758           0          _current_dma_chan (run_address 0x00002758)
+0x00002758                      F_current_dma_chan_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_init.eln)
+0x00002758           0          _advance_dma_chan (run_address 0x00002758)
+0x00002758                      F_advance_dma_chan_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_init.eln)
+0x00002758           0          _dma_completed (run_address 0x00002758)
+0x00002758                      F_dma_completed_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_init.eln)
+0x00002758           0          _dma_start (run_address 0x00002758)
+0x00002758                      F_dma_start_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_init.eln)
+0x00002758           0          _dma_start_2xfr (run_address 0x00002758)
+0x00002758                      F_dma_start_2xfr_end (run_address 0x00002758)
+0x00002758           0      Section: .text(.\source_shared\DFE_init.eln)
+0x00002758           0          _dma_start_with_axi_slave_flag_set (run_address 0x00002758)
+0x00002758                      F_dma_start_with_axi_slave_flag_set_end (run_address 0x00002758)
+0x00002758         168      Section: .text(.\source_shared\DFE_init.eln)
+0x00002758         168          ___init (run_address 0x00002758)
+0x00002800                      F___init_end (run_address 0x00002800)
+0x00002800           0      Section: .text(.\source_shared\DFE_init.eln)
+0x00002800           0          _init_coreB (run_address 0x00002800)
+0x00002800                      F_init_coreB_end (run_address 0x00002800)
+0x00002800         296      Section: .text(.\source_shared\DFE_init.eln)
+0x00002800         296          _init_common (run_address 0x00002800)
 0x00002928                      F_init_common_end (run_address 0x00002928)
 0x00002928         240      Section: .text(.\source_shared\boot.eln)
 0x00002928         240          _boot (run_address 0x00002928)
@@ -1623,339 +1719,342 @@
 0x00002d80         792      Section: .text(.\source_shared\dump_inject.eln)
 0x00002d80         792          _dump_inject_data_1block (run_address 0x00002d80)
 0x00003098                      F_dump_inject_data_1block_end (run_address 0x00003098)
-0x00003098         112      Section: .text(.\source_shared\host_vspa_msg.eln)
-0x00003098         112          _mailbox_send_msg (run_address 0x00003098)
-0x00003108                      F_mailbox_send_msg_end (run_address 0x00003108)
-0x00003108           0      Section: .text(.\source_shared\host_vspa_msg.eln)
-0x00003108           0          _add_a_pattern (run_address 0x00003108)
-0x00003108                      F_add_a_pattern_end (run_address 0x00003108)
-0x00003108         104      Section: .text(.\source_shared\host_vspa_msg.eln)
-0x00003108         104          _convert_sym_idx_to_sample_idx (run_address 0x00003108)
-0x00003170                      F_convert_sym_idx_to_sample_idx_end (run_address 0x00003170)
-0x00003170         104      Section: .text(.\source_shared\host_vspa_msg.eln)
-0x00003170         104          _get_num_samples_in_symbol_idx_range (run_address 0x00003170)
-0x000031d8                      F_get_num_samples_in_symbol_idx_range_end (run_address 0x000031d8)
-0x000031d8        3384      Section: .text(.\source_shared\host_vspa_msg.eln)
-0x000031d8        3384          _core_A_msg_parse (run_address 0x000031d8)
-0x00003f10                      F_core_A_msg_parse_end (run_address 0x00003f10)
-0x00003f10           0      Section: .text(.\source_shared\host_vspa_msg.eln)
-0x00003f10           0          _host_msg_handling (run_address 0x00003f10)
-0x00003f10                      F_host_msg_handling_end (run_address 0x00003f10)
-0x00003f10         152      Section: .text(.\source_shared\inter_core_msg.eln)
-0x00003f10         152          _ext_word_write (run_address 0x00003f10)
-0x00003fa8                      F_ext_word_write_end (run_address 0x00003fa8)
-0x00003fa8           0      Section: .text(.\source_shared\inter_core_msg.eln)
-0x00003fa8           0          _ext_word_write_2int (run_address 0x00003fa8)
-0x00003fa8                      F_ext_word_write_2int_end (run_address 0x00003fa8)
-0x00003fa8         416      Section: .text(.\source_shared\inter_core_msg.eln)
-0x00003fa8         416          _wait_for_cores (run_address 0x00003fa8)
-0x00004148                      F_wait_for_cores_end (run_address 0x00004148)
-0x00004148           0      Section: .text(.\source_shared\inter_core_msg.eln)
-0x00004148           0          _inter_core_gpio_msg_processing (run_address 0x00004148)
-0x00004148                      F_inter_core_gpio_msg_processing_end (run_address 0x00004148)
-0x00004148           0      Section: .text(.\source_shared\main_pair_coreA.eln)
-0x00004148           0          _decim_2x_handler (run_address 0x00004148)
-0x00004148                      F_decim_2x_handler_end (run_address 0x00004148)
-0x00004148           0      Section: .text(.\source_shared\main_pair_coreA.eln)
-0x00004148           0          _copy_needed_var_to_core_B (run_address 0x00004148)
-0x00004148                      F_copy_needed_var_to_core_B_end (run_address 0x00004148)
-0x00004148           0      Section: .text(.\source_shared\main_pair_coreA.eln)
-0x00004148           0          _check_tx_block_arrival (run_address 0x00004148)
-0x00004148                      F_check_tx_block_arrival_end (run_address 0x00004148)
-0x00004148           0      Section: .text(.\source_shared\main_pair_coreA.eln)
-0x00004148           0          _pair_interf_rx_coreA (run_address 0x00004148)
-0x00004148                      F_pair_interf_rx_coreA_end (run_address 0x00004148)
-0x00004148           0      Section: .text(.\source_shared\main_pair_coreA.eln)
-0x00004148           0          _qec (run_address 0x00004148)
-0x00004148                      F_qec_end (run_address 0x00004148)
-0x00004148        2192      Section: .text(.\source_shared\main_pair_coreA.eln)
-0x00004148        2192          _init_coreA (run_address 0x00004148)
-0x000049d8                      F_init_coreA_end (run_address 0x000049d8)
-0x000049d8        6768      Section: .text(.\source_shared\main_pair_coreA.eln)
-0x000049d8        6768          _main (run_address 0x000049d8)
-0x00006448                      F_main_end (run_address 0x00006448)
-0x00006448           0      Section: .text(.\source_shared\kernel_FFT\ifft_cp.eln)
-0x00006448           0          _start_ippu_ifft_bitrev (run_address 0x00006448)
-0x00006448                      F_start_ippu_ifft_bitrev_end (run_address 0x00006448)
-0x00006448           0      Section: .text(.\source_shared\kernel_FFT\ifft_cp.eln)
-0x00006448           0          _start_ippu_tx_bitrev_cp_insert (run_address 0x00006448)
-0x00006448                      F_start_ippu_tx_bitrev_cp_insert_end (run_address 0x00006448)
-0x00006448           0      Section: .text(.\source_shared\kernel_FFT\ifft_cp.eln)
-0x00006448           0          _start_ippu_tx_bitrev_cp_insert_2parts (run_address 0x00006448)
-0x00006448                      F_start_ippu_tx_bitrev_cp_insert_2parts_end (run_address 0x00006448)
-0x00006448           0      Section: .text(.\source_shared\kernel_FFT\ifft_cp.eln)
-0x00006448           0          _fft_cp_remove (run_address 0x00006448)
-0x00006448                      F_fft_cp_remove_end (run_address 0x00006448)
-0x00006448         200      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00006448         200          _Ant_buffer_rx_axiq_reset (run_address 0x00006448)
-0x00006510                      F_Ant_buffer_rx_axiq_reset_end (run_address 0x00006510)
-0x00006510           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00006510           0          _Ant_buffer_rx_axiq_enable (run_address 0x00006510)
-0x00006510                      F_Ant_buffer_rx_axiq_enable_end (run_address 0x00006510)
-0x00006510           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00006510           0          _rx_error_handling (run_address 0x00006510)
-0x00006510                      F_rx_error_handling_end (run_address 0x00006510)
-0x00006510           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00006510           0          _get_rx_allowed_status (run_address 0x00006510)
-0x00006510                      F_get_rx_allowed_status_end (run_address 0x00006510)
-0x00006510           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00006510           0          _convert_sample_idx_to_sym_idx (run_address 0x00006510)
-0x00006510                      F_convert_sample_idx_to_sym_idx_end (run_address 0x00006510)
-0x00006510        1400      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00006510        1400          _Ant_buffer_rx_init (run_address 0x00006510)
-0x00006a88                      F_Ant_buffer_rx_init_end (run_address 0x00006a88)
-0x00006a88           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00006a88           0          _Ant_buffer_rx_dma_check (run_address 0x00006a88)
-0x00006a88                      F_Ant_buffer_rx_dma_check_end (run_address 0x00006a88)
-0x00006a88        2328      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00006a88        2328          _Ant_buffer_rx_dma_feed (run_address 0x00006a88)
-0x000073a0                      F_Ant_buffer_rx_dma_feed_end (run_address 0x000073a0)
-0x000073a0        1152      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x000073a0        1152          _Ant_buffer_rx_check_status (run_address 0x000073a0)
-0x00007820                      F_Ant_buffer_rx_check_status_end (run_address 0x00007820)
-0x00007820           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00007820           0          _Ant_buffer_rx_check_status_obs (run_address 0x00007820)
-0x00007820                      F_Ant_buffer_rx_check_status_obs_end (run_address 0x00007820)
-0x00007820         376      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00007820         376          _Ant_buffer_rx_poll_buffer (run_address 0x00007820)
-0x00007998                      F_Ant_buffer_rx_poll_buffer_end (run_address 0x00007998)
-0x00007998         136      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
-0x00007998         136          _Ant_buffer_rx_free_buffer (run_address 0x00007998)
-0x00007a20                      F_Ant_buffer_rx_free_buffer_end (run_address 0x00007a20)
-0x00007a20           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00007a20           0          _Ant_buffer_tx_axiq_clrerror (run_address 0x00007a20)
-0x00007a20                      F_Ant_buffer_tx_axiq_clrerror_end (run_address 0x00007a20)
-0x00007a20         176      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00007a20         176          _Ant_buffer_tx_axiq_reset (run_address 0x00007a20)
-0x00007ad0                      F_Ant_buffer_tx_axiq_reset_end (run_address 0x00007ad0)
-0x00007ad0           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00007ad0           0          _Ant_buffer_tx_axiq_enable (run_address 0x00007ad0)
-0x00007ad0                      F_Ant_buffer_tx_axiq_enable_end (run_address 0x00007ad0)
-0x00007ad0           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00007ad0           0          _tx_error_handling (run_address 0x00007ad0)
-0x00007ad0                      F_tx_error_handling_end (run_address 0x00007ad0)
-0x00007ad0           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00007ad0           0          _Ant_buffer_tx_dma_feed (run_address 0x00007ad0)
-0x00007ad0                      F_Ant_buffer_tx_dma_feed_end (run_address 0x00007ad0)
-0x00007ad0        1312      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00007ad0        1312          _Ant_buffer_tx_init (run_address 0x00007ad0)
-0x00007ff0                      F_Ant_buffer_tx_init_end (run_address 0x00007ff0)
-0x00007ff0           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00007ff0           0          _get_tx_allowed_status (run_address 0x00007ff0)
-0x00007ff0                      F_get_tx_allowed_status_end (run_address 0x00007ff0)
-0x00007ff0           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00007ff0           0          _Ant_buffer_tx_dma_check (run_address 0x00007ff0)
-0x00007ff0                      F_Ant_buffer_tx_dma_check_end (run_address 0x00007ff0)
-0x00007ff0        1912      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00007ff0        1912          _Ant_buffer_tx_check_status (run_address 0x00007ff0)
-0x00008768                      F_Ant_buffer_tx_check_status_end (run_address 0x00008768)
-0x00008768        1184      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00008768        1184          _Ant_buffer_tx_apply_buffer (run_address 0x00008768)
-0x00008c08                      F_Ant_buffer_tx_apply_buffer_end (run_address 0x00008c08)
-0x00008c08         280      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
-0x00008c08         280          _Ant_buffer_tx_write_complete (run_address 0x00008c08)
-0x00008d20                      F_Ant_buffer_tx_write_complete_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(.\source_shared\eDMA\eDMA_la9310.eln)
-0x00008d20           0          _iEdmaInit (run_address 0x00008d20)
-0x00008d20                      F_iEdmaInit_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(.\source_shared\eDMA\eDMA_la9310.eln)
-0x00008d20           0          _iEdmaChanInit (run_address 0x00008d20)
-0x00008d20                      F_iEdmaChanInit_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(.\source_shared\eDMA\eDMA_la9310.eln)
-0x00008d20           0          _iEdmaXferReq (run_address 0x00008d20)
-0x00008d20                      F_iEdmaXferReq_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(.\source_shared\SINAD\sinad.eln)
-0x00008d20           0          _fr2_rx_bitrev_b1_b1 (run_address 0x00008d20)
-0x00008d20                      F_fr2_rx_bitrev_b1_b1_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(.\source_shared\SINAD\sinad.eln)
-0x00008d20           0          _fr2_rx_bitrev_b0_b1 (run_address 0x00008d20)
-0x00008d20                      F_fr2_rx_bitrev_b0_b1_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(.\source_shared\SINAD\sinad.eln)
-0x00008d20           0          _SINAD_test (run_address 0x00008d20)
-0x00008d20                      F_SINAD_test_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_to_fp16 (run_address 0x00008d20)
-0x00008d20                      F___f_to_fp16_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___fp16_to_f (run_address 0x00008d20)
-0x00008d20                      F___fp16_to_f_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_lt (run_address 0x00008d20)
-0x00008d20                      F___f_lt_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_to_fx16 (run_address 0x00008d20)
-0x00008d20                      F___f_to_fx16_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___fx16_to_f (run_address 0x00008d20)
-0x00008d20                      F___fx16_to_f_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_to_d (run_address 0x00008d20)
-0x00008d20                      F___f_to_d_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_to_i32 (run_address 0x00008d20)
-0x00008d20                      F___f_to_i32_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_to_u32 (run_address 0x00008d20)
-0x00008d20                      F___f_to_u32_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_eq (run_address 0x00008d20)
-0x00008d20                      F___f_eq_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_to_i64 (run_address 0x00008d20)
-0x00008d20                      F___f_to_i64_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_to_u64 (run_address 0x00008d20)
-0x00008d20                      F___f_to_u64_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___i32_to_f (run_address 0x00008d20)
-0x00008d20                      F___i32_to_f_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___u32_to_f (run_address 0x00008d20)
-0x00008d20                      F___u32_to_f_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___i64_to_f (run_address 0x00008d20)
-0x00008d20                      F___i64_to_f_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___u64_to_f (run_address 0x00008d20)
-0x00008d20                      F___u64_to_f_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_mul (run_address 0x00008d20)
-0x00008d20                      F___f_mul_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_div (run_address 0x00008d20)
-0x00008d20                      F___f_div_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_add (run_address 0x00008d20)
-0x00008d20                      F___f_add_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_sub (run_address 0x00008d20)
-0x00008d20                      F___f_sub_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_ne (run_address 0x00008d20)
-0x00008d20                      F___f_ne_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_le (run_address 0x00008d20)
-0x00008d20                      F___f_le_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_gt (run_address 0x00008d20)
-0x00008d20                      F___f_gt_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___f_ge (run_address 0x00008d20)
-0x00008d20                      F___f_ge_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_to_f (run_address 0x00008d20)
-0x00008d20                      F___d_to_f_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_to_i32 (run_address 0x00008d20)
-0x00008d20                      F___d_to_i32_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_to_u32 (run_address 0x00008d20)
-0x00008d20                      F___d_to_u32_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_to_i64 (run_address 0x00008d20)
-0x00008d20                      F___d_to_i64_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_to_u64 (run_address 0x00008d20)
-0x00008d20                      F___d_to_u64_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___i32_to_d (run_address 0x00008d20)
-0x00008d20                      F___i32_to_d_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___u32_to_d (run_address 0x00008d20)
-0x00008d20                      F___u32_to_d_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_sub (run_address 0x00008d20)
-0x00008d20                      F___d_sub_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___i64_to_d (run_address 0x00008d20)
-0x00008d20                      F___i64_to_d_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___u64_to_d (run_address 0x00008d20)
-0x00008d20                      F___u64_to_d_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_mul (run_address 0x00008d20)
-0x00008d20                      F___d_mul_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_div (run_address 0x00008d20)
-0x00008d20                      F___d_div_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_add (run_address 0x00008d20)
-0x00008d20                      F___d_add_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_eq (run_address 0x00008d20)
-0x00008d20                      F___d_eq_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_ne (run_address 0x00008d20)
-0x00008d20                      F___d_ne_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_lt (run_address 0x00008d20)
-0x00008d20                      F___d_lt_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_le (run_address 0x00008d20)
-0x00008d20                      F___d_le_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_gt (run_address 0x00008d20)
-0x00008d20                      F___d_gt_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          ___d_ge (run_address 0x00008d20)
-0x00008d20                      F___d_ge_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
-0x00008d20           0          _fabs (run_address 0x00008d20)
-0x00008d20                      F_fabs_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln))
-0x00008d20           0          ___cmp64_eq (run_address 0x00008d20)
-0x00008d20                      F___cmp64_eq_end (run_address 0x00008d20)
-0x00008d20           0          ___cmp64_neq (run_address 0x00008d20)
-0x00008d20                      F___cmp64_neq_end (run_address 0x00008d20)
-0x00008d20           0          ___cmp64_ge (run_address 0x00008d20)
-0x00008d20                      F___cmp64_ge_end (run_address 0x00008d20)
-0x00008d20           0          ___cmp64_uge (run_address 0x00008d20)
-0x00008d20                      F___cmp64_uge_end (run_address 0x00008d20)
-0x00008d20           0          ___cmp64_ugt (run_address 0x00008d20)
-0x00008d20                      F___cmp64_ugt_end (run_address 0x00008d20)
-0x00008d20           0          ___cmp64_gt (run_address 0x00008d20)
-0x00008d20                      F___cmp64_gt_end (run_address 0x00008d20)
-0x00008d20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_shift.eln))
-0x00008d20           0          ___lshr64 (run_address 0x00008d20)
-0x00008d20                      F___lshr64_end (run_address 0x00008d20)
-0x00008d20           0          ___ashr64 (run_address 0x00008d20)
-0x00008d20                      F___ashr64_end (run_address 0x00008d20)
-0x00008d20           0          ___shl64 (run_address 0x00008d20)
-0x00008d20                      F___shl64_end (run_address 0x00008d20)
-0x00008d20         312      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(staticinit.eln))
-0x00008d20         312          ___exec_staticinit (run_address 0x00008d20)
-0x00008e58                      F___exec_staticinit_end (run_address 0x00008e58)
-0x00008e58           0      Section: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(decim2x.eln)(.text.rx_a)(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(decim2x.eln))
-0x00008e58           0          _decimator_2x_6_Taps_asm (run_address 0x00008e58)
-0x00008e58           0          _decimator_2x_8_Taps_asm (run_address 0x00008e58)
-0x00008e58           0          _decimator_4x_8_Taps_asm (run_address 0x00008e58)
-0x00008e58           0          _decimator_2x_NTaps_asm (run_address 0x00008e58)
-0x00008e58           0          _gen_decx2_NTaps_align_asm (run_address 0x00008e58)
+0x00003098           0      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00003098           0          _channel_restart (run_address 0x00003098)
+0x00003098                      F_channel_restart_end (run_address 0x00003098)
+0x00003098           0      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00003098           0          _mailbox_send_msg (run_address 0x00003098)
+0x00003098                      F_mailbox_send_msg_end (run_address 0x00003098)
+0x00003098           0      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00003098           0          _add_a_pattern (run_address 0x00003098)
+0x00003098                      F_add_a_pattern_end (run_address 0x00003098)
+0x00003098         104      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00003098         104          _convert_sym_idx_to_sample_idx (run_address 0x00003098)
+0x00003100                      F_convert_sym_idx_to_sample_idx_end (run_address 0x00003100)
+0x00003100         104      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00003100         104          _get_num_samples_in_symbol_idx_range (run_address 0x00003100)
+0x00003168                      F_get_num_samples_in_symbol_idx_range_end (run_address 0x00003168)
+0x00003168        3056      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00003168        3056          _core_A_msg_parse (run_address 0x00003168)
+0x00003d58                      F_core_A_msg_parse_end (run_address 0x00003d58)
+0x00003d58           0      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00003d58           0          _host_msg_handling (run_address 0x00003d58)
+0x00003d58                      F_host_msg_handling_end (run_address 0x00003d58)
+0x00003d58         176      Section: .text(.\source_shared\host_vspa_msg.eln)
+0x00003d58         176          _check_msg (run_address 0x00003d58)
+0x00003e08                      F_check_msg_end (run_address 0x00003e08)
+0x00003e08         152      Section: .text(.\source_shared\inter_core_msg.eln)
+0x00003e08         152          _ext_word_write (run_address 0x00003e08)
+0x00003ea0                      F_ext_word_write_end (run_address 0x00003ea0)
+0x00003ea0           0      Section: .text(.\source_shared\inter_core_msg.eln)
+0x00003ea0           0          _ext_word_write_2int (run_address 0x00003ea0)
+0x00003ea0                      F_ext_word_write_2int_end (run_address 0x00003ea0)
+0x00003ea0         416      Section: .text(.\source_shared\inter_core_msg.eln)
+0x00003ea0         416          _wait_for_cores (run_address 0x00003ea0)
+0x00004040                      F_wait_for_cores_end (run_address 0x00004040)
+0x00004040           0      Section: .text(.\source_shared\inter_core_msg.eln)
+0x00004040           0          _inter_core_gpio_msg_processing (run_address 0x00004040)
+0x00004040                      F_inter_core_gpio_msg_processing_end (run_address 0x00004040)
+0x00004040           0      Section: .text(.\source_shared\main_pair_coreA.eln)
+0x00004040           0          _decim_2x_handler (run_address 0x00004040)
+0x00004040                      F_decim_2x_handler_end (run_address 0x00004040)
+0x00004040           0      Section: .text(.\source_shared\main_pair_coreA.eln)
+0x00004040           0          _copy_needed_var_to_core_B (run_address 0x00004040)
+0x00004040                      F_copy_needed_var_to_core_B_end (run_address 0x00004040)
+0x00004040           0      Section: .text(.\source_shared\main_pair_coreA.eln)
+0x00004040           0          _check_tx_block_arrival (run_address 0x00004040)
+0x00004040                      F_check_tx_block_arrival_end (run_address 0x00004040)
+0x00004040           0      Section: .text(.\source_shared\main_pair_coreA.eln)
+0x00004040           0          _pair_interf_rx_coreA (run_address 0x00004040)
+0x00004040                      F_pair_interf_rx_coreA_end (run_address 0x00004040)
+0x00004040           0      Section: .text(.\source_shared\main_pair_coreA.eln)
+0x00004040           0          _qec (run_address 0x00004040)
+0x00004040                      F_qec_end (run_address 0x00004040)
+0x00004040        2176      Section: .text(.\source_shared\main_pair_coreA.eln)
+0x00004040        2176          _init_coreA (run_address 0x00004040)
+0x000048c0                      F_init_coreA_end (run_address 0x000048c0)
+0x000048c0        6880      Section: .text(.\source_shared\main_pair_coreA.eln)
+0x000048c0        6880          _main (run_address 0x000048c0)
+0x000063a0                      F_main_end (run_address 0x000063a0)
+0x000063a0           0      Section: .text(.\source_shared\kernel_FFT\ifft_cp.eln)
+0x000063a0           0          _start_ippu_ifft_bitrev (run_address 0x000063a0)
+0x000063a0                      F_start_ippu_ifft_bitrev_end (run_address 0x000063a0)
+0x000063a0           0      Section: .text(.\source_shared\kernel_FFT\ifft_cp.eln)
+0x000063a0           0          _start_ippu_tx_bitrev_cp_insert (run_address 0x000063a0)
+0x000063a0                      F_start_ippu_tx_bitrev_cp_insert_end (run_address 0x000063a0)
+0x000063a0           0      Section: .text(.\source_shared\kernel_FFT\ifft_cp.eln)
+0x000063a0           0          _start_ippu_tx_bitrev_cp_insert_2parts (run_address 0x000063a0)
+0x000063a0                      F_start_ippu_tx_bitrev_cp_insert_2parts_end (run_address 0x000063a0)
+0x000063a0           0      Section: .text(.\source_shared\kernel_FFT\ifft_cp.eln)
+0x000063a0           0          _fft_cp_remove (run_address 0x000063a0)
+0x000063a0                      F_fft_cp_remove_end (run_address 0x000063a0)
+0x000063a0         208      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x000063a0         208          _Ant_buffer_rx_axiq_reset (run_address 0x000063a0)
+0x00006470                      F_Ant_buffer_rx_axiq_reset_end (run_address 0x00006470)
+0x00006470           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00006470           0          _Ant_buffer_rx_axiq_enable (run_address 0x00006470)
+0x00006470                      F_Ant_buffer_rx_axiq_enable_end (run_address 0x00006470)
+0x00006470           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00006470           0          _rx_error_handling (run_address 0x00006470)
+0x00006470                      F_rx_error_handling_end (run_address 0x00006470)
+0x00006470           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00006470           0          _get_rx_allowed_status (run_address 0x00006470)
+0x00006470                      F_get_rx_allowed_status_end (run_address 0x00006470)
+0x00006470           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00006470           0          _convert_sample_idx_to_sym_idx (run_address 0x00006470)
+0x00006470                      F_convert_sample_idx_to_sym_idx_end (run_address 0x00006470)
+0x00006470        1424      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00006470        1424          _Ant_buffer_rx_init (run_address 0x00006470)
+0x00006a00                      F_Ant_buffer_rx_init_end (run_address 0x00006a00)
+0x00006a00         288      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00006a00         288          _Ant_buffer_rx_dma_check (run_address 0x00006a00)
+0x00006b20                      F_Ant_buffer_rx_dma_check_end (run_address 0x00006b20)
+0x00006b20         656      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00006b20         656          _Ant_buffer_rx_check_status (run_address 0x00006b20)
+0x00006db0                      F_Ant_buffer_rx_check_status_end (run_address 0x00006db0)
+0x00006db0           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00006db0           0          _Ant_buffer_rx_check_status_obs (run_address 0x00006db0)
+0x00006db0                      F_Ant_buffer_rx_check_status_obs_end (run_address 0x00006db0)
+0x00006db0        2328      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00006db0        2328          _Ant_buffer_rx_dma_feed (run_address 0x00006db0)
+0x000076c8                      F_Ant_buffer_rx_dma_feed_end (run_address 0x000076c8)
+0x000076c8         376      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x000076c8         376          _Ant_buffer_rx_poll_buffer (run_address 0x000076c8)
+0x00007840                      F_Ant_buffer_rx_poll_buffer_end (run_address 0x00007840)
+0x00007840         424      Section: .text(.\source_shared\function_Ant_manage\Ant_Rx_Buffer_manager.eln)
+0x00007840         424          _Ant_buffer_rx_free_buffer (run_address 0x00007840)
+0x000079e8                      F_Ant_buffer_rx_free_buffer_end (run_address 0x000079e8)
+0x000079e8         208      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x000079e8         208          _Ant_buffer_tx_axiq_reset (run_address 0x000079e8)
+0x00007ab8                      F_Ant_buffer_tx_axiq_reset_end (run_address 0x00007ab8)
+0x00007ab8           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x00007ab8           0          _get_tx_allowed_status (run_address 0x00007ab8)
+0x00007ab8                      F_get_tx_allowed_status_end (run_address 0x00007ab8)
+0x00007ab8           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x00007ab8           0          _Ant_buffer_tx_axiq_enable (run_address 0x00007ab8)
+0x00007ab8                      F_Ant_buffer_tx_axiq_enable_end (run_address 0x00007ab8)
+0x00007ab8           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x00007ab8           0          _tx_error_handling (run_address 0x00007ab8)
+0x00007ab8                      F_tx_error_handling_end (run_address 0x00007ab8)
+0x00007ab8           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x00007ab8           0          _Ant_buffer_tx_dma_feed (run_address 0x00007ab8)
+0x00007ab8                      F_Ant_buffer_tx_dma_feed_end (run_address 0x00007ab8)
+0x00007ab8        1392      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x00007ab8        1392          _Ant_buffer_tx_init (run_address 0x00007ab8)
+0x00008028                      F_Ant_buffer_tx_init_end (run_address 0x00008028)
+0x00008028           0      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x00008028           0          _Ant_buffer_tx_dma_check (run_address 0x00008028)
+0x00008028                      F_Ant_buffer_tx_dma_check_end (run_address 0x00008028)
+0x00008028         680      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x00008028         680          _Ant_buffer_tx_check_status (run_address 0x00008028)
+0x000082d0                      F_Ant_buffer_tx_check_status_end (run_address 0x000082d0)
+0x000082d0        1152      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x000082d0        1152          _Ant_buffer_tx_apply_buffer (run_address 0x000082d0)
+0x00008750                      F_Ant_buffer_tx_apply_buffer_end (run_address 0x00008750)
+0x00008750        1232      Section: .text(.\source_shared\function_Ant_manage\Ant_Tx_Buffer_manager.eln)
+0x00008750        1232          _Ant_buffer_tx_write_complete (run_address 0x00008750)
+0x00008c20                      F_Ant_buffer_tx_write_complete_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(.\source_shared\eDMA\eDMA_la9310.eln)
+0x00008c20           0          _iEdmaInit (run_address 0x00008c20)
+0x00008c20                      F_iEdmaInit_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(.\source_shared\eDMA\eDMA_la9310.eln)
+0x00008c20           0          _iEdmaChanInit (run_address 0x00008c20)
+0x00008c20                      F_iEdmaChanInit_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(.\source_shared\eDMA\eDMA_la9310.eln)
+0x00008c20           0          _iEdmaXferReq (run_address 0x00008c20)
+0x00008c20                      F_iEdmaXferReq_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(.\source_shared\SINAD\sinad.eln)
+0x00008c20           0          _fr2_rx_bitrev_b1_b1 (run_address 0x00008c20)
+0x00008c20                      F_fr2_rx_bitrev_b1_b1_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(.\source_shared\SINAD\sinad.eln)
+0x00008c20           0          _fr2_rx_bitrev_b0_b1 (run_address 0x00008c20)
+0x00008c20                      F_fr2_rx_bitrev_b0_b1_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(.\source_shared\SINAD\sinad.eln)
+0x00008c20           0          _SINAD_test (run_address 0x00008c20)
+0x00008c20                      F_SINAD_test_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_to_fp16 (run_address 0x00008c20)
+0x00008c20                      F___f_to_fp16_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___fp16_to_f (run_address 0x00008c20)
+0x00008c20                      F___fp16_to_f_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_lt (run_address 0x00008c20)
+0x00008c20                      F___f_lt_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_to_fx16 (run_address 0x00008c20)
+0x00008c20                      F___f_to_fx16_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___fx16_to_f (run_address 0x00008c20)
+0x00008c20                      F___fx16_to_f_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_to_d (run_address 0x00008c20)
+0x00008c20                      F___f_to_d_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_to_i32 (run_address 0x00008c20)
+0x00008c20                      F___f_to_i32_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_to_u32 (run_address 0x00008c20)
+0x00008c20                      F___f_to_u32_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_eq (run_address 0x00008c20)
+0x00008c20                      F___f_eq_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_to_i64 (run_address 0x00008c20)
+0x00008c20                      F___f_to_i64_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_to_u64 (run_address 0x00008c20)
+0x00008c20                      F___f_to_u64_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___i32_to_f (run_address 0x00008c20)
+0x00008c20                      F___i32_to_f_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___u32_to_f (run_address 0x00008c20)
+0x00008c20                      F___u32_to_f_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___i64_to_f (run_address 0x00008c20)
+0x00008c20                      F___i64_to_f_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___u64_to_f (run_address 0x00008c20)
+0x00008c20                      F___u64_to_f_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_mul (run_address 0x00008c20)
+0x00008c20                      F___f_mul_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_div (run_address 0x00008c20)
+0x00008c20                      F___f_div_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_add (run_address 0x00008c20)
+0x00008c20                      F___f_add_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_sub (run_address 0x00008c20)
+0x00008c20                      F___f_sub_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_ne (run_address 0x00008c20)
+0x00008c20                      F___f_ne_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_le (run_address 0x00008c20)
+0x00008c20                      F___f_le_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_gt (run_address 0x00008c20)
+0x00008c20                      F___f_gt_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___f_ge (run_address 0x00008c20)
+0x00008c20                      F___f_ge_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_to_f (run_address 0x00008c20)
+0x00008c20                      F___d_to_f_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_to_i32 (run_address 0x00008c20)
+0x00008c20                      F___d_to_i32_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_to_u32 (run_address 0x00008c20)
+0x00008c20                      F___d_to_u32_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_to_i64 (run_address 0x00008c20)
+0x00008c20                      F___d_to_i64_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_to_u64 (run_address 0x00008c20)
+0x00008c20                      F___d_to_u64_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___i32_to_d (run_address 0x00008c20)
+0x00008c20                      F___i32_to_d_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___u32_to_d (run_address 0x00008c20)
+0x00008c20                      F___u32_to_d_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_sub (run_address 0x00008c20)
+0x00008c20                      F___d_sub_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___i64_to_d (run_address 0x00008c20)
+0x00008c20                      F___i64_to_d_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___u64_to_d (run_address 0x00008c20)
+0x00008c20                      F___u64_to_d_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_mul (run_address 0x00008c20)
+0x00008c20                      F___d_mul_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_div (run_address 0x00008c20)
+0x00008c20                      F___d_div_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_add (run_address 0x00008c20)
+0x00008c20                      F___d_add_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_eq (run_address 0x00008c20)
+0x00008c20                      F___d_eq_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_ne (run_address 0x00008c20)
+0x00008c20                      F___d_ne_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_lt (run_address 0x00008c20)
+0x00008c20                      F___d_lt_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_le (run_address 0x00008c20)
+0x00008c20                      F___d_le_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_gt (run_address 0x00008c20)
+0x00008c20                      F___d_gt_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          ___d_ge (run_address 0x00008c20)
+0x00008c20                      F___d_ge_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(fp_runtime.eln))
+0x00008c20           0          _fabs (run_address 0x00008c20)
+0x00008c20                      F_fabs_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_cmp.eln))
+0x00008c20           0          ___cmp64_eq (run_address 0x00008c20)
+0x00008c20                      F___cmp64_eq_end (run_address 0x00008c20)
+0x00008c20           0          ___cmp64_neq (run_address 0x00008c20)
+0x00008c20                      F___cmp64_neq_end (run_address 0x00008c20)
+0x00008c20           0          ___cmp64_ge (run_address 0x00008c20)
+0x00008c20                      F___cmp64_ge_end (run_address 0x00008c20)
+0x00008c20           0          ___cmp64_uge (run_address 0x00008c20)
+0x00008c20                      F___cmp64_uge_end (run_address 0x00008c20)
+0x00008c20           0          ___cmp64_ugt (run_address 0x00008c20)
+0x00008c20                      F___cmp64_ugt_end (run_address 0x00008c20)
+0x00008c20           0          ___cmp64_gt (run_address 0x00008c20)
+0x00008c20                      F___cmp64_gt_end (run_address 0x00008c20)
+0x00008c20           0      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(ll_shift.eln))
+0x00008c20           0          ___lshr64 (run_address 0x00008c20)
+0x00008c20                      F___lshr64_end (run_address 0x00008c20)
+0x00008c20           0          ___ashr64 (run_address 0x00008c20)
+0x00008c20                      F___ashr64_end (run_address 0x00008c20)
+0x00008c20           0          ___shl64 (run_address 0x00008c20)
+0x00008c20                      F___shl64_end (run_address 0x00008c20)
+0x00008c20         312      Section: .text(C:/Freescale/CW_VSPA_v10.3.6/VSPA/VSPA3_Tools\lib\vspa3\librt_gen_au16_sp.elb(staticinit.eln))
+0x00008c20         312          ___exec_staticinit (run_address 0x00008c20)
+0x00008d58                      F___exec_staticinit_end (run_address 0x00008d58)
+0x00008d58           0      Section: C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(decim2x.eln)(.text.rx_a)(C:/0_dsp/Projects_VSPA/DFE_Ref/lib/lib_DFE_Ref_vspa3.elb(decim2x.eln))
+0x00008d58           0          _decimator_2x_6_Taps_asm (run_address 0x00008d58)
+0x00008d58           0          _decimator_2x_8_Taps_asm (run_address 0x00008d58)
+0x00008d58           0          _decimator_4x_8_Taps_asm (run_address 0x00008d58)
+0x00008d58           0          _decimator_2x_NTaps_asm (run_address 0x00008d58)
+0x00008d58           0          _gen_decx2_NTaps_align_asm (run_address 0x00008d58)
 ;*********************************************************************************
 0x0001f800        2048  Section: memory_stack_and_heap (Segment: memory_stack_and_heap)
 ;*********************************************************************************
@@ -1976,9 +2075,9 @@
 0x00020088           0          _tx_bitrev_done (run_address 0x00020088)
 0x00020088           4      Section: .ibss(.\source_shared\global_var.eln)
 0x00020088           4          _tx_bitrev_progress_ippu (run_address 0x00020088)
-0x00020100       65536      Section: .ibss(.\source_shared\global_var.eln)
+0x00020100       65536      Section: .ibss(.\source_shared\main_pair_coreA.eln)
 0x00020100       65536          _ant_buf (run_address 0x00020100)
-0x00030100       32768      Section: .ibss(.\source_shared\global_var.eln)
+0x00030100       32768      Section: .ibss(.\source_shared\main_pair_coreA.eln)
 0x00030100       32768          _ant_buf0 (run_address 0x00030100)
 0x00038100           0      Section: .ibss1(.\source_shared\DFE_func_rx.eln)
 0x00038100           0          _sym_queue_rx (run_address 0x00038100)
