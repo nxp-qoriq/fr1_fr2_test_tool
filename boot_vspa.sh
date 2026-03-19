@@ -278,7 +278,7 @@ else
 		echo 1 > /sys/bus/pci/rescan
 		echo 8 > /proc/sys/kernel/printk
 		#tail -f /var/log/syslog &
-		boot_cmd="insmod $boot_tool scratch_buf_size=$mscratch_buf_size share_buf_size=$mshare_buf_size scratch_buf_phys_addr=$mscratch_buf_phys_addr $dcs_enable_arg $dcs1_enable_arg rf_data_size=$mrf_data_size rfic_disable=0 alt_firmware_name=$malt_firmware_name alt_vspa_fw_name_prefix=$malt_vspa_fw_name_prefix $mpci_addr_array"
+		boot_cmd="insmod $boot_tool scratch_buf_size=$mscratch_buf_size share_buf_size=$mshare_buf_size scratch_buf_phys_addr=$mscratch_buf_phys_addr $dcs_enable_arg $dcs1_enable_arg rf_data_size=$mrf_data_size alt_firmware_name=$malt_firmware_name alt_vspa_fw_name_prefix=$malt_vspa_fw_name_prefix $mpci_addr_array"
 		echo "$boot_cmd"
 		$boot_cmd
 		ret=$? 
