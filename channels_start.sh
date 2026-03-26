@@ -318,13 +318,13 @@ if [ $arg_dcsen != 0 ];then
 		[ $i = 4 ] && { txant_idx=4; rxant_idx=4; }
 		((DCSchan[i]=arg_dcs[i]))
 		if [ $((DCSchan[i]&BITMASK_ANT_ENABLE_TX)) -ne 0 ];then
-			((ant_map_tx[ant_order[txant_idx]]=i))
-			((ant_selected[ant_order[txant_idx]]=ant_selected[ant_order[txant_idx]] | $BITMASK_ANT_ENABLE_TX))
+			((ant_map_tx[${ant_order[txant_idx]}]=i))
+			((ant_selected[${ant_order[txant_idx]}]=ant_selected[${ant_order[txant_idx]}] | $BITMASK_ANT_ENABLE_TX))
 			((txant_idx++))
 		fi
 		if [ $((DCSchan[i]&BITMASK_ANT_ENABLE_RX)) -ne 0 ];then
-			((ant_map_rx[ant_order[rxant_idx]]=i))
-			((ant_selected[ant_order[rxant_idx]]=ant_selected[ant_order[rxant_idx]] | $BITMASK_ANT_ENABLE_RX))
+			((ant_map_rx[${ant_order[rxant_idx]}]=i))
+			((ant_selected[${ant_order[rxant_idx]}]=ant_selected[${ant_order[rxant_idx]}] | $BITMASK_ANT_ENABLE_RX))
 			((rxant_idx++))
 		fi
 		ant_remap=1
